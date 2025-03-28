@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Script Hub</title>
+    <title>Script-net</title>
+    <link rel="icon" type="image/png" href="images/ava.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -67,9 +68,27 @@
         @keyframes fadeIn {
             to { opacity: 1; }
         }
+        .header {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
         .main-section {
             flex: 4;
             padding: 20px;
+            padding-top: 60px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -360,7 +379,7 @@
             background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content pre {
+        .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre {
             width: 100%;
             margin: 10px 0;
             padding: 12px;
@@ -370,14 +389,15 @@
             border-radius: 10px;
             transition: all 0.5s ease;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-            resize: none;
+            resize: vertical;
+            overflow-x: hidden;
         }
-        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme, .modal-content pre.light-theme {
+        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme {
             background-color: #ddd;
             color: #333;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme, .fullscreen-content pre.space-theme, .modal-content pre.space-theme {
+        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme, .fullscreen-content pre.space-theme {
             background-color: #3b3b5e;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
@@ -516,6 +536,10 @@
 </head>
 <body>
     <div class="stars" id="stars"></div>
+    <div class="header">
+        <img src="images/ava.png" alt="Site Avatar">
+        <h1>Script-net</h1>
+    </div>
     <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
             <div class="search-container">
@@ -529,7 +553,7 @@
             <div class="script-list" id="scriptListContainer"></div>
         </div>
         <div class="sidebar">
-            <img src="https://placehold.co/80x80" class="avatar" id="userAvatar" alt="Аватар пользователя">
+            <img src="images/ava.png" class="avatar" id="userAvatar" alt="Аватар пользователя">
             <div class="user-name" id="userName"></div>
             <button class="tooltip" onclick="openModal()" id="submitButton">
                 <i class="fas fa-upload"></i> <span data-ru="Выложить работу" data-en="Submit work"></span>
@@ -572,13 +596,12 @@
             <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
             <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/gif" required>
             <small data-ru="Загрузите аватар скрипта (PNG, JPG, GIF)" data-en="Upload script avatar (PNG, JPG, GIF)"></small>
-            <input type="text" id="scriptName" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
+            <input type="text" id=" Ascendingly" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
             <small data-ru="Название (до 25 символов), например, 'Автокликер'" data-en="Name (up to 25 chars), e.g., 'Autoclicker'"></small>
             <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
             <small data-ru="Опишите, что делает скрипт" data-en="Describe what the script does"></small>
-            <textarea id="scriptCode" data-ru-placeholder="Код (макс 8000 строк)" data-en-placeholder="Code (max 8000 lines)" required oninput="updateCodePreview()"></textarea>
-            <small data-ru="Вставьте код (до 8000 строк)" data-en="Insert code (up to 8000 lines)"></small>
-            <pre id="codePreview">Превью кода (первые 10 строк):</pre>
+            <textarea id="scriptCode" data-ru-placeholder="Код (макс 10 строк)" data-en-placeholder="Code (max 10 lines)" required oninput="limitCodeLines()"></textarea>
+            <small data-ru="Вставьте код (до 10 строк)" data-en="Insert code (up to 10 lines)"></small>
             <p id="lineCount">Строк: 0</p>
             <input type="text" id="scriptTarget" data-ru-placeholder="Для чего код" data-en-placeholder="What the code is for" required>
             <small data-ru="Например, 'Roblox, фарм'" data-en="E.g., 'Roblox, farming'"></small>
@@ -603,7 +626,6 @@
             <div class="rating">
                 <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
                 <button class="dislike-btn" id="fullDislikeBtn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
-                <button class="delete-btn" id="deleteBtn" style="display: none;"><i class="fas fa-trash"></i> Удалить</button>
                 <button class="admin-delete-btn" id="adminDeleteBtn" style="display: none;"><i class="fas fa-trash"></i> Удалить (Админ)</button>
             </div>
         </div>
@@ -719,7 +741,7 @@
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('historyButton').style.display = 'none';
-                document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
+                document.getElementById('userAvatar').src = 'images/ava.png';
                 document.getElementById('userName').textContent = '';
                 createRipple(event);
                 loadScripts();
@@ -743,7 +765,7 @@
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('historyButton').style.display = 'none';
-                document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
+                document.getElementById('userAvatar').src = 'images/ava.png';
                 document.getElementById('userName').textContent = '';
                 loadScripts();
             }
@@ -757,18 +779,18 @@
             localStorage.setItem('username', username);
             localStorage.setItem('userId', userId);
             localStorage.setItem('userEmail', userEmail);
-            localStorage.setItem('userPicture', user.photoURL || 'https://placehold.co/80x80');
+            localStorage.setItem('userPicture', user.photoURL || 'images/ava.png');
             database.ref('users/' + userId).set({
                 username: username,
                 email: userEmail,
-                picture: user.photoURL || 'https://placehold.co/80x80',
+                picture: user.photoURL || 'images/ava.png',
                 theme: currentTheme,
                 language: currentLanguage
             });
             document.getElementById('signInButton').style.display = 'none';
             document.getElementById('signOutButton').style.display = 'block';
             document.getElementById('submitButton').style.display = 'block';
-            document.getElementById('userAvatar').src = user.photoURL || 'https://placehold.co/80x80';
+            document.getElementById('userAvatar').src = user.photoURL || 'images/ava.png';
             document.getElementById('userName').textContent = username;
             loadUserScripts();
             loadScripts();
@@ -826,7 +848,7 @@
         function updateThemeClasses() {
             const isLight = document.body.classList.contains('light-theme');
             const isSpace = document.body.classList.contains('space-theme');
-            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small').forEach(el => {
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small').forEach(el => {
                 el.classList.remove('light-theme', 'space-theme');
                 if (isLight) el.classList.add('light-theme');
                 if (isSpace) el.classList.add('space-theme');
@@ -859,7 +881,6 @@
             document.getElementById('fullCode').textContent = script.code || 'Код отсутствует';
             const likeBtn = document.getElementById('fullLikeBtn');
             const dislikeBtn = document.getElementById('fullDislikeBtn');
-            const deleteBtn = document.getElementById('deleteBtn');
             const adminDeleteBtn = document.getElementById('adminDeleteBtn');
             likeBtn.querySelector('.like-count').textContent = script.likes || 0;
             dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes || 0;
@@ -867,12 +888,6 @@
             dislikeBtn.classList.toggle('disliked', script.userRatings && script.userRatings[userId] === 'dislike');
             likeBtn.onclick = () => rateScript(index, 'like', null);
             dislikeBtn.onclick = () => rateScript(index, 'dislike', null);
-            if (script.userId === userId) {
-                deleteBtn.style.display = 'block';
-                deleteBtn.onclick = () => deleteScript(index);
-            } else {
-                deleteBtn.style.display = 'none';
-            }
             if (userEmail === 'kt0r2023@gmail.com') {
                 adminDeleteBtn.style.display = 'block';
                 adminDeleteBtn.onclick = () => adminDeleteScript(index);
@@ -931,16 +946,14 @@
             document.getElementById('historyModal').style.display = 'none';
         }
 
-        function updateCodePreview() {
+        function limitCodeLines() {
             const code = document.getElementById('scriptCode').value;
-            const lines = code.split('\n').slice(0, 10).join('\n');
-            document.getElementById('codePreview').textContent = `Превью кода (первые 10 строк):\n${lines}`;
-            const lineCount = code.split('\n').length;
-            document.getElementById('lineCount').textContent = `Строк: ${lineCount}`;
-            if (lineCount > 8000) {
-                document.getElementById('scriptCode').value = code.split('\n').slice(0, 8000).join('\n');
-                alert(currentLanguage === 'ru' ? 'Превышен лимит в 8000 строк!' : 'Exceeded 8000 line limit!');
+            const lines = code.split('\n');
+            if (lines.length > 10) {
+                document.getElementById('scriptCode').value = lines.slice(0, 10).join('\n');
             }
+            const lineCount = document.getElementById('scriptCode').value.split('\n').length;
+            document.getElementById('lineCount').textContent = `Строк: ${lineCount}`;
         }
 
         function submitScript() {
@@ -975,7 +988,6 @@
                 document.getElementById('scriptCode').value = '';
                 document.getElementById('scriptTarget').value = '';
                 document.getElementById('hasKey').checked = false;
-                document.getElementById('codePreview').textContent = 'Превью кода (первые 10 строк):';
                 document.getElementById('lineCount').textContent = 'Строк: 0';
                 closeModal();
             };
@@ -987,17 +999,8 @@
             const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
             const chatId = '5180010738';
             const firstTenLines = script.code.split('\n').slice(0, 10).join('\n');
-            const message = `
-Новая работа:
-Название: ${script.name}
-Автор: ${script.user}
-Описание: ${script.desc}
-Цель: ${script.target}
-Ключ: ${script.hasKey ? 'Есть' : 'Нет'}
-Первые 10 строк кода:
-${firstTenLines}
-Аватар: ${script.avatar}
-            `;
+            const message = `Новая работа:\nНазвание: ${script.name}\nАвтор: ${script.user}\nОписание: ${script.desc}\nЦель: ${script.target}\nКлюч: ${script.hasKey ? 'Есть' : 'Нет'}\nКод:\n${firstTenLines}`;
+            
             const url = `https://api.telegram.org/bot${token}/sendMessage`;
             const params = {
                 chat_id: chatId,
@@ -1011,11 +1014,28 @@ ${firstTenLines}
                     ]
                 })
             };
+
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(params)
-            }).catch(error => console.error('Error sending to Telegram:', error));
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.ok) {
+                    console.error('Telegram API error:', data);
+                    alert(currentLanguage === 'ru' ? 'Ошибка отправки в Telegram: ' + data.description : 'Error sending to Telegram: ' + data.description);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending to Telegram:', error);
+                alert(currentLanguage === 'ru' ? 'Ошибка отправки в Telegram: ' + error.message : 'Error sending to Telegram: ' + error.message);
+            });
         }
 
         function handleTelegramCallback(callbackData) {
@@ -1066,35 +1086,50 @@ ${firstTenLines}
             document.getElementById('sadNotification').style.display = 'flex';
         }
 
-        function deleteScript(index) {
-            const script = scripts[index];
-            if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить этот скрипт?' : 'Are you sure you want to delete this script?')) {
-                database.ref('scripts/' + script.id).remove();
-                database.ref('userScripts/' + userId + '/' + script.id).remove();
-                closeFullscreen();
-                loadScripts();
-            }
-        }
-
         function adminDeleteScript(index) {
             const script = scripts[index];
             if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить этот скрипт? (Админ)' : 'Are you sure you want to delete this script? (Admin)')) {
-                database.ref('scripts/' + script.id).remove();
-                if (script.userId) {
-                    database.ref('userScripts/' + script.userId + '/' + script.id).remove();
-                }
-                closeFullscreen();
-                loadScripts();
+                database.ref('scripts/' + script.id).remove()
+                    .then(() => {
+                        if (script.userId) {
+                            database.ref('userScripts/' + script.userId + '/' + script.id).remove()
+                                .then(() => {
+                                    closeFullscreen();
+                                    loadScripts();
+                                    loadUserScripts();
+                                })
+                                .catch(error => {
+                                    console.error("Error removing from userScripts:", error);
+                                });
+                        } else {
+                            closeFullscreen();
+                            loadScripts();
+                            loadUserScripts();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error removing from scripts:", error);
+                    });
             }
         }
 
         function deleteUserScript(scriptId, event) {
             event.stopPropagation();
             if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить эту работу?' : 'Are you sure you want to delete this submission?')) {
-                database.ref('scripts/' + scriptId).remove();
-                database.ref('userScripts/' + userId + '/' + scriptId).remove();
-                loadUserScripts();
-                loadScripts();
+                database.ref('scripts/' + scriptId).remove()
+                    .then(() => {
+                        database.ref('userScripts/' + userId + '/' + scriptId).remove()
+                            .then(() => {
+                                loadUserScripts();
+                                loadScripts();
+                            })
+                            .catch(error => {
+                                console.error("Error removing from userScripts:", error);
+                            });
+                    })
+                    .catch(error => {
+                        console.error("Error removing from scripts:", error);
+                    });
             }
         }
 
@@ -1178,6 +1213,7 @@ ${firstTenLines}
                 } else {
                     document.getElementById('historyButton').style.display = 'none';
                 }
+                openHistory();
             }, (error) => {
                 console.error("Error loading user scripts from Firebase:", error);
             });
@@ -1229,7 +1265,9 @@ ${firstTenLines}
                 if (filterType === 'script') {
                     return (script.name || '').toLowerCase().includes(searchValue);
                 } else {
-                    return (script.user || '').toLowerCase().includes(searchValue);
+                    return (script.user || '').toLowerCase().includes(searchValue
+
+);
                 }
             });
             renderScripts(filteredScripts);

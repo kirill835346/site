@@ -43,6 +43,7 @@
             height: 100%;
             pointer-events: none;
             display: none;
+            z-index: 0; /* Устанавливаем низкий z-index, чтобы звёзды были на заднем плане */
         }
         body.space-theme .stars {
             display: block;
@@ -63,6 +64,8 @@
             height: 100vh;
             opacity: 0;
             animation: fadeIn 1s ease forwards;
+            position: relative;
+            z-index: 1; /* Контейнер выше звёзд */
         }
         @keyframes fadeIn {
             to { opacity: 1; }
@@ -85,6 +88,7 @@
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
             transition: background 0.5s ease;
             position: relative;
+            z-index: 1; /* Сайдбар выше звёзд */
         }
         .sidebar.light-theme {
             background: linear-gradient(180deg, #f0f0f0, #e0e0e0);
@@ -320,6 +324,7 @@
             justify-content: center;
             align-items: center;
             animation: fadeInModal 0.5s ease;
+            z-index: 1000; /* Модальные окна выше всего */
         }
         @keyframes fadeInModal {
             from { opacity: 0; }
@@ -418,7 +423,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            z-index: 1001; /* Уведомление выше модальных окон */
             opacity: 0;
             transition: opacity 0.5s ease;
         }
@@ -770,7 +775,9 @@
 
         function openFullscreen(index) {
             const script = scripts[index];
-            document.getElementById('fullAvatar').src = script.avatar || 'https://placehold.co/200x150';
+            const fullAvatar = document.getElementById('fullAvatar');
+            fullAvatar.src = script.avatar || 'https://placehold.co/200x150';
+            fullAvatar.onerror = () => { fullAvatar.src = 'https://placehold.co/200x150'; };
             document.getElementById('fullName').textContent = script.name || 'Без названия';
             document.getElementById('fullUser').textContent = script.user || 'Аноним';
             document.getElementById('fullDesc').textContent = script.desc || 'Нет описания';
@@ -812,13 +819,19 @@
             userScripts.forEach((script, index) => {
                 const card = document.createElement('div');
                 card.className = 'script-card';
-                card.innerHTML = `
-                    <img src="${script.avatar || 'https://placehold.co/200x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
-                    <div class="script-info">
-                        <h3>${script.name || 'Без названия'}</h3>
-                        <div class="username">${script.user || 'Аноним'}</div>
-                    </div>
+                const img = document.createElement('img');
+                img.className = 'script-avatar';
+                img.alt = script.name || 'Без названия';
+                img.src = script.avatar || 'https://placehold.co/200x150';
+                img.onerror = () => { img.src = 'https://placehold.co/200x150'; };
+                const info = document.createElement('div');
+                info.className = 'script-info';
+                info.innerHTML = `
+                    <h3>${script.name || 'Без названия'}</h3>
+                    <div class="username">${script.user || 'Аноним'}</div>
                 `;
+                card.appendChild(img);
+                card.appendChild(info);
                 card.onclick = () => {
                     closeHistory();
                     openFullscreen(scripts.findIndex(s => s.name === script.name && s.user === script.user));
@@ -959,21 +972,35 @@
             filteredScripts.forEach((script, index) => {
                 const card = document.createElement('div');
                 card.className = 'script-card';
-                card.innerHTML = `
-                    <img src="${script.avatar || 'https://placehold.co/200x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
-                    <div class="script-info">
-                        <h3>${script.name || 'Без названия'}</h3>
-                        <div class="username">${script.user || 'Аноним'}</div>
-                        <div class="rating">
-                            <button class="like-btn ${script.userRatings && script.userRatings[userId] === 'like' ? 'liked' : ''}" onclick="rateScript(${index}, 'like', event)">
-                                <i class="fas fa-thumbs-up"></i> <span class="like-count">${script.likes || 0}</span>
-                            </button>
-                            <button class="dislike-btn ${script.userRatings && script.userRatings[userId] === 'dislike' ? 'disliked' : ''}" onclick="rateScript(${index}, 'dislike', event)">
-                                <i class="fas fa-thumbs-down"></i> <span class="dislike-count">${script.dislikes || 0}</span>
-                            </button>
-                        </div>
+                const img = document.createElement('img');
+                img.className = 'script-avatar';
+                img.alt = script.name || 'Без названия';
+                img.src = script.avatar || 'https://placehold.co/200x150';
+                img.onerror = () => { img.src = 'https://placehold.co/200x150'; };
+                const info = document.createElement('div');
+                info.className = 'script-info';
+                info.innerHTML = `
+                    <h3>${script.name || 'Без названия'}</h3>
+                    <div class="username">${script.user || 'Аноним'}</div>
+                    <div class="rating">
+                        <button class="like-btn ${script.userRatings && script.userRatings[userId] === 'like' ? 'liked' : ''}">
+                            <i class="fas fa-thumbs-up"></i> <span class="like-count">${script.likes || 0}</span>
+                        </button>
+                        <button class="dislike-btn ${script.userRatings && script.userRatings[userId] === 'dislike' ? 'disliked' : ''}">
+                            <i class="fas fa-thumbs-down"></i> <span class="dislike-count">${script.dislikes || 0}</span>
+                        </button>
                     </div>
                 `;
+                info.querySelector('.like-btn').onclick = (event) => {
+                    event.stopPropagation();
+                    rateScript(index, 'like', event);
+                };
+                info.querySelector('.dislike-btn').onclick = (event) => {
+                    event.stopPropagation();
+                    rateScript(index, 'dislike', event);
+                };
+                card.appendChild(img);
+                card.appendChild(info);
                 card.onclick = (e) => {
                     if (!e.target.closest('.rating')) openFullscreen(index);
                 };

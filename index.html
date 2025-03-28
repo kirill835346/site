@@ -158,6 +158,7 @@
             max-height: 85vh;
             overflow-y: auto;
             transition: background 0.5s ease;
+            position: relative;
         }
         .modal-content.light-theme, .fullscreen-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
@@ -187,6 +188,23 @@
         .modal-content small.light-theme {
             color: #555;
         }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #ff4d4d, #ff6666);
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .close-btn:hover {
+            background: linear-gradient(45deg, #ff6666, #ff8787);
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 <body>
@@ -195,7 +213,7 @@
             <input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">
         </div>
         <div class="sidebar">
-            <img src="images/Avatar.png" class="avatar" alt="Аватар пользователя" onerror="this.src='https://via.placeholder.com/80';">
+            <img src="images/avatar.png" class="avatar" alt="Аватар пользователя" onerror="this.src='https://via.placeholder.com/80';">
             <button onclick="openModal()"><i class="fas fa-upload"></i> <span data-ru="Отправить работу" data-en="Submit work"></span></button>
             <button onclick="window.location.href='/site/bypasser.html'"><i class="fas fa-shield-alt"></i> <span data-ru="Обходники" data-en="Bypassers"></span></button>
             <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
@@ -205,6 +223,7 @@
 
     <div class="modal" id="submitModal">
         <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
             <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
             <input type="file" id="avatarInput" accept="image/*" required>
             <small data-ru="Загрузите аватар скрипта" data-en="Upload script avatar"></small>
@@ -236,169 +255,10 @@
     </div>
 
     <script>
-        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // Замени на свой токен
-        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID'; // Замени на свой chat_id
+        const TELEGRAM_BOT_TOKEN = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE'; // Замени на свой токен
+        const TELEGRAM_CHAT_ID = '5180010738'; // Замени на свой chat_id
         let scripts = [];
         let username = localStorage.getItem('username') || null;
         let currentLanguage = 'ru';
 
-        async function loadScripts() {
-            const list = document.getElementById('scriptList');
-            list.innerHTML = '<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">';
-            scripts.forEach((script, index) => {
-                const card = document.createElement('div');
-                card.className = 'script-card';
-                card.dataset.index = index;
-                card.onclick = () => openFullscreen(script);
-                card.innerHTML = `
-                    <img src="${script.avatar}" class="script-avatar" alt="Аватар скрипта">
-                    <div class="script-info">
-                        <h3>${script.name}</h3>
-                        <div class="username">${script.user}</div>
-                    </div>
-                    ${script.hasKey ? '<div class="key-message"><i class="fas fa-key"></i> ' + (currentLanguage === 'ru' ? 'Ключ' : 'Key') + '</div>' : ''}
-                `;
-                list.appendChild(card);
-            });
-            updateLanguage();
-        }
-
-        function openModal() {
-            document.getElementById('submitModal').style.display = 'flex';
-            if (username) {
-                document.getElementById('userName').value = username;
-                document.getElementById('userName').disabled = true;
-            }
-            updateLanguage();
-        }
-
-        function checkCodeLength() {
-            const code = document.getElementById('scriptCode').value;
-            const lines = code.split('\n').length;
-            document.getElementById('lineCount').textContent = currentLanguage === 'ru' ? `Строк: ${lines}` : `Lines: ${lines}`;
-            if (lines > 8000) {
-                alert(currentLanguage === 'ru' ? 'Код превышает 8000 строк!' : 'Code exceeds 8000 lines!');
-                document.getElementById('scriptCode').value = code.split('\n').slice(0, 8000).join('\n');
-            }
-        }
-
-        async function submitScript() {
-            const avatar = document.getElementById('avatarInput').files[0];
-            const name = document.getElementById('scriptName').value;
-            const desc = document.getElementById('scriptDesc').value;
-            const code = document.getElementById('scriptCode').value;
-            const target = document.getElementById('scriptTarget').value;
-            const user = document.getElementById('userName').value;
-
-            if (!avatar || !name || !desc || !code || !target || !user) {
-                alert(currentLanguage === 'ru' ? 'Заполните все поля!' : 'Fill all fields!');
-                return;
-            }
-
-            if (!username) {
-                username = user;
-                localStorage.setItem('username', username);
-            }
-
-            const reader = new FileReader();
-            reader.onload = async function() {
-                const base64Image = reader.result.split(',')[1];
-                const newScript = {
-                    id: Date.now().toString(),
-                    avatar: `data:image/jpeg;base64,${base64Image}`,
-                    name: name,
-                    desc: desc,
-                    code: code,
-                    target: target,
-                    user: user,
-                    hasKey: false
-                };
-
-                const message = `
-                    Новый скрипт:
-                    Название: ${name}
-                    Описание: ${desc}
-                    Код: ${code}
-                    Цель: ${target}
-                    Автор: ${user}
-                    Аватар: <файл>
-                `;
-                const formData = new FormData();
-                formData.append('chat_id', TELEGRAM_CHAT_ID);
-                formData.append('text', message);
-                formData.append('photo', avatar);
-
-                try {
-                    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    if (response.ok) {
-                        scripts.push(newScript);
-                        loadScripts();
-                        document.getElementById('submitModal').style.display = 'none';
-                        alert(currentLanguage === 'ru' ? 'Скрипт отправлен!' : 'Script submitted!');
-                    } else {
-                        throw new Error('Ошибка отправки');
-                    }
-                } catch (error) {
-                    console.error('Ошибка:', error);
-                    alert(currentLanguage === 'ru' ? 'Ошибка отправки!' : 'Submission failed!');
-                }
-            };
-            reader.readAsDataURL(avatar);
-        }
-
-        function openFullscreen(script) {
-            const window = document.getElementById('fullscreenWindow');
-            const content = document.getElementById('fullscreenContent');
-            document.getElementById('fullAvatar').src = script.avatar;
-            document.getElementById('fullName').textContent = script.name;
-            document.getElementById('fullUser').textContent = script.user;
-            document.getElementById('fullDesc').textContent = `${currentLanguage === 'ru' ? 'Описание:' : 'Description:'} ${script.desc}`;
-            document.getElementById('fullTarget').textContent = `${currentLanguage === 'ru' ? 'Цель:' : 'Target:'} ${script.target}`;
-            document.getElementById('fullCode').textContent = script.code;
-            window.style.display = 'flex';
-        }
-
-        function closeFullscreen() {
-            document.getElementById('fullscreenWindow').style.display = 'none';
-        }
-
-        function searchScripts() {
-            const query = document.getElementById('searchField').value.toLowerCase();
-            document.querySelectorAll('.script-card').forEach(card => {
-                const name = card.querySelector('h3').textContent.toLowerCase();
-                card.style.display = name.includes(query) ? 'block' : 'none';
-            });
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('light-theme');
-            document.querySelectorAll('.sidebar, .search, .script-card, .script-info, .username, .modal-content, .modal-content input, .modal-content textarea, .modal-content small, .fullscreen-content').forEach(el => el.classList.toggle('light-theme'));
-            const toggle = document.querySelector('.theme-toggle');
-            toggle.innerHTML = document.body.classList.contains('light-theme') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        }
-
-        function toggleLanguage() {
-            currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
-            updateLanguage();
-        }
-
-        function updateLanguage() {
-            document.querySelectorAll('[data-ru]').forEach(el => {
-                const key = currentLanguage === 'ru' ? 'data-ru' : 'data-en';
-                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                    el.placeholder = el.getAttribute(key);
-                } else {
-                    el.textContent = el.getAttribute(key);
-                }
-            });
-        }
-
-        window.onload = () => {
-            loadScripts();
-        };
-    </script>
-</body>
-</html>
+        async function

@@ -432,35 +432,11 @@
         .flash {
             animation: flash 0.5s ease 2;
         }
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: var(--background-color);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1001;
-        }
-        .loading i {
-            font-size: 40px;
-            color: var(--primary-color);
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
-    <div class="loading" id="loading">
-        <i class="fas fa-spinner"></i>
-    </div>
     <div class="stars" id="stars"></div>
-    <div class="container" id="mainContainer" style="display: none;">
+    <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
             <div class="search-container">
                 <i class="fas fa-search"></i>
@@ -686,8 +662,6 @@
 
         // Проверка состояния авторизации
         auth.onAuthStateChanged(user => {
-            const loading = document.getElementById('loading');
-            const mainContainer = document.getElementById('mainContainer');
             if (user) {
                 updateUI(user);
             } else {
@@ -703,8 +677,6 @@
                 document.getElementById('userName').textContent = '';
                 loadScripts();
             }
-            loading.style.display = 'none';
-            mainContainer.style.display = 'flex';
             isAuthChecked = true;
         });
 
@@ -798,18 +770,18 @@
 
         function openFullscreen(index) {
             const script = scripts[index];
-            document.getElementById('fullAvatar').src = script.avatar;
-            document.getElementById('fullName').textContent = script.name;
-            document.getElementById('fullUser').textContent = script.user;
-            document.getElementById('fullDesc').textContent = script.desc;
-            document.getElementById('fullTarget').textContent = `Target: ${script.target}`;
-            document.getElementById('fullCode').textContent = script.code;
+            document.getElementById('fullAvatar').src = script.avatar || 'https://placehold.co/200x150';
+            document.getElementById('fullName').textContent = script.name || 'Без названия';
+            document.getElementById('fullUser').textContent = script.user || 'Аноним';
+            document.getElementById('fullDesc').textContent = script.desc || 'Нет описания';
+            document.getElementById('fullTarget').textContent = `Target: ${script.target || 'Не указано'}`;
+            document.getElementById('fullCode').textContent = script.code || 'Код отсутствует';
             const likeBtn = document.getElementById('fullLikeBtn');
             const dislikeBtn = document.getElementById('fullDislikeBtn');
-            likeBtn.querySelector('.like-count').textContent = script.likes;
-            dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes;
-            likeBtn.classList.toggle('liked', script.userRatings[userId] === 'like');
-            dislikeBtn.classList.toggle('disliked', script.userRatings[userId] === 'dislike');
+            likeBtn.querySelector('.like-count').textContent = script.likes || 0;
+            dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes || 0;
+            likeBtn.classList.toggle('liked', script.userRatings && script.userRatings[userId] === 'like');
+            dislikeBtn.classList.toggle('disliked', script.userRatings && script.userRatings[userId] === 'dislike');
             likeBtn.onclick = () => rateScript(index, 'like', null);
             dislikeBtn.onclick = () => rateScript(index, 'dislike', null);
             document.getElementById('fullscreenWindow').style.display = 'flex';
@@ -841,10 +813,10 @@
                 const card = document.createElement('div');
                 card.className = 'script-card';
                 card.innerHTML = `
-                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://placehold.co/200x150';">
+                    <img src="${script.avatar || 'https://placehold.co/200x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
                     <div class="script-info">
-                        <h3>${script.name}</h3>
-                        <div class="username">${script.user}</div>
+                        <h3>${script.name || 'Без названия'}</h3>
+                        <div class="username">${script.user || 'Аноним'}</div>
                     </div>
                 `;
                 card.onclick = () => {
@@ -988,16 +960,16 @@
                 const card = document.createElement('div');
                 card.className = 'script-card';
                 card.innerHTML = `
-                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://placehold.co/200x150';">
+                    <img src="${script.avatar || 'https://placehold.co/200x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
                     <div class="script-info">
-                        <h3>${script.name}</h3>
-                        <div class="username">${script.user}</div>
+                        <h3>${script.name || 'Без названия'}</h3>
+                        <div class="username">${script.user || 'Аноним'}</div>
                         <div class="rating">
-                            <button class="like-btn ${script.userRatings[userId] === 'like' ? 'liked' : ''}" onclick="rateScript(${index}, 'like', event)">
-                                <i class="fas fa-thumbs-up"></i> <span class="like-count">${script.likes}</span>
+                            <button class="like-btn ${script.userRatings && script.userRatings[userId] === 'like' ? 'liked' : ''}" onclick="rateScript(${index}, 'like', event)">
+                                <i class="fas fa-thumbs-up"></i> <span class="like-count">${script.likes || 0}</span>
                             </button>
-                            <button class="dislike-btn ${script.userRatings[userId] === 'dislike' ? 'disliked' : ''}" onclick="rateScript(${index}, 'dislike', event)">
-                                <i class="fas fa-thumbs-down"></i> <span class="dislike-count">${script.dislikes}</span>
+                            <button class="dislike-btn ${script.userRatings && script.userRatings[userId] === 'dislike' ? 'disliked' : ''}" onclick="rateScript(${index}, 'dislike', event)">
+                                <i class="fas fa-thumbs-down"></i> <span class="dislike-count">${script.dislikes || 0}</span>
                             </button>
                         </div>
                     </div>
@@ -1015,9 +987,9 @@
             const filterType = document.getElementById('filterSelect').value;
             const filteredScripts = scripts.filter(script => {
                 if (filterType === 'script') {
-                    return script.name.toLowerCase().includes(searchValue);
+                    return (script.name || '').toLowerCase().includes(searchValue);
                 } else {
-                    return script.user.toLowerCase().includes(searchValue);
+                    return (script.user || '').toLowerCase().includes(searchValue);
                 }
             });
             renderScripts(filteredScripts);
@@ -1078,6 +1050,7 @@
         createStars();
         updateLanguage();
         changeTheme();
+        loadScripts();
     </script>
 </body>
 </html>

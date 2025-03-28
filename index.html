@@ -156,6 +156,9 @@
             font-size: 16px;
             font-weight: 500;
             transition: transform 0.2s, box-shadow 0.3s, background 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .боковая-панель button:hover {
             transform: scale(1.05);
@@ -1264,11 +1267,24 @@
         <!-- Боковая панель -->
         <div class="боковая-панель">
             <img src="images/Avatar.png" class="аватар" alt="Аватар пользователя">
-            <button onclick="открытьМодальное()"><i class="fas fa-upload иконка"></i> <span data-ru="Отправить свою работу" data-en="Submit your work"></span></button>
-            <button onclick="показатьУведомление()"><i class="fas fa-key иконка"></i> <span data-ru="Получить ключ" data-en="Get key"></span></button>
-            <button class="переключатель-темы" onclick="переключитьТему()"><i class="fas fa-moon"></i></button>
-            <button class="переключатель-языка" onclick="переключитьЯзык()"><i class="fas fa-globe"></i></button>
-            <button onclick="navigateToBypass()"><i class="fas fa-key иконка"></i> <span data-ru="Обход" data-en="Bypass"></span></button>
+            <button onclick="открытьМодальное()">
+                <i class="fas fa-upload иконка"></i>
+                <span data-ru="Отправить свою работу" data-en="Submit your work"></span>
+            </button>
+            <button onclick="показатьУведомление()">
+                <i class="fas fa-key иконка"></i>
+                <span data-ru="Получить ключ" data-en="Get key"></span>
+            </button>
+            <button class="переключатель-темы" onclick="переключитьТему()">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="переключатель-языка" onclick="переключитьЯзык()">
+                <i class="fas fa-globe"></i>
+            </button>
+            <button onclick="navigateToBypass()">
+                <i class="fas fa-key иконка"></i>
+                <span data-ru="Обход" data-en="Bypass"></span>
+            </button>
         </div>
     </div>
 
@@ -1317,6 +1333,8 @@
             <div class="сообщение-ключа-полноэкранное" id="полноэкранныйСтатусКлюча"></div>
         </div>
     </div>
+
+    <div class="notification" id="notification"></div>
 
     <script>
         const REPO_OWNER = 'kirill835346';
@@ -1409,6 +1427,93 @@
             обновитьЯзык();
         }
 
+        function показатьУведомление() {
+            const уведомление = document.getElementById('уведомление');
+            уведомление.style.display = 'block';
+            setTimeout(() => {
+                уведомление.style.display = 'none';
+            }, 3000);
+        }
+
+        function переключитьТему() {
+            document.body.classList.toggle('светлый-режим');
+            document.querySelector('.боковая-панель').classList.toggle('светлый-режим');
+            document.querySelectorAll('.поиск').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.карточка-скрипта').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.инфо-скрипта').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.имя-юзера').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.переключатель-темы').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.переключатель-языка').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            const модальное = document.querySelector('.содержимое-модального');
+            if (модальное) модальное.classList.toggle('светлый-режим');
+            document.querySelectorAll('.содержимое-модального input, .содержимое-модального textarea').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.содержимое-модального small').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.метка-галочки').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            const полноэкранное = document.querySelector('.содержимое-полноэкранного');
+            if (полноэкранное) полноэкранное.classList.toggle('светлый-режим');
+            document.querySelectorAll('.полноэкранное-окно .имя-юзера').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.полноэкранное-окно pre').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+            document.querySelectorAll('.крестик').forEach(элемент => элемент.classList.toggle('светлый-режим'));
+        }
+
+        function переключитьЯзык() {
+            текущийЯзык = текущийЯзык === 'ru' ? 'en' : 'ru';
+            обновитьЯзык();
+        }
+
+        function обновитьЯзык() {
+            document.querySelectorAll('[data-ru]').forEach(элемент => {
+                const текст = элемент.getAttribute(`data-${текущийЯзык}`);
+                if (текст) {
+                    if (элемент.tagName === 'INPUT' || элемент.tagName === 'TEXTAREA') {
+                        элемент.placeholder = текст;
+                    } else {
+                        элемент.textContent = текст;
+                    }
+                }
+            });
+            document.querySelectorAll('[data-ru-placeholder]').forEach(элемент => {
+                const текст = элемент.getAttribute(`data-${текущийЯзык}-placeholder`);
+                if (текст) {
+                    элемент.placeholder = текст;
+                }
+            });
+            document.querySelectorAll('.сообщение-ключа').forEach(элемент => {
+                if (элемент.querySelector('.иконка-ключа')) {
+                    элемент.innerHTML = `<i class="fas fa-key иконка-ключа"></i>${текущийЯзык === 'ru' ? 'Ключ доступа' : 'Access Key'}`;
+                }
+            });
+            const текстГалочки = document.querySelector('.текст-галочки');
+            if (текстГалочки) {
+                текстГалочки.textContent = document.getElementById('естьКлюч').checked
+                    ? (текущийЯзык === 'ru' ? 'Есть ключ' : 'Has key')
+                    : (текущийЯзык === 'ru' ? 'Нет ключа' : 'No key');
+            }
+            document.getElementById('счётчикСтрок').textContent = `${текущийЯзык === 'ru' ? 'Строк' : 'Lines'}: ${document.getElementById('кодСкрипта') ? document.getElementById('кодСкрипта').value.split('\n').length : 0}`;
+        }
+
+        async function определитьЯзыкПоIP() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                текущийЯзык = data.country_code === 'RU' ? 'ru' : 'en';
+                обновитьЯзык();
+            } catch (err) {
+                console.error('Ошибка определения языка:', err);
+                текущийЯзык = 'ru';
+                обновитьЯзык();
+            }
+        }
+
+        function поискСкриптов() {
+            const запрос = document.getElementById('полеПоиска').value.toLowerCase();
+            const карточки = document.querySelectorAll('.карточка-скрипта');
+            карточки.forEach(карточка => {
+                const название = карточка.querySelector('h3').textContent.toLowerCase();
+                карточка.style.display = название.includes(запрос) ? 'inline-block' : 'none';
+            });
+        }
+
         function проверитьДлинуКода() {
             const код = document.getElementById('кодСкрипта').value;
             const строк = код.split('\n').length;
@@ -1436,76 +1541,4 @@
             const название = document.getElementById('названиеСкрипта').value;
             const описание = document.getElementById('описаниеСкрипта').value;
             const код = document.getElementById('кодСкрипта').value;
-            const цель = document.getElementById('цельСкрипта').value;
-            const имя = document.getElementById('имяПользователя').value;
-            const естьКлюч = document.getElementById('естьКлюч').checked;
-
-            if (!аватар || !название || !описание || !код || !цель || !имя) {
-                alert(текущийЯзык === 'ru' ? 'Заполните все поля!' : 'Please fill all fields!');
-                return;
-            }
-
-            if (!имяПользователя) {
-                имяПользователя = имя;
-                localStorage.setItem('имяПользователя', имяПользователя);
-            }
-
-            try {
-                const reader = new FileReader();
-                reader.onload = async function() {
-                    const base64Image = reader.result.split(',')[1];
-                    const avatarFilename = `${Date.now()}_avatar.jpg`;
-                    const avatarUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${IMAGES_PATH}/${avatarFilename}`;
-
-                    const newScript = {
-                        id: Date.now().toString(),
-                        аватар: avatarUrl,
-                        название: название,
-                        описание: описание,
-                        код: код,
-                        цель: цель,
-                        пользователь: имя,
-                        естьКлюч: естьКлюч,
-                        avatar: base64Image
-                    };
-
-                    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${DISPATCH_TOKEN}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        },
-                        body: JSON.stringify({
-                            event_type: 'update-scripts',
-                            client_payload: {
-                                script: JSON.stringify(newScript)
-                            }
-                        })
-                    });
-
-                    if (response.ok) {
-                        alert(текущийЯзык === 'ru' ? 'Скрипт отправлен! Обновите страницу через несколько секунд.' : 'Script submitted! Refresh the page in a few seconds.');
-                        очиститьФорму();
-                        document.getElementById('модальноеОтправки').style.display = 'none';
-                        setTimeout(() => {
-                            загрузитьСкрипты();
-                        }, 5000);
-                    } else {
-                        throw new Error('Ошибка отправки события');
-                    }
-                };
-                reader.readAsDataURL(аватар);
-            } catch (error) {
-                console.error('Ошибка отправки скрипта:', error);
-                alert(текущийЯзык === 'ru' ? 'Не удалось отправить скрипт.' : 'Failed to submit script.');
-            }
-        }
-
-        function открытьПолноэкранное(скрипт, индекс) {
-            const окно = document.getElementById('полноэкранноеОкно');
-            const содержимое = document.getElementById('содержимоеПолноэкранного');
-            document.getElementById('полноэкранныйАватар').src = скрипт.аватар;
-            document.getElementById('полноэкранноеНазвание').textContent = скрипт.название;
-            document.getElementById('полноэкранноеИмя').textContent = скрипт.пользователь;
-            document.getElementById('полноэкранноеОписание').textContent = `${текущийЯзык === 'ru' ? 'Описание:' : 'Description:'} ${скрипт.описание}`;
-            document.getElementById('полноэкраннаяЦель').textContent = `${текущийЯзык === 'ru' ? 'На что код:' : '
+            const цель = document.getElementById('цельСкри

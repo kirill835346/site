@@ -63,9 +63,8 @@
             padding: 20px;
             overflow-y: auto;
             display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
+            flex-direction: column;
+            align-items: flex-start;
         }
         .sidebar {
             flex: 0.7;
@@ -87,7 +86,7 @@
             box-shadow: -5px 0 15px rgba(255, 255, 255, 0.1);
         }
         .search {
-            width: 100%;
+            width: 300px;
             padding: 12px;
             margin-bottom: 20px;
             background-color: #444;
@@ -106,6 +105,11 @@
         .search.space-theme {
             background-color: #2e2e5e;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        .script-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
         }
         .script-card {
             background: #555;
@@ -367,25 +371,13 @@
     <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
             <input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">
-            <div class="script-card" onclick="openFullscreen(0)">
-                <img src="images/script1.png" class="script-avatar" alt="Script 1" onerror="this.src='https://via.placeholder.com/200x150';">
-                <div class="script-info">
-                    <h3>Script 1</h3>
-                    <div class="username">User1</div>
-                </div>
-            </div>
-            <div class="script-card" onclick="openFullscreen(1)">
-                <img src="images/script2.png" class="script-avatar" alt="Script 2" onerror="this.src='https://via.placeholder.com/200x150';">
-                <div class="script-info">
-                    <h3>Script 2</h3>
-                    <div class="username">User2</div>
-                </div>
-            </div>
-            <div class="script-card" onclick="openFullscreen(2)">
-                <img src="images/script3.png" class="script-avatar" alt="Script 3" onerror="this.src='https://via.placeholder.com/200x150';">
-                <div class="script-info">
-                    <h3>Script 3</h3>
-                    <div class="username">User3</div>
+            <div class="script-list">
+                <div class="script-card" onclick="openFullscreen(0)">
+                    <img src="images/script1.png" class="script-avatar" alt="Script 1" onerror="this.src='https://via.placeholder.com/200x150';">
+                    <div class="script-info">
+                        <h3>Script 1</h3>
+                        <div class="username">User1</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -396,7 +388,7 @@
                 <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
             </button>
             <button class="tooltip" onclick="window.location.href='/site/bypasser.html'">
-                <i class="fas fa-shield-alt"></i> <span data-ru="Обходники" data-en="Bypassers"></span>
+                <i class="fas fa-shield-alt"></i> <span data-ru="Обходчики" data-en="Bypassers"></span>
                 <span class="tooltiptext" data-ru="Открыть обходчики" data-en="Open bypassers"></span>
             </button>
             <button class="tooltip" onclick="openSettings()">
@@ -463,9 +455,7 @@
         const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // Замени на свой токен
         const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID'; // Замени на свой chat_id
         let scripts = [
-            { name: 'Script 1', user: 'User1', desc: 'Описание скрипта 1', target: 'Roblox, фарм', code: '// Код скрипта 1', avatar: 'images/script1.png' },
-            { name: 'Script 2', user: 'User2', desc: 'Описание скрипта 2', target: 'Roblox, читы', code: '// Код скрипта 2', avatar: 'images/script2.png' },
-            { name: 'Script 3', user: 'User3', desc: 'Описание скрипта 3', target: 'Roblox, автоматизация', code: '// Код скрипта 3', avatar: 'images/script3.png' }
+            { name: 'Script 1', user: 'User1', desc: 'Описание скрипта 1', target: 'Roblox, фарм', code: '// Код скрипта 1', avatar: 'images/script1.png' }
         ];
         let username = localStorage.getItem('username') || null;
         let currentLanguage = 'ru';
@@ -615,6 +605,8 @@
         function renderScripts() {
             const scriptList = document.getElementById('scriptList');
             scriptList.innerHTML = `<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">`;
+            const scriptListContainer = document.createElement('div');
+            scriptListContainer.className = 'script-list';
             scripts.forEach((script, index) => {
                 const card = document.createElement('div');
                 card.className = 'script-card';
@@ -626,8 +618,9 @@
                     </div>
                 `;
                 card.onclick = () => openFullscreen(index);
-                scriptList.appendChild(card);
+                scriptListContainer.appendChild(card);
             });
+            scriptList.appendChild(scriptListContainer);
             updateThemeClasses();
         }
 
@@ -636,6 +629,8 @@
             const filteredScripts = scripts.filter(script => script.name.toLowerCase().includes(searchValue));
             const scriptList = document.getElementById('scriptList');
             scriptList.innerHTML = `<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()" value="${searchValue}">`;
+            const scriptListContainer = document.createElement('div');
+            scriptListContainer.className = 'script-list';
             filteredScripts.forEach((script, index) => {
                 const card = document.createElement('div');
                 card.className = 'script-card';
@@ -647,8 +642,9 @@
                     </div>
                 `;
                 card.onclick = () => openFullscreen(scripts.indexOf(script));
-                scriptList.appendChild(card);
+                scriptListContainer.appendChild(card);
             });
+            scriptList.appendChild(scriptListContainer);
             updateThemeClasses();
         }
 

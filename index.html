@@ -548,15 +548,6 @@
     <div class="notification" id="notification" data-ru="Перед тем как выложить работу или поставить лайк, войдите в Google аккаунт!" data-en="Before submitting work or liking, sign in with Google!"></div>
 
     <script>
-        // Чтобы исправить ошибку с Firebase, добавьте домен 'kirill835346.github.io' в "Authorized domains" в Firebase Console:
-        // 1. Зайдите в Firebase Console: https://console.firebase.google.com/
-        // 2. Выберите проект 'script-net'.
-        // 3. Перейдите в "Authentication" -> "Sign-in method".
-        // 4. В настройках провайдера Google добавьте 'kirill835346.github.io' в "Authorized domains".
-
-        const TELEGRAM_BOT_TOKEN = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
-        const TELEGRAM_CHAT_ID = '5180010738';
-
         // Firebase конфигурация
         const firebaseConfig = {
             apiKey: "AIzaSyDkCcxWEzi2aiu8RhzQxIV2Rfw-3wWK2Vg",
@@ -569,12 +560,7 @@
         };
 
         // Инициализация Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            console.log("Firebase initialized successfully");
-        } catch (error) {
-            console.error("Firebase initialization failed:", error);
-        }
+        firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
 
@@ -591,54 +577,17 @@
         provider.addScope('profile');
         provider.addScope('email');
 
-        // Функция входа через Google в отдельном окне
+        // Функция входа через Google
         function signIn() {
-            const authWindow = window.open('', 'GoogleAuth', 'width=500,height=600');
-            authWindow.document.write(`
-                <html>
-                <head><title>Вход через Google</title></head>
-                <body>
-                    <p>Выполняется вход...</p>
-                    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-                    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-                    <script>
-                        const firebaseConfig = ${JSON.stringify(firebaseConfig)};
-                        firebase.initializeApp(firebaseConfig);
-                        const auth = firebase.auth();
-                        const provider = new firebase.auth.GoogleAuthProvider();
-                        provider.addScope('profile');
-                        provider.addScope('email');
-                        auth.signInWithPopup(provider).then(result => {
-                            window.opener.postMessage({
-                                type: 'authSuccess',
-                                user: {
-                                    uid: result.user.uid,
-                                    displayName: result.user.displayName,
-                                    photoURL: result.user.photoURL
-                                }
-                            }, '*');
-                            window.close();
-                        }).catch(error => {
-                            window.opener.postMessage({ type: 'authError', error: error.message }, '*');
-                            window.close();
-                        });
-                    </script>
-                </body>
-                </html>
-            `);
+            auth.signInWithPopup(provider).then(result => {
+                const user = result.user;
+                updateUI(user);
+            }).catch(error => {
+                console.error("Error during Google Sign-In:", error);
+                alert(currentLanguage === 'ru' ? 'Ошибка при входе через Google: ' + error.message : 'Error during Google Sign-In: ' + error.message);
+            });
             createRipple(event);
         }
-
-        // Обработка сообщений от окна авторизации
-        window.addEventListener('message', (event) => {
-            if (event.data.type === 'authSuccess') {
-                const user = event.data.user;
-                updateUI(user);
-            } else if (event.data.type === 'authError') {
-                console.error("Error during Google Sign-In:", event.data.error);
-                alert(currentLanguage === 'ru' ? 'Ошибка при входе через Google: ' + event.data.error : 'Error during Google Sign-In: ' + event.data.error);
-            }
-        });
 
         // Функция выхода
         function signOut() {
@@ -710,24 +659,24 @@
             document.querySelectorAll('[data-ru]').forEach(element => {
                 const text = element.getAttribute(`data-${currentLanguage}`);
                 if (element.tagName === 'INPUT') {
-                    element.placeholder = element.getAttribute(`data-${currentLanguage}-placeholder`);
+                    element.placeholder = element.getAttribute(`data-${currentLanguage}-placeholder`) || '';
                 } else if (element.tagName === 'LABEL') {
                     element.textContent = text + ':';
                 } else {
-                    element.textContent = text;
+                    element.textContent = text || '';
                 }
             });
             const themeSelect = document.getElementById('themeSelect');
             const languageSelect = document.getElementById('languageSelect');
             const filterSelect = document.getElementById('filterSelect');
             Array.from(themeSelect.options).forEach(option => {
-                option.text = option.getAttribute(`data-${currentLanguage}`);
+                option.text = option.getAttribute(`data-${currentLanguage}`) || '';
             });
             Array.from(languageSelect.options).forEach(option => {
-                option.text = option.getAttribute(`data-${currentLanguage}`);
+                option.text = option.getAttribute(`data-${currentLanguage}`) || '';
             });
             Array.from(filterSelect.options).forEach(option => {
-                option.text = option.getAttribute(`data-${currentLanguage}`);
+                option.text = option.getAttribute(`data-${currentLanguage}`) || '';
             });
         }
 
@@ -861,29 +810,11 @@
                 const scriptId = database.ref('scripts').push().key;
                 database.ref('scripts/' + scriptId).set(script);
                 database.ref('userScripts/' + userId + '/' + scriptId).set(script);
-                sendToTelegram(script);
                 closeModal();
                 openHistory();
             };
             reader.readAsDataURL(avatarInput);
             createRipple(event);
-        }
-
-        function sendToTelegram(script) {
-            const message = `Новый скрипт:\nНазвание: ${script.name}\nАвтор: ${script.user}\nОписание: ${script.desc}\nЦель: ${script.target}\nКод:\n${script.code}`;
-            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    photo: script.avatar,
-                    caption: message
-                })
-            }).then(response => {
-                console.log("Telegram message sent successfully:", response);
-            }).catch(error => {
-                console.error('Ошибка отправки в Telegram:', error);
-            });
         }
 
         function rateScript(index, type, event) {
@@ -1020,8 +951,7 @@
         }
 
         function createRipple(event) {
-            const button = event.target.closest('button');
-            if (!button) return;
+            const button = event.currentTarget;
             const rect = button.getBoundingClientRect();
             const ripple = document.createElement('span');
             ripple.classList.add('ripple');

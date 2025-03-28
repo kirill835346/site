@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Script-net</title>
+    <title>Roblox Script Hub</title>
     <link rel="icon" type="image/png" href="images/ava.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -439,7 +439,7 @@
         .ripple {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255,  unregistered users255, 0.3);
             transform: scale(0);
             animation: rippleAnimation 0.6s linear;
             pointer-events: none;
@@ -537,8 +537,8 @@
 <body>
     <div class="stars" id="stars"></div>
     <div class="header">
-        <img src="images/ava.png" alt="Site Avatar">
-        <h1>Script-net</h1>
+        <img id="headerAvatar" src="images/ava.png" alt="Site Avatar">
+        <h1>Roblox Script Hub</h1>
     </div>
     <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
@@ -596,7 +596,7 @@
             <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
             <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/gif" required>
             <small data-ru="Загрузите аватар скрипта (PNG, JPG, GIF)" data-en="Upload script avatar (PNG, JPG, GIF)"></small>
-            <input type="text" id=" Ascendingly" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
+            <input type="text" id="scriptName" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
             <small data-ru="Название (до 25 символов), например, 'Автокликер'" data-en="Name (up to 25 chars), e.g., 'Autoclicker'"></small>
             <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
             <small data-ru="Опишите, что делает скрипт" data-en="Describe what the script does"></small>
@@ -742,6 +742,7 @@
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('historyButton').style.display = 'none';
                 document.getElementById('userAvatar').src = 'images/ava.png';
+                document.getElementById('headerAvatar').src = 'images/ava.png';
                 document.getElementById('userName').textContent = '';
                 createRipple(event);
                 loadScripts();
@@ -766,6 +767,7 @@
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('historyButton').style.display = 'none';
                 document.getElementById('userAvatar').src = 'images/ava.png';
+                document.getElementById('headerAvatar').src = 'images/ava.png';
                 document.getElementById('userName').textContent = '';
                 loadScripts();
             }
@@ -791,6 +793,7 @@
             document.getElementById('signOutButton').style.display = 'block';
             document.getElementById('submitButton').style.display = 'block';
             document.getElementById('userAvatar').src = user.photoURL || 'images/ava.png';
+            document.getElementById('headerAvatar').src = user.photoURL || 'images/ava.png';
             document.getElementById('userName').textContent = username;
             loadUserScripts();
             loadScripts();
@@ -1265,9 +1268,7 @@
                 if (filterType === 'script') {
                     return (script.name || '').toLowerCase().includes(searchValue);
                 } else {
-                    return (script.user || '').toLowerCase().includes(searchValue
-
-);
+                    return (script.user || '').toLowerCase().includes(searchValue);
                 }
             });
             renderScripts(filteredScripts);

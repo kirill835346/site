@@ -208,6 +208,7 @@
             display: flex;
             gap: 10px;
             margin-top: 5px;
+            position: relative;
         }
         .rating button {
             background: none;
@@ -233,6 +234,9 @@
             border-radius: 15px;
             font-size: 12px;
             animation: pulse 1.5s infinite;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -323,7 +327,7 @@
             visibility: visible;
             opacity: 1;
         }
-        .modal, .fullscreen, .settings-modal, .history-modal {
+        .modal, .fullscreen, .settings-modal, .history-modal, .notification-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -339,7 +343,7 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        .modal-content, .fullscreen-content, .settings-content, .history-content {
+        .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content {
             background: linear-gradient(145deg, #444, #555);
             padding: 25px;
             border-radius: 15px;
@@ -349,14 +353,14 @@
             transition: all 0.5s ease;
             position: relative;
         }
-        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme {
+        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
         }
-        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme {
+        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme {
             background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre {
+        .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content pre {
             width: 100%;
             margin: 10px 0;
             padding: 12px;
@@ -368,16 +372,16 @@
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
             resize: none;
         }
-        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme {
+        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme, .modal-content pre.light-theme {
             background-color: #ddd;
             color: #333;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme, .fullscreen-content pre.space-theme {
+        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme, .fullscreen-content pre.space-theme, .modal-content pre.space-theme {
             background-color: #3b3b5e;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
-        .modal-content small, .settings-content small, .history-content small {
+        .modal-content small, .settings-content small, .history-content small, .notification-content small {
             display: block;
             color: #bbb;
             font-size: 12px;
@@ -385,10 +389,10 @@
             margin-bottom: 10px;
             transition: color 0.5s ease;
         }
-        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme {
+        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme, .notification-content small.light-theme {
             color: #555;
         }
-        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme {
+        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme, .notification-content small.space-theme {
             color: #ccc;
         }
         .close-btn {
@@ -446,6 +450,53 @@
         }
         .flash {
             animation: flash 0.5s ease 2;
+        }
+        .history-content .script-list {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 20px;
+        }
+        .history-content .script-list .script-card {
+            flex: 0 0 auto;
+            width: 200px;
+        }
+        .like-animation {
+            position: absolute;
+            font-size: 20px;
+            color: #ff0000;
+            animation: heartRise 1s ease forwards;
+        }
+        @keyframes heartRise {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .checkbox-container input {
+            width: auto;
+        }
+        .notification-content .warning {
+            color: red;
+            text-decoration: underline;
+        }
+        .notification-content button {
+            background: linear-gradient(90deg, #ff6f61, #ff8787);
+            border: none;
+            padding: 10px 20px;
+            color: #fff;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .notification-content button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
         }
     </style>
 </head>
@@ -511,11 +562,16 @@
             <small data-ru="Название (до 25 символов), например, 'Автокликер'" data-en="Name (up to 25 chars), e.g., 'Autoclicker'"></small>
             <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
             <small data-ru="Опишите, что делает скрипт" data-en="Describe what the script does"></small>
-            <textarea id="scriptCode" data-ru-placeholder="Код (макс 8000 строк)" data-en-placeholder="Code (max 8000 lines)" required oninput="checkCodeLength()"></textarea>
+            <textarea id="scriptCode" data-ru-placeholder="Код (макс 8000 строк)" data-en-placeholder="Code (max 8000 lines)" required oninput="updateCodePreview()"></textarea>
             <small data-ru="Вставьте код (до 8000 строк)" data-en="Insert code (up to 8000 lines)"></small>
+            <pre id="codePreview">Превью кода (первые 10 строк):</pre>
             <p id="lineCount">Строк: 0</p>
             <input type="text" id="scriptTarget" data-ru-placeholder="Для чего код" data-en-placeholder="What the code is for" required>
             <small data-ru="Например, 'Roblox, фарм'" data-en="E.g., 'Roblox, farming'"></small>
+            <div class="checkbox-container">
+                <input type="checkbox" id="hasKey">
+                <label for="hasKey" data-ru="Есть ключ" data-en="Has key"></label>
+            </div>
             <button onclick="submitScript()">Отправить</button>
         </div>
     </div>
@@ -528,6 +584,7 @@
             <div class="username" id="fullUser"></div>
             <p id="fullDesc"></p>
             <p id="fullTarget"></p>
+            <p id="keyStatus"></p>
             <pre id="fullCode"></pre>
             <div class="rating">
                 <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
@@ -561,11 +618,36 @@
         <div class="history-content">
             <button class="close-btn" onclick="closeHistory()"><i class="fas fa-times"></i></button>
             <h2 data-ru="Ваши работы" data-en="Your Submissions"></h2>
-            <div id="historyList"></div>
+            <div id="historyList" class="script-list"></div>
         </div>
     </div>
 
     <div class="notification" id="notification" data-ru="Перед тем как выложить работу или поставить лайк, войдите в Google аккаунт!" data-en="Before submitting work or liking, sign in with Google!"></div>
+
+    <div class="notification-modal" id="newUserNotification">
+        <div class="notification-content">
+            <h2 data-ru="Уведомления" data-en="Notifications"></h2>
+            <p data-ru="Хотите включить уведомления, чтобы узнать, приняли ваш код или отказали?" data-en="Would you like to enable notifications to know if your script is accepted or rejected?"></p>
+            <p class="warning" data-ru="Больше потом нельзя изменить это решение!" data-en="You cannot change this decision later!"></p>
+            <button onclick="enableNotifications()">Да</button>
+            <button onclick="disableNotifications()">Нет</button>
+        </div>
+    </div>
+
+    <div class="notification-modal" id="thanksNotification">
+        <div class="notification-content">
+            <h2 data-ru="Спасибо!" data-en="Thank You!"></h2>
+            <p data-ru="Спасибо, что пользуетесь нашим сайтом! 😊" data-en="Thank you for using our site! 😊"></p>
+        </div>
+    </div>
+
+    <div class="notification-modal" id="sadNotification">
+        <div class="notification-content">
+            <h2 data-ru="Жаль :(" data-en="Sorry :("></h2>
+            <p>:(</p>
+            <button onclick="signOut()">Выйти</button>
+        </div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -584,11 +666,14 @@
 
         let scripts = [];
         let userScripts = [];
+        let pendingScripts = {};
         let username = localStorage.getItem('username') || null;
         let userId = localStorage.getItem('userId') || null;
         let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentTheme = localStorage.getItem('theme') || 'dark';
         let isAuthChecked = false;
+        let hasSubmitted = localStorage.getItem('hasSubmitted') || false;
+        let notificationPreference = localStorage.getItem('notificationPreference') || null;
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
@@ -718,7 +803,7 @@
         function updateThemeClasses() {
             const isLight = document.body.classList.contains('light-theme');
             const isSpace = document.body.classList.contains('space-theme');
-            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content small, .settings-content small, .history-content small').forEach(el => {
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small').forEach(el => {
                 el.classList.remove('light-theme', 'space-theme');
                 if (isLight) el.classList.add('light-theme');
                 if (isSpace) el.classList.add('space-theme');
@@ -747,6 +832,7 @@
             document.getElementById('fullUser').textContent = script.user || 'Аноним';
             document.getElementById('fullDesc').textContent = script.desc || 'Нет описания';
             document.getElementById('fullTarget').textContent = `Target: ${script.target || 'Не указано'}`;
+            document.getElementById('keyStatus').textContent = script.hasKey ? (currentLanguage === 'ru' ? 'Ключ: Есть' : 'Key: Present') : '';
             document.getElementById('fullCode').textContent = script.code || 'Код отсутствует';
             const likeBtn = document.getElementById('fullLikeBtn');
             const dislikeBtn = document.getElementById('fullDislikeBtn');
@@ -812,11 +898,13 @@
             document.getElementById('historyModal').style.display = 'none';
         }
 
-        function checkCodeLength() {
+        function updateCodePreview() {
             const code = document.getElementById('scriptCode').value;
-            const lines = code.split('\n').length;
-            document.getElementById('lineCount').textContent = `Строк: ${lines}`;
-            if (lines > 8000) {
+            const lines = code.split('\n').slice(0, 10).join('\n');
+            document.getElementById('codePreview').textContent = `Превью кода (первые 10 строк):\n${lines}`;
+            const lineCount = code.split('\n').length;
+            document.getElementById('lineCount').textContent = `Строк: ${lineCount}`;
+            if (lineCount > 8000) {
                 document.getElementById('scriptCode').value = code.split('\n').slice(0, 8000).join('\n');
                 alert(currentLanguage === 'ru' ? 'Превышен лимит в 8000 строк!' : 'Exceeded 8000 line limit!');
             }
@@ -828,6 +916,7 @@
             const desc = document.getElementById('scriptDesc').value;
             const code = document.getElementById('scriptCode').value;
             const target = document.getElementById('scriptTarget').value;
+            const hasKey = document.getElementById('hasKey').checked;
 
             if (!avatarInput || !name || !desc || !code || !target) {
                 alert(currentLanguage === 'ru' ? 'Заполните все поля!' : 'Fill in all fields!');
@@ -836,15 +925,112 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {}, userId: userId };
-                const scriptId = database.ref('scripts').push().key;
-                database.ref('scripts/' + scriptId).set(script);
-                database.ref('userScripts/' + userId + '/' + scriptId).set(script);
+                const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {}, userId: userId, hasKey };
+                const scriptId = database.ref('pendingScripts').push().key;
+                pendingScripts[scriptId] = script;
+                sendToTelegram(scriptId, script);
+
+                if (!hasSubmitted && !notificationPreference) {
+                    showNewUserNotification();
+                    localStorage.setItem('hasSubmitted', 'true');
+                    hasSubmitted = true;
+                }
+
+                document.getElementById('avatarInput').value = '';
+                document.getElementById('scriptName').value = '';
+                document.getElementById('scriptDesc').value = '';
+                document.getElementById('scriptCode').value = '';
+                document.getElementById('scriptTarget').value = '';
+                document.getElementById('hasKey').checked = false;
+                document.getElementById('codePreview').textContent = 'Превью кода (первые 10 строк):';
+                document.getElementById('lineCount').textContent = 'Строк: 0';
                 closeModal();
-                openHistory();
             };
             reader.readAsDataURL(avatarInput);
             createRipple(event);
+        }
+
+        function sendToTelegram(scriptId, script) {
+            const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
+            const chatId = '5180010738';
+            const firstTenLines = script.code.split('\n').slice(0, 10).join('\n');
+            const message = `
+Новая работа:
+Название: ${script.name}
+Автор: ${script.user}
+Описание: ${script.desc}
+Цель: ${script.target}
+Ключ: ${script.hasKey ? 'Есть' : 'Нет'}
+Первые 10 строк кода:
+${firstTenLines}
+Аватар: ${script.avatar}
+            `;
+            const url = `https://api.telegram.org/bot${token}/sendMessage`;
+            const params = {
+                chat_id: chatId,
+                text: message,
+                reply_markup: JSON.stringify({
+                    inline_keyboard: [
+                        [
+                            { text: 'Принять', callback_data: `accept_${scriptId}` },
+                            { text: 'Отказать', callback_data: `reject_${scriptId}` }
+                        ]
+                    ]
+                })
+            };
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params)
+            }).catch(error => console.error('Error sending to Telegram:', error));
+        }
+
+        function handleTelegramCallback(callbackData) {
+            const [action, scriptId] = callbackData.split('_');
+            if (action === 'accept') {
+                const script = pendingScripts[scriptId];
+                if (script) {
+                    const newScriptId = database.ref('scripts').push().key;
+                    database.ref('scripts/' + newScriptId).set(script);
+                    database.ref('userScripts/' + userId + '/' + newScriptId).set(script);
+                    delete pendingScripts[scriptId];
+                    if (notificationPreference === 'enabled') {
+                        new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
+                    }
+                }
+            } else if (action === 'reject') {
+                delete pendingScripts[scriptId];
+                if (notificationPreference === 'enabled') {
+                    new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
+                }
+            }
+        }
+
+        function showNewUserNotification() {
+            document.getElementById('newUserNotification').style.display = 'flex';
+            updateLanguage();
+            updateThemeClasses();
+        }
+
+        function enableNotifications() {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    localStorage.setItem('notificationPreference', 'enabled');
+                    notificationPreference = 'enabled';
+                    document.getElementById('newUserNotification').style.display = 'none';
+                    document.getElementById('thanksNotification').style.display = 'flex';
+                    setTimeout(() => {
+                        document.getElementById('thanksNotification').style.display = 'none';
+                    }, 3000);
+                }
+            });
+        }
+
+        function disableNotifications() {
+            localStorage.setItem('notificationPreference', 'disabled');
+            notificationPreference = 'disabled';
+            document.getElementById('newUserNotification').style.display = 'none';
+            document.getElementById('sadNotification').style.display = 'flex';
         }
 
         function deleteScript(index) {
@@ -867,7 +1053,8 @@
 
             const script = scripts[index];
             const scriptId = script.id;
-            const previousRating = script.userRatings ? script.userRatings[userId] : null;
+            if (!script.userRatings) script.userRatings = {};
+            const previousRating = script.userRatings[userId];
 
             if (previousRating === type) {
                 if (type === 'like') script.likes--;
@@ -879,6 +1066,16 @@
                 if (type === 'like') script.likes++;
                 else script.dislikes++;
                 script.userRatings[userId] = type;
+            }
+
+            if (type === 'like' && event) {
+                const button = event.currentTarget;
+                const heart = document.createElement('span');
+                heart.className = 'like-animation';
+                heart.innerHTML = '❤️';
+                heart.style.left = `${button.offsetWidth / 2}px`;
+                heart.style.top = `${button.offsetHeight / 2}px`;
+                button.appendChild(heart);
             }
 
             database.ref('scripts/' + scriptId).update({
@@ -946,6 +1143,7 @@
                 const isDisliked = script.userRatings && script.userRatings[userId] === 'dislike';
                 card.innerHTML = `
                     <img src="${avatarSrc}" class="script-avatar" alt="${scriptName}" onerror="this.src='https://placehold.co/200x150';">
+                    ${script.hasKey ? '<div class="key-message"><i class="fas fa-key"></i> Key</div>' : ''}
                     <div class="script-info">
                         <h3>${scriptName}</h3>
                         <div class="username">${scriptUser}</div>
@@ -1036,6 +1234,9 @@
         updateLanguage();
         changeTheme();
         loadScripts();
+
+        // Для обработки Telegram callback (нужен серверный код, здесь для примера)
+        window.handleTelegramCallback = handleTelegramCallback;
     </script>
 </body>
 </html>

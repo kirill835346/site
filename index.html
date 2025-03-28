@@ -3,48 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Script Hub</title>
-    <!-- Иконки FontAwesome -->
+    <title>Roblox Script Hub & Bypass</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Шрифты Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Стили оставляем без изменений */
         body {
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #1a1a1a, #2e2e2e);
             color: #fff;
-            transition: background 0.5s ease, color 0.5s ease;
-            position: relative;
+            transition: all 0.5s ease;
             overflow: hidden;
+            height: 100vh;
         }
-        body.светлый-режим {
+        body.light-theme {
             background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
             color: #333;
         }
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: -1;
-        }
-        .контейнер {
+        .container {
             display: flex;
             height: 100vh;
         }
-        .главная-секция {
+        .main-section {
             flex: 4;
             padding: 20px;
             overflow-y: auto;
         }
-        .боковая-панель {
+        .sidebar {
             flex: 0.7;
             background: linear-gradient(180deg, #3a3a3a, #2e2e2e);
             padding: 20px;
@@ -54,11 +40,11 @@
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
             transition: background 0.5s ease;
         }
-        .боковая-панель.светлый-режим {
+        .sidebar.light-theme {
             background: linear-gradient(180deg, #f0f0f0, #e0e0e0);
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
         }
-        .поиск {
+        .search {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -67,62 +53,51 @@
             border-radius: 25px;
             color: #fff;
             font-size: 16px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: background 0.5s ease, color 0.5s ease;
+            transition: all 0.5s ease;
         }
-        .поиск.светлый-режим {
+        .search.light-theme {
             background-color: #ddd;
             color: #333;
         }
-        .карточка-скрипта {
+        .script-card {
             background: #555;
             width: 200px;
             margin: 10px;
             border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.5s ease;
-            overflow: hidden;
+            transition: all 0.3s ease;
             display: inline-block;
-            vertical-align: top;
             position: relative;
         }
-        .карточка-скрипта.светлый-режим {
+        .script-card.light-theme {
             background: #eee;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        .карточка-скрипта:hover {
+        .script-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
         }
-        .аватар-скрипта {
+        .script-avatar {
             width: 100%;
             height: 150px;
             object-fit: cover;
-            display: block;
         }
-        .инфо-скрипта {
+        .script-info {
             background: #666;
             padding: 10px;
             transition: background 0.5s ease;
         }
-        .инфо-скрипта.светлый-режим {
+        .script-info.light-theme {
             background: #ddd;
         }
-        .инфо-скрипта h3 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .имя-юзера {
+        .username {
             font-size: 14px;
             color: #bbb;
-            margin: 5px 0 0;
             transition: color 0.5s ease;
         }
-        .имя-юзера.светлый-режим {
+        .username.light-theme {
             color: #555;
         }
-        .сообщение-ключа {
+        .key-message {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -131,24 +106,15 @@
             padding: 5px 10px;
             border-radius: 15px;
             font-size: 12px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
-        .сообщение-ключа .иконка-ключа {
-            margin-right: 5px;
-            color: #ffd700;
-        }
-        .боковая-панель .аватар {
+        .sidebar .avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             margin-bottom: 20px;
-            object-fit: cover;
             border: 3px solid #ff6f61;
-            box-shadow: 0 0 10px rgba(255, 111, 97, 0.5);
         }
-        .боковая-панель button {
+        .sidebar button {
             background: linear-gradient(90deg, #666, #888);
             border: none;
             padding: 12px 25px;
@@ -156,27 +122,24 @@
             margin: 15px 0;
             cursor: pointer;
             border-radius: 25px;
-            font-size: 16px;
-            font-weight: 500;
-            transition: transform 0.2s, box-shadow 0.3s, background 0.5s ease;
+            transition: all 0.3s ease;
         }
-        .боковая-панель button:hover {
+        .sidebar button:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
         }
-        .переключатель-темы, .переключатель-языка {
+        .theme-toggle, .language-toggle {
             background: none;
             border: none;
             color: #fff;
             font-size: 24px;
             cursor: pointer;
-            margin: 10px 0;
             transition: color 0.5s ease;
         }
-        .переключатель-темы.светлый-режим, .переключатель-языка.светлый-режим {
+        .theme-toggle.light-theme, .language-toggle.light-theme {
             color: #333;
         }
-        .модальное-окно {
+        .modal, .fullscreen {
             display: none;
             position: fixed;
             top: 0;
@@ -187,24 +150,19 @@
             justify-content: center;
             align-items: center;
         }
-        .содержимое-модального {
+        .modal-content, .fullscreen-content {
             background: linear-gradient(145deg, #444, #555);
             padding: 25px;
             border-radius: 15px;
             width: 550px;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             transition: background 0.5s ease;
         }
-        .содержимое-модального.светлый-режим {
+        .modal-content.light-theme, .fullscreen-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
         }
-        .содержимое-модального h2 {
-            margin-top: 0;
-            color: #ff6f61;
-        }
-        .содержимое-модального input, .содержимое-модального textarea {
+        .modal-content input, .modal-content textarea {
             width: 100%;
             margin: 10px 0;
             padding: 12px;
@@ -212,574 +170,444 @@
             border: none;
             color: #fff;
             border-radius: 10px;
-            font-size: 16px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: background 0.5s ease, color 0.5s ease;
+            transition: all 0.5s ease;
         }
-        .содержимое-модального input.светлый-режим, .содержимое-модального textarea.светлый-режим {
+        .modal-content input.light-theme, .modal-content textarea.light-theme {
             background-color: #ddd;
             color: #333;
         }
-        .содержимое-модального textarea {
-            height: 200px;
-            resize: none;
-        }
-        .содержимое-модального button {
-            background: linear-gradient(90deg, #666, #888);
-            border: none;
-            padding: 12px 25px;
-            color: #fff;
-            cursor: pointer;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 500;
-            transition: background 0.5s ease;
-        }
-        .содержимое-модального button:hover {
-            background: linear-gradient(90deg, #888, #666);
-        }
-        .содержимое-модального small {
-            display: block;
-            color: #bbb;
-            font-size: 12px;
-            margin-top: -5px;
-            margin-bottom: 10px;
-            transition: color 0.5s ease;
-        }
-        .содержимое-модального small.светлый-режим {
-            color: #555;
-        }
-        .контейнер-галочки {
-            display: flex;
+        .bypass-section {
+            display: none;
+            flex-direction: column;
             align-items: center;
-            margin: 10px 0;
+            justify-content: center;
+            height: 100%;
         }
-        .кастомная-галочка {
-            display: none;
-        }
-        .метка-галочки {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #fff;
-            border-radius: 4px;
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
-            transition: background 0.3s ease, border 0.3s ease;
-        }
-        .метка-галочки.светлый-режим {
-            border: 2px solid #333;
-        }
-        .кастомная-галочка:checked + .метка-галочки {
-            background: #28a745;
-            border: 2px solid #28a745;
-        }
-        .метка-галочки::after {
-            content: '\f00c';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            color: #fff;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .кастомная-галочка:checked + .метка-галочки::after {
-            opacity: 1;
-        }
-        .текст-галочки {
-            margin-left: 10px;
-            font-size: 16px;
-        }
-        .уведомление {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(145deg, #666, #888);
+        .bypass-banner {
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 15px;
-            color: #fff;
+            width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .bypass-btn {
+            background: linear-gradient(45deg, #2E7D32, #4CAF50);
+            padding: 15px 30px;
             font-size: 18px;
-            font-weight: 500;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-        .полноэкранное-окно {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .полноэкранное-окно.открыто {
-            display: flex;
-            opacity: 1;
-        }
-        .содержимое-полноэкранного {
-            background: linear-gradient(145deg, #444, #555);
-            padding: 30px;
-            border-radius: 15px;
-            width: 80%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            transform: scale(0);
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-        .содержимое-полноэкранного.светлый-режим {
-            background: linear-gradient(145deg, #fff, #eee);
-        }
-        .содержимое-полноэкранного.открыто {
-            transform: scale(1);
-            opacity: 1;
-        }
-        .крестик {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 24px;
             color: #fff;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
         }
-        .крестик:hover {
-            color: #ff6f61;
+        .bypass-btn:hover {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
         }
-        .крестик.светлый-режим {
-            color: #333;
+        .player-check {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
-        .крестик.светлый-режим:hover {
-            color: #ff6f61;
-        }
-        .полноэкранное-окно .аватар-скрипта {
-            width: 150px;
-            height: 150px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .полноэкранное-окно h3 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 600;
-            color: #ff6f61;
-        }
-        .полноэкранное-окно .имя-юзера {
-            font-size: 18px;
-            color: #bbb;
-            margin: 10px 0;
-        }
-        .полноэкранное-окно .имя-юзера.светлый-режим {
-            color: #555;
-        }
-        .полноэкранное-окно p {
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        .полноэкранное-окно pre {
-            background: #333;
+        .player-info {
+            display: flex;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 10px;
-            overflow-y: auto;
-            max-height: 200px;
-            white-space: pre-wrap;
-            transition: background 0.5s ease;
         }
-        .полноэкранное-окно pre.светлый-режим {
-            background: #ddd;
+        .player-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #03A9F4;
         }
-        .кнопка-скопировать {
-            background: linear-gradient(90deg, #666, #888);
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(45deg, #ff4d4d, #ff6666);
+            width: 30px;
+            height: 30px;
             border: none;
-            padding: 10px 20px;
+            border-radius: 50%;
             color: #fff;
             cursor: pointer;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-top: 10px;
-            margin-right: 10px;
-            transition: background 0.5s ease;
         }
-        .кнопка-скопировать:hover {
-            background: linear-gradient(90deg, #888, #666);
+        .close-btn:hover {
+            background: linear-gradient(45deg, #ff6666, #ff8787);
         }
-        .сообщение-ключа-полноэкранное {
-            background: #ff4444;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            margin-top: 10px;
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid transparent;
+            border-top: 5px solid #03A9F4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px 0;
         }
-        .сообщение-ключа-полноэкранное .иконка-ключа {
-            margin-right: 5px;
-            color: #ffd700;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="контейнер">
-        <!-- Главная секция для скриптов -->
-        <div class="главная-секция" id="списокСкриптов">
-            <input type="text" class="поиск" id="полеПоиска" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="поискСкриптов()">
+    <div class="container">
+        <div class="main-section" id="scriptList">
+            <input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">
         </div>
-
-        <!-- Боковая панель -->
-        <div class="боковая-панель">
-            <img src="images/Avatar.png" class="аватар" alt="Аватар пользователя">
-            <button onclick="открытьМодальное()"><i class="fas fa-upload иконка"></i> <span data-ru="Отправить свою работу" data-en="Submit your work"></span></button>
-            <button onclick="показатьУведомление()"><i class="fas fa-key иконка"></i> <span data-ru="Получить ключ" data-en="Get key"></span></button>
-            <button class="переключатель-темы" onclick="переключитьТему()"><i class="fas fa-moon"></i></button>
-            <button class="переключатель-языка" onclick="переключитьЯзык()"><i class="fas fa-globe"></i></button>
+        <div class="sidebar">
+            <img src="images/Avatar.png" class="avatar" alt="Аватар пользователя">
+            <button onclick="openModal()"><i class="fas fa-upload"></i> <span data-ru="Отправить работу" data-en="Submit work"></span></button>
+            <button onclick="showBypassSection()"><i class="fas fa-shield-alt"></i> <span data-ru="Обходники" data-en="Bypassers"></span></button>
+            <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+            <button class="language-toggle" onclick="toggleLanguage()"><i class="fas fa-globe"></i></button>
         </div>
     </div>
 
-    <!-- Модальное окно для отправки скрипта -->
-    <div class="модальное-окно" id="модальноеОтправки">
-        <div class="содержимое-модального">
-            <h2 data-ru="Отправить свой скрипт" data-en="Submit Your Script"></h2>
-            <input type="file" id="вводАватара" accept="image/*" required>
-            <small data-ru="Загрузите изображение, которое будет отображаться как аватарка вашего скрипта" data-en="Upload an image to be displayed as your script's avatar"></small>
-            <input type="text" id="названиеСкрипта" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
-            <small data-ru="Укажите название вашего скрипта (до 25 символов), например, 'Скрипт для автокликера'" data-en="Enter your script's name (up to 25 characters), e.g., 'Autoclicker Script'"></small>
-            <textarea id="описаниеСкрипта" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
-            <small data-ru="Опишите, что делает ваш скрипт, например, 'Автоматизирует клики в игре'" data-en="Describe what your script does, e.g., 'Automates clicks in the game'"></small>
-            <textarea id="кодСкрипта" data-ru-placeholder="Ваш код (максимум 8000 строк)" data-en-placeholder="Your Code (Max 8000 lines)" required oninput="проверитьДлинуКода()"></textarea>
-            <small data-ru="Вставьте код вашего скрипта (максимум 8000 строк)" data-en="Insert your script's code (max 8000 lines)"></small>
-            <p id="счётчикСтрок">Строк: 0</p>
-            <input type="text" id="цельСкрипта" data-ru-placeholder="На что код, что делает или на какую игру" data-en-placeholder="What the code is for, what it does, or for which game" required>
-            <small data-ru="Укажите, для чего ваш код, например, 'Для Roblox, автоматизация фарма'" data-en="Specify what your code is for, e.g., 'For Roblox, farming automation'"></small>
-            <input type="text" id="имяПользователя" data-ru-placeholder="Ваше имя (нельзя изменить позже)" data-en-placeholder="Your Name (Cannot be changed later)" required>
-            <small data-ru="Укажите ваше имя, которое будет отображаться как автор скрипта" data-en="Enter your name, which will be displayed as the script's author"></small>
-            <div class="контейнер-галочки">
-                <input type="checkbox" id="естьКлюч" class="кастомная-галочка">
-                <label for="естьКлюч" class="метка-галочки"></label>
-                <span class="текст-галочки" data-ru="Нет ключа" data-en="No key"></span>
-            </div>
-            <button onclick="отправитьСкрипт()"><span data-ru="Отправить" data-en="Submit"></span></button>
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
+            <input type="file" id="avatarInput" accept="image/*" required>
+            <input type="text" id="scriptName" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" required>
+            <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
+            <textarea id="scriptCode" data-ru-placeholder="Код (макс 8000 строк)" data-en-placeholder="Code (max 8000 lines)" required oninput="checkCodeLength()"></textarea>
+            <p id="lineCount">Строк: 0</p>
+            <input type="text" id="scriptTarget" data-ru-placeholder="Для чего код" data-en-placeholder="What the code is for" required>
+            <input type="text" id="userName" data-ru-placeholder="Ваше имя" data-en-placeholder="Your Name" required>
+            <button onclick="submitScript()">Отправить</button>
         </div>
     </div>
 
-    <!-- Уведомление для ключа -->
-    <div class="уведомление" id="уведомление">
-        <span data-ru="Функция закрыта, в разработке." data-en="Function is closed, in development."></span>
+    <div class="fullscreen" id="fullscreenWindow">
+        <div class="fullscreen-content" id="fullscreenContent">
+            <i class="fas fa-times close-btn" onclick="closeFullscreen()"></i>
+            <img id="fullAvatar" class="script-avatar" alt="Аватар скрипта">
+            <h3 id="fullName"></h3>
+            <div class="username" id="fullUser"></div>
+            <p id="fullDesc"></p>
+            <p id="fullTarget"></p>
+            <pre id="fullCode"></pre>
+        </div>
     </div>
 
-    <!-- Полноэкранное окно для деталей скрипта -->
-    <div class="полноэкранное-окно" id="полноэкранноеОкно">
-        <div class="содержимое-полноэкранного" id="содержимоеПолноэкранного">
-            <i class="fas fa-times крестик" onclick="закрытьПолноэкранное()"></i>
-            <img id="полноэкранныйАватар" class="аватар-скрипта" alt="Аватар скрипта">
-            <h3 id="полноэкранноеНазвание"></h3>
-            <div class="имя-юзера" id="полноэкранноеИмя"></div>
-            <p id="полноэкранноеОписание"></p>
-            <p id="полноэкраннаяЦель"></p>
-            <pre id="полноэкранныйКод"></pre>
-            <button class="кнопка-скопировать" onclick="скопироватьКод()"><span data-ru="Скопировать" data-en="Copy"></span></button>
-            <div class="сообщение-ключа-полноэкранное" id="полноэкранныйСтатусКлюча"></div>
+    <div class="main-section bypass-section" id="bypassSection">
+        <div class="bypass-banner">
+            <h2 data-ru="Обходники" data-en="Bypassers"></h2>
+            <button class="bypass-btn" onclick="showBypassMethod('bypass1')" data-ru="Обход 1" data-en="Bypass 1"></button>
+            <button class="bypass-btn" onclick="showBypassMethod('bypass2')" data-ru="Обход 2" data-en="Bypass 2"></button>
+            <button class="bypass-btn" onclick="showPlayerCheck()" data-ru="Проверить игрока" data-en="Check Player"></button>
+            <button class="bypass-btn" onclick="backToMain()" data-ru="На главную" data-en="Back to Main"></button>
+        </div>
+    </div>
+
+    <div class="main-section bypass-section" id="bypass1Content">
+        <div class="bypass-banner">
+            <h2 data-ru="Обход 1" data-en="Bypass 1"></h2>
+            <input type="text" id="bypass1Input" data-ru-placeholder="Введи текст..." data-en-placeholder="Enter text...">
+            <button class="bypass-btn" onclick="applyBypass('bypass1')">Применить</button>
+            <div id="bypass1Output"></div>
+        </div>
+    </div>
+
+    <div class="main-section bypass-section" id="bypass2Content">
+        <div class="bypass-banner">
+            <h2 data-ru="Обход 2" data-en="Bypass 2"></h2>
+            <input type="text" id="bypass2Input" data-ru-placeholder="Введи текст..." data-en-placeholder="Enter text...">
+            <button class="bypass-btn" onclick="applyBypass('bypass2')">Применить</button>
+            <textarea id="bypass2Output" readonly></textarea>
+        </div>
+    </div>
+
+    <div class="main-section player-check" id="playerCheckContent">
+        <div class="bypass-banner">
+            <h2 data-ru="Проверить игрока" data-en="Check Player"></h2>
+            <input type="text" id="playerInput" data-ru-placeholder="Введи ник..." data-en-placeholder="Enter username...">
+            <button class="bypass-btn" onclick="checkPlayer()">Проверить</button>
+            <div class="loader" id="playerLoader"></div>
+            <div id="playerOutput"></div>
         </div>
     </div>
 
     <script>
-        const REPO_OWNER = 'kirill835346'; // Твой username
-        const REPO_NAME = 'ihpdfgbdnjfg'; // Название репозитория
-        const SCRIPTS_PATH = 'scripts.json'; // Путь к файлу scripts.json
-        const IMAGES_PATH = 'images'; // Папка для изображений
-        const DISPATCH_TOKEN = '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'; // Вставь новый токен сюда
-
+        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // Замени на свой токен
+        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID'; // Замени на свой chat_id
         let scripts = [];
-        let имяПользователя = localStorage.getItem('имяПользователя') || null;
-        let текущийЯзык = 'ru';
+        let username = localStorage.getItem('username') || null;
+        let currentLanguage = 'ru';
+        let currentSection = 'general';
 
-        // Загрузка скриптов из GitHub
-        async function загрузитьСкрипты() {
-            try {
-                const response = await fetch(`https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${SCRIPTS_PATH}`);
-                scripts = await response.json();
+        async function loadScripts() {
+            // Здесь можно подключить загрузку из GitHub, как в оригинале, но для примера оставим пустой массив
+            const list = document.getElementById('scriptList');
+            list.innerHTML = '<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">';
+            scripts.forEach((script, index) => {
+                const card = document.createElement('div');
+                card.className = 'script-card';
+                card.dataset.index = index;
+                card.onclick = () => openFullscreen(script);
+                card.innerHTML = `
+                    <img src="${script.avatar}" class="script-avatar" alt="Аватар скрипта">
+                    <div class="script-info">
+                        <h3>${script.name}</h3>
+                        <div class="username">${script.user}</div>
+                    </div>
+                    ${script.hasKey ? '<div class="key-message"><i class="fas fa-key"></i> ' + (currentLanguage === 'ru' ? 'Ключ' : 'Key') + '</div>' : ''}
+                `;
+                list.appendChild(card);
+            });
+            updateLanguage();
+            updateURL();
+        }
 
-                const списокСкриптов = document.getElementById('списокСкриптов');
-                списокСкриптов.innerHTML = '<input type="text" class="поиск" id="полеПоиска" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="поискСкриптов()">';
-                scripts.forEach((скрипт, индекс) => {
-                    const карточка = document.createElement('div');
-                    карточка.className = 'карточка-скрипта';
-                    карточка.dataset.index = индекс;
-                    карточка.onclick = function() { открытьПолноэкранное(скрипт, индекс); };
-                    карточка.innerHTML = `
-                        <img src="${скрипт.аватар}" class="аватар-скрипта" alt="Аватар скрипта">
-                        <div class="инфо-скрипта">
-                            <h3>${скрипт.название}</h3>
-                            <div class="имя-юзера">${скрипт.пользователь}</div>
-                        </div>
-                        ${скрипт.естьКлюч ? '<div class="сообщение-ключа"><i class="fas fa-key иконка-ключа"></i>' + (текущийЯзык === 'ru' ? 'Ключ доступа' : 'Access Key') + '</div>' : ''}
-                    `;
-                    списокСкриптов.appendChild(карточка);
-                });
-                обновитьЯзык();
-            } catch (err) {
-                console.error('Ошибка загрузки скриптов:', err);
-                alert(текущийЯзык === 'ru' ? 'Не удалось загрузить скрипты.' : 'Failed to load scripts.');
+        function openModal() {
+            document.getElementById('submitModal').style.display = 'flex';
+            if (username) {
+                document.getElementById('userName').value = username;
+                document.getElementById('userName').disabled = true;
+            }
+            updateLanguage();
+        }
+
+        function checkCodeLength() {
+            const code = document.getElementById('scriptCode').value;
+            const lines = code.split('\n').length;
+            document.getElementById('lineCount').textContent = currentLanguage === 'ru' ? `Строк: ${lines}` : `Lines: ${lines}`;
+            if (lines > 8000) {
+                alert(currentLanguage === 'ru' ? 'Код превышает 8000 строк!' : 'Code exceeds 8000 lines!');
+                document.getElementById('scriptCode').value = code.split('\n').slice(0, 8000).join('\n');
             }
         }
 
-        // Открыть модальное окно
-        function открытьМодальное() {
-            const модальное = document.getElementById('модальноеОтправки');
-            модальное.style.display = 'flex';
-            if (имяПользователя) {
-                document.getElementById('имяПользователя').value = имяПользователя;
-                document.getElementById('имяПользователя').disabled = true;
-            }
-            обновитьЯзык();
-        }
+        async function submitScript() {
+            const avatar = document.getElementById('avatarInput').files[0];
+            const name = document.getElementById('scriptName').value;
+            const desc = document.getElementById('scriptDesc').value;
+            const code = document.getElementById('scriptCode').value;
+            const target = document.getElementById('scriptTarget').value;
+            const user = document.getElementById('userName').value;
 
-        // Проверить длину кода
-        function проверитьДлинуКода() {
-            const код = document.getElementById('кодСкрипта').value;
-            const строк = код.split('\n').length;
-            document.getElementById('счётчикСтрок').textContent = текущийЯзык === 'ru' ? `Строк: ${строк}` : `Lines: ${строк}`;
-            if (строк > 8000) {
-                alert(текущийЯзык === 'ru' ? 'Код превышает 8000 строк! Уменьшите длину.' : 'Code exceeds 8000 lines! Please reduce the length.');
-                document.getElementById('кодСкрипта').value = код.split('\n').slice(0, 8000).join('\n');
-            }
-        }
-
-        // Очистить форму после отправки
-        function очиститьФорму() {
-            document.getElementById('вводАватара').value = '';
-            document.getElementById('названиеСкрипта').value = '';
-            document.getElementById('описаниеСкрипта').value = '';
-            document.getElementById('кодСкрипта').value = '';
-            document.getElementById('цельСкрипта').value = '';
-            document.getElementById('имяПользователя').value = имяПользователя || '';
-            document.getElementById('естьКлюч').checked = false;
-            document.querySelector('.текст-галочки').textContent = текущийЯзык === 'ru' ? 'Нет ключа' : 'No key';
-            document.getElementById('счётчикСтрок').textContent = текущийЯзык === 'ru' ? 'Строк: 0' : 'Lines: 0';
-        }
-
-        // Отправить скрипт через repository_dispatch
-        async function отправитьСкрипт() {
-            const аватар = document.getElementById('вводАватара').files[0];
-            const название = document.getElementById('названиеСкрипта').value;
-            const описание = document.getElementById('описаниеСкрипта').value;
-            const код = document.getElementById('кодСкрипта').value;
-            const цель = document.getElementById('цельСкрипта').value;
-            const имя = document.getElementById('имяПользователя').value;
-            const естьКлюч = document.getElementById('естьКлюч').checked;
-
-            if (!аватар || !название || !описание || !код || !цель || !имя) {
-                alert(текущийЯзык === 'ru' ? 'Заполните все поля!' : 'Please fill all fields!');
+            if (!avatar || !name || !desc || !code || !target || !user) {
+                alert(currentLanguage === 'ru' ? 'Заполните все поля!' : 'Fill all fields!');
                 return;
             }
 
-            if (!имяПользователя) {
-                имяПользователя = имя;
-                localStorage.setItem('имяПользователя', имяПользователя);
+            if (!username) {
+                username = user;
+                localStorage.setItem('username', username);
             }
 
-            try {
-                // Читаем аватар как base64
-                const reader = new FileReader();
-                reader.onload = async function() {
-                    const base64Image = reader.result.split(',')[1];
-                    const avatarFilename = `${Date.now()}_avatar.jpg`;
-                    const avatarUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${IMAGES_PATH}/${avatarFilename}`;
-
-                    // Формируем данные скрипта
-                    const newScript = {
-                        id: Date.now().toString(),
-                        аватар: avatarUrl,
-                        название: название,
-                        описание: описание,
-                        код: код,
-                        цель: цель,
-                        пользователь: имя,
-                        естьКлюч: естьКлюч,
-                        avatar: base64Image // Передаём аватар как base64
-                    };
-
-                    // Отправляем событие repository_dispatch
-                    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${DISPATCH_TOKEN}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        },
-                        body: JSON.stringify({
-                            event_type: 'update-scripts',
-                            client_payload: {
-                                script: JSON.stringify(newScript)
-                            }
-                        })
-                    });
-
-                    if (response.ok) {
-                        alert(текущийЯзык === 'ru' ? 'Скрипт отправлен! Обновите страницу через несколько секунд.' : 'Script submitted! Refresh the page in a few seconds.');
-                        очиститьФорму();
-                        document.getElementById('модальноеОтправки').style.display = 'none';
-                        // Автоматическое обновление через 5 секунд
-                        setTimeout(() => {
-                            загрузитьСкрипты();
-                        }, 5000);
-                    } else {
-                        throw new Error('Ошибка отправки события');
-                    }
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const base64Image = reader.result.split(',')[1];
+                const newScript = {
+                    id: Date.now().toString(),
+                    avatar: `data:image/jpeg;base64,${base64Image}`,
+                    name: name,
+                    desc: desc,
+                    code: code,
+                    target: target,
+                    user: user,
+                    hasKey: false
                 };
-                reader.readAsDataURL(аватар);
-            } catch (error) {
-                console.error('Ошибка отправки скрипта:', error);
-                alert(текущийЯзык === 'ru' ? 'Не удалось отправить скрипт.' : 'Failed to submit script.');
-            }
-        }
 
-        // Открыть полноэкранное окно
-        function открытьПолноэкранное(скрипт, индекс) {
-            const окно = document.getElementById('полноэкранноеОкно');
-            const содержимое = document.getElementById('содержимоеПолноэкранного');
-            document.getElementById('полноэкранныйАватар').src = скрипт.аватар;
-            document.getElementById('полноэкранноеНазвание').textContent = скрипт.название;
-            document.getElementById('полноэкранноеИмя').textContent = скрипт.пользователь;
-            document.getElementById('полноэкранноеОписание').textContent = `${текущийЯзык === 'ru' ? 'Описание:' : 'Description:'} ${скрипт.описание}`;
-            document.getElementById('полноэкраннаяЦель').textContent = `${текущийЯзык === 'ru' ? 'На что код:' : 'What the code is for:'} ${скрипт.цель}`;
-            document.getElementById('полноэкранныйКод').textContent = скрипт.код;
-            const статусКлюча = document.getElementById('полноэкранныйСтатусКлюча');
-            if (скрипт.естьКлюч) {
-                статусКлюча.innerHTML = `
-                    <i class="fas fa-key иконка-ключа"></i>
-                    ${текущийЯзык === 'ru' ? 'Ключ доступа' : 'Access Key'}
+                // Отправка в Telegram
+                const message = `
+                    Новый скрипт:
+                    Название: ${name}
+                    Описание: ${desc}
+                    Код: ${code}
+                    Цель: ${target}
+                    Автор: ${user}
+                    Аватар: <файл>
                 `;
-            } else {
-                статусКлюча.innerHTML = '';
-            }
-            if (document.body.classList.contains('светлый-режим')) {
-                содержимое.classList.add('светлый-режим');
-                document.getElementById('полноэкранноеИмя').classList.add('светлый-режим');
-                document.getElementById('полноэкранныйКод').classList.add('светлый-режим');
-                document.querySelector('.крестик').classList.add('светлый-режим');
-            }
-            окно.classList.add('открыто');
-            содержимое.classList.add('открыто');
+                const formData = new FormData();
+                formData.append('chat_id', TELEGRAM_CHAT_ID);
+                formData.append('text', message);
+                formData.append('photo', avatar);
+
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (response.ok) {
+                        scripts.push(newScript);
+                        loadScripts();
+                        document.getElementById('submitModal').style.display = 'none';
+                        alert(currentLanguage === 'ru' ? 'Скрипт отправлен!' : 'Script submitted!');
+                    } else {
+                        throw new Error('Ошибка отправки');
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert(currentLanguage === 'ru' ? 'Ошибка отправки!' : 'Submission failed!');
+                }
+            };
+            reader.readAsDataURL(avatar);
         }
 
-        // Закрыть полноэкранное окно
-        function закрытьПолноэкранное() {
-            const окно = document.getElementById('полноэкранноеОкно');
-            const содержимое = document.getElementById('содержимоеПолноэкранного');
-            окно.classList.remove('открыто');
-            содержимое.classList.remove('открыто');
+        function openFullscreen(script) {
+            const window = document.getElementById('fullscreenWindow');
+            const content = document.getElementById('fullscreenContent');
+            document.getElementById('fullAvatar').src = script.avatar;
+            document.getElementById('fullName').textContent = script.name;
+            document.getElementById('fullUser').textContent = script.user;
+            document.getElementById('fullDesc').textContent = `${currentLanguage === 'ru' ? 'Описание:' : 'Description:'} ${script.desc}`;
+            document.getElementById('fullTarget').textContent = `${currentLanguage === 'ru' ? 'Цель:' : 'Target:'} ${script.target}`;
+            document.getElementById('fullCode').textContent = script.code;
+            window.style.display = 'flex';
         }
 
-        // Скопировать код
-        function скопироватьКод() {
-            const код = document.getElementById('полноэкранныйКод').textContent;
-            navigator.clipboard.writeText(код).then(() => {
-                alert(текущийЯзык === 'ru' ? 'Код скопирован!' : 'Code copied!');
-            }).catch(err => {
-                console.error('Ошибка копирования:', err);
-                alert(текущийЯзык === 'ru' ? 'Не удалось скопировать код.' : 'Failed to copy code.');
+        function closeFullscreen() {
+            document.getElementById('fullscreenWindow').style.display = 'none';
+        }
+
+        function searchScripts() {
+            const query = document.getElementById('searchField').value.toLowerCase();
+            document.querySelectorAll('.script-card').forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                card.style.display = name.includes(query) ? 'block' : 'none';
             });
         }
 
-        // Поиск скриптов по названию
-        function поискСкриптов() {
-            const запрос = document.getElementById('полеПоиска').value.toLowerCase();
-            const карточки = document.querySelectorAll('.карточка-скрипта');
-            карточки.forEach(карточка => {
-                const название = карточка.querySelector('h3').textContent.toLowerCase();
-                карточка.style.display = название.includes(запрос) ? 'block' : 'none';
-            });
+        function showBypassSection() {
+            document.getElementById('scriptList').style.display = 'none';
+            document.getElementById('bypassSection').style.display = 'flex';
+            currentSection = 'bypass';
+            updateURL();
         }
 
-        // Показать уведомление
-        function показатьУведомление() {
-            const уведомление = document.getElementById('уведомление');
-            уведомление.style.display = 'block';
-            setTimeout(() => {
-                уведомление.style.display = 'none';
-            }, 3000);
+        function backToMain() {
+            document.querySelectorAll('.bypass-section, .player-check').forEach(section => section.style.display = 'none');
+            document.getElementById('scriptList').style.display = 'block';
+            currentSection = 'general';
+            updateURL();
         }
 
-        // Переключить тему
-        function переключитьТему() {
-            const тело = document.body;
-            const переключатель = document.querySelector('.переключатель-темы');
-            тело.classList.toggle('светлый-режим');
-            document.querySelector('.боковая-панель').classList.toggle('светлый-режим');
-            document.querySelector('.поиск').classList.toggle('светлый-режим');
-            document.querySelectorAll('.карточка-скрипта').forEach(карточка => карточка.classList.toggle('светлый-режим'));
-            document.querySelectorAll('.инфо-скрипта').forEach(инфо => инфо.classList.toggle('светлый-режим'));
-            document.querySelectorAll('.имя-юзера').forEach(имя => имя.classList.toggle('светлый-режим'));
-            if (document.getElementById('модальноеОтправки').style.display === 'flex') {
-                document.querySelector('.содержимое-модального').classList.toggle('светлый-режим');
-                document.querySelectorAll('.содержимое-модального input, .содержимое-модального textarea').forEach(поле => поле.classList.toggle('светлый-режим'));
-                document.querySelectorAll('.содержимое-модального small').forEach(подсказка => подсказка.classList.toggle('светлый-режим'));
-                document.querySelector('.метка-галочки').classList.toggle('светлый-режим');
-            }
-            if (document.getElementById('полноэкранноеОкно').classList.contains('открыто')) {
-                document.getElementById('содержимоеПолноэкранного').classList.toggle('светлый-режим');
-                document.getElementById('полноэкранноеИмя').classList.toggle('светлый-режим');
-                document.getElementById('полноэкранныйКод').classList.toggle('светлый-режим');
-                document.querySelector('.крестик').classList.toggle('светлый-режим');
-            }
-            переключатель.innerHTML = тело.classList.contains('светлый-режим') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        function showBypassMethod(method) {
+            document.getElementById('bypassSection').style.display = 'none';
+            document.getElementById(`${method}Content`).style.display = 'flex';
         }
 
-        // Определение языка по IP
-        async function определитьЯзыкПоIP() {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                const страна = data.country_code;
-                текущийЯзык = (страна === 'RU' || страна === 'UA' || страна === 'BY') ? 'ru' : 'en';
-                обновитьЯзык();
-            } catch (error) {
-                console.error('Ошибка определения языка по IP:', error);
-                текущийЯзык = 'ru';
-                обновитьЯзык();
-            }
+        function showPlayerCheck() {
+            document.getElementById('bypassSection').style.display = 'none';
+            document.getElementById('playerCheckContent').style.display = 'flex';
         }
 
-        // Переключить язык вручную
-        function переключитьЯзык() {
-            текущийЯзык = текущийЯзык === 'ru' ? 'en' : 'ru';
-            обновитьЯзык();
-        }
-
-        // Обновить текст на странице в зависимости от языка
-        function обновитьЯзык() {
-            document.querySelectorAll('[data-ru]').forEach(element => {
-                const ключ = текущийЯзык === 'ru' ? 'data-ru' : 'data-en';
-                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                    element.placeholder = element.getAttribute(ключ);
+        function applyBypass(method) {
+            if (method === 'bypass1') {
+                const input = document.getElementById('bypass1Input').value;
+                const output = document.getElementById('bypass1Output');
+                const charMap = { 'А': '🅰', 'а': '🅰', 'В': '🅱', 'в': '🅱', /* и так далее */ };
+                const result = input.split('').map(char => charMap[char] || char).join('');
+                output.innerHTML = result;
+            } else if (method === 'bypass2') {
+                const input = document.getElementById('bypass2Input').value;
+                const output = document.getElementById('bypass2Output');
+                const fancyMap = { 'A': 'Λ', 'a': 'α', /* и так далее */ };
+                if (/[А-Яа-яЁё]/.test(input)) {
+                    output.value = currentLanguage === 'ru' ? 'Только английский!' : 'English only!';
                 } else {
-                    element.textContent = element.getAttribute(ключ);
+                    output.value = input.split('').map(char => fancyMap[char] || char).join('');
+                }
+            }
+        }
+
+        async function checkPlayer() {
+            const username = document.getElementById('playerInput').value.trim();
+            const output = document.getElementById('playerOutput');
+            const loader = document.getElementById('playerLoader');
+
+            if (!username) {
+                alert(currentLanguage === 'ru' ? 'Введите ник!' : 'Enter username!');
+                return;
+            }
+
+            loader.style.display = 'block';
+            output.innerHTML = '';
+
+            try {
+                const userRes = await fetch(`https://users.roblox.com/v1/users/search?keyword=${username}&limit=10`);
+                const userData = await userRes.json();
+                const user = userData.data.find(u => u.name.toLowerCase() === username.toLowerCase());
+                if (!user) throw new Error('User not found');
+                const userId = user.id;
+
+                const [profileRes, avatarRes, gamesRes] = await Promise.all([
+                    fetch(`https://users.roblox.com/v1/users/${userId}`),
+                    fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=150x150&format=Png&isCircular=true`),
+                    fetch(`https://games.roblox.com/v2/users/${userId}/favorite/games?limit=5`)
+                ]);
+
+                const profile = await profileRes.json();
+                const avatar = await avatarRes.json();
+                const games = await gamesRes.json();
+
+                const avatarUrl = avatar.data[0]?.imageUrl || 'https://via.placeholder.com/100';
+                const gameList = games.data.map(game => game.name).join('</li><li>') || (currentLanguage === 'ru' ? 'Нет игр' : 'No games');
+
+                loader.style.display = 'none';
+                output.innerHTML = `
+                    <div class="player-info">
+                        <img src="${avatarUrl}" class="player-avatar">
+                        <div>
+                            <h3>${profile.name}</h3>
+                            <p>ID: ${userId}</p>
+                            <p>${currentLanguage === 'ru' ? 'Дисплей:' : 'Display:'} ${profile.displayName}</p>
+                            <p>${currentLanguage === 'ru' ? 'Избранные игры:' : 'Favorite Games:'}</p>
+                            <ul><li>${gameList}</li></ul>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                output.innerHTML = currentLanguage === 'ru' ? 'Ошибка или игрок не найден!' : 'Error or player not found!';
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            document.querySelectorAll('.sidebar, .search, .script-card, .script-info, .username, .modal-content, .modal-content input, .modal-content textarea, .fullscreen-content').forEach(el => el.classList.toggle('light-theme'));
+            const toggle = document.querySelector('.theme-toggle');
+            toggle.innerHTML = document.body.classList.contains('light-theme') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-ru]').forEach(el => {
+                const key = currentLanguage === 'ru' ? 'data-ru' : 'data-en';
+                if (el.tagName === 'INPUT') {
+                    el.placeholder = el.getAttribute(key);
+                } else {
+                    el.textContent = el.getAttribute(key);
                 }
             });
         }
 
-        // Обновление текста галочки
-        document.getElementById('естьКлюч').addEventListener('change', function() {
-            const текстГалочки = document.querySelector('.текст-галочки');
-            текстГалочки.textContent = this.checked ? (текущийЯзык === 'ru' ? 'Есть ключ' : 'Has key') : (текущийЯзык === 'ru' ? 'Нет ключа' : 'No key');
-        });
+        function updateURL() {
+            const url = currentSection === 'general' ? '/general' : '/bypass';
+            window.history.pushState({}, '', url);
+        }
 
-        // Загрузка скриптов при старте
-        window.onload = function() {
-            определитьЯзыкПоIP();
-            загрузитьСкрипты();
+        window.onload = () => {
+            loadScripts();
+            window.onpopstate = () => {
+                if (window.location.pathname === '/general') {
+                    backToMain();
+                } else if (window.location.pathname === '/bypass') {
+                    showBypassSection();
+                }
+            };
         };
     </script>
 </body>

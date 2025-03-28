@@ -13,22 +13,59 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #1a1a1a, #2e2e2e);
             color: #fff;
-            transition: all 0.5s ease;
             overflow: hidden;
             height: 100vh;
+            transition: all 0.5s ease;
+            position: relative;
         }
         body.light-theme {
             background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
             color: #333;
         }
+        body.space-theme {
+            background: linear-gradient(135deg, #0d0d2b, #1a1a3d);
+            color: #fff;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: none;
+        }
+        body.space-theme .stars {
+            display: block;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100vh); opacity: 0.7; }
+            100% { transform: translateY(100vh); opacity: 0.2; }
+        }
         .container {
             display: flex;
             height: 100vh;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
         .main-section {
             flex: 4;
             padding: 20px;
             overflow-y: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
         }
         .sidebar {
             flex: 0.7;
@@ -39,55 +76,79 @@
             align-items: center;
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
             transition: background 0.5s ease;
+            position: relative;
         }
         .sidebar.light-theme {
             background: linear-gradient(180deg, #f0f0f0, #e0e0e0);
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
         }
+        .sidebar.space-theme {
+            background: linear-gradient(180deg, #1a1a3d, #0d0d2b);
+            box-shadow: -5px 0 15px rgba(255, 255, 255, 0.1);
+        }
         .search {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 20px;
             background-color: #444;
             border: none;
             border-radius: 25px;
             color: #fff;
             font-size: 16px;
-            transition: all 0.5s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
         .search.light-theme {
             background-color: #ddd;
             color: #333;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .search.space-theme {
+            background-color: #2e2e5e;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
         .script-card {
             background: #555;
             width: 200px;
-            margin: 10px;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: inline-block;
             position: relative;
+            overflow: hidden;
+            animation: slideIn 0.5s ease forwards;
         }
         .script-card.light-theme {
             background: #eee;
         }
+        .script-card.space-theme {
+            background: #3b3b5e;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
         .script-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
         }
         .script-avatar {
             width: 100%;
             height: 150px;
             object-fit: cover;
+            border-radius: 15px 15px 0 0;
+            transition: all 0.3s ease;
+        }
+        .script-card:hover .script-avatar {
+            filter: brightness(1.2);
         }
         .script-info {
             background: #666;
             padding: 10px;
             transition: background 0.5s ease;
+            border-radius: 0 0 15px 15px;
         }
         .script-info.light-theme {
             background: #ddd;
+        }
+        .script-info.space-theme {
+            background: #4a4a7a;
         }
         .username {
             font-size: 14px;
@@ -96,6 +157,9 @@
         }
         .username.light-theme {
             color: #555;
+        }
+        .username.space-theme {
+            color: #ccc;
         }
         .key-message {
             position: absolute;
@@ -106,6 +170,12 @@
             padding: 5px 10px;
             border-radius: 15px;
             font-size: 12px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         .sidebar .avatar {
             width: 80px;
@@ -113,9 +183,20 @@
             border-radius: 50%;
             margin-bottom: 20px;
             border: 3px solid #ff6f61;
+            transition: all 0.3s ease;
+            animation: bounceIn 1s ease;
+        }
+        .sidebar .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 111, 97, 0.5);
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         .sidebar button {
-            background: linear-gradient(90deg, #666, #888);
+            background: linear-gradient(90deg, #ff6f61, #ff8787);
             border: none;
             padding: 12px 25px;
             color: #fff;
@@ -123,23 +204,59 @@
             cursor: pointer;
             border-radius: 25px;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: flyIn 0.5s ease forwards;
         }
         .sidebar button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
         }
-        .theme-toggle, .language-toggle {
-            background: none;
-            border: none;
+        .sidebar button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        .sidebar button:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+        @keyframes flyIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background: rgba(0, 0, 0, 0.8);
             color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            transition: color 0.5s ease;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 12px;
         }
-        .theme-toggle.light-theme, .language-toggle.light-theme {
-            color: #333;
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
         }
-        .modal, .fullscreen {
+        .modal, .fullscreen, .settings-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -149,21 +266,35 @@
             background-color: rgba(0, 0, 0, 0.8);
             justify-content: center;
             align-items: center;
+            animation: fadeInModal 0.5s ease;
         }
-        .modal-content, .fullscreen-content {
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content, .fullscreen-content, .settings-content {
             background: linear-gradient(145deg, #444, #555);
             padding: 25px;
             border-radius: 15px;
             width: 550px;
             max-height: 85vh;
             overflow-y: auto;
-            transition: background 0.5s ease;
+            transition: all 0.5s ease;
             position: relative;
+            animation: popIn 0.5s ease;
         }
-        .modal-content.light-theme, .fullscreen-content.light-theme {
+        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
         }
-        .modal-content input, .modal-content textarea {
+        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme {
+            background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-content input, .modal-content textarea, .settings-content select {
             width: 100%;
             margin: 10px 0;
             padding: 12px;
@@ -171,13 +302,19 @@
             border: none;
             color: #fff;
             border-radius: 10px;
-            transition: all 0.5s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
-        .modal-content input.light-theme, .modal-content textarea.light-theme {
+        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme {
             background-color: #ddd;
             color: #333;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        .modal-content small {
+        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme {
+            background-color: #3b3b5e;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        .modal-content small, .settings-content small {
             display: block;
             color: #bbb;
             font-size: 12px;
@@ -185,8 +322,11 @@
             margin-bottom: 10px;
             transition: color 0.5s ease;
         }
-        .modal-content small.light-theme {
+        .modal-content small.light-theme, .settings-content small.light-theme {
             color: #555;
+        }
+        .modal-content small.space-theme, .settings-content small.space-theme {
+            color: #ccc;
         }
         .close-btn {
             position: absolute;
@@ -200,24 +340,69 @@
             color: #fff;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .close-btn:hover {
             background: linear-gradient(45deg, #ff6666, #ff8787);
             transform: rotate(90deg);
+            box-shadow: 0 0 15px rgba(255, 102, 102, 0.5);
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: rippleAnimation 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnimation {
+            to { transform: scale(4); opacity: 0; }
         }
     </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
     <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
             <input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">
+            <div class="script-card" onclick="openFullscreen(0)">
+                <img src="images/script1.png" class="script-avatar" alt="Script 1" onerror="this.src='https://via.placeholder.com/200x150';">
+                <div class="script-info">
+                    <h3>Script 1</h3>
+                    <div class="username">User1</div>
+                </div>
+            </div>
+            <div class="script-card" onclick="openFullscreen(1)">
+                <img src="images/script2.png" class="script-avatar" alt="Script 2" onerror="this.src='https://via.placeholder.com/200x150';">
+                <div class="script-info">
+                    <h3>Script 2</h3>
+                    <div class="username">User2</div>
+                </div>
+            </div>
+            <div class="script-card" onclick="openFullscreen(2)">
+                <img src="images/script3.png" class="script-avatar" alt="Script 3" onerror="this.src='https://via.placeholder.com/200x150';">
+                <div class="script-info">
+                    <h3>Script 3</h3>
+                    <div class="username">User3</div>
+                </div>
+            </div>
         </div>
         <div class="sidebar">
             <img src="images/avatar.png" class="avatar" alt="Аватар пользователя" onerror="this.src='https://via.placeholder.com/80';">
-            <button onclick="openModal()"><i class="fas fa-upload"></i> <span data-ru="Отправить работу" data-en="Submit work"></span></button>
-            <button onclick="window.location.href='/site/bypasser.html'"><i class="fas fa-shield-alt"></i> <span data-ru="Обходники" data-en="Bypassers"></span></button>
-            <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
-            <button class="language-toggle" onclick="toggleLanguage()"><i class="fas fa-globe"></i></button>
+            <button class="tooltip" onclick="openModal()">
+                <i class="fas fa-upload"></i> <span data-ru="Отправить работу" data-en="Submit work"></span>
+                <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
+            </button>
+            <button class="tooltip" onclick="window.location.href='/site/bypasser.html'">
+                <i class="fas fa-shield-alt"></i> <span data-ru="Обходники" data-en="Bypassers"></span>
+                <span class="tooltiptext" data-ru="Открыть обходчики" data-en="Open bypassers"></span>
+            </button>
+            <button class="tooltip" onclick="openSettings()">
+                <i class="fas fa-cog"></i> <span data-ru="Настройки" data-en="Settings"></span>
+                <span class="tooltiptext" data-ru="Настроить сайт" data-en="Configure the site"></span>
+            </button>
         </div>
     </div>
 
@@ -244,7 +429,7 @@
 
     <div class="fullscreen" id="fullscreenWindow">
         <div class="fullscreen-content" id="fullscreenContent">
-            <i class="fas fa-times close-btn" onclick="closeFullscreen()"></i>
+            <button class="close-btn" onclick="closeFullscreen()"><i class="fas fa-times"></i></button>
             <img id="fullAvatar" class="script-avatar" alt="Аватар скрипта">
             <h3 id="fullName"></h3>
             <div class="username" id="fullUser"></div>
@@ -254,11 +439,256 @@
         </div>
     </div>
 
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-content">
+            <button class="close-btn" onclick="closeSettings()"><i class="fas fa-times"></i></button>
+            <h2 data-ru="Настройки" data-en="Settings"></h2>
+            <label for="themeSelect" data-ru="Тема сайта" data-en="Site Theme"></label>
+            <select id="themeSelect" onchange="changeTheme()">
+                <option value="dark" data-ru="Тёмная" data-en="Dark">Dark</option>
+                <option value="light" data-ru="Светлая" data-en="Light">Light</option>
+                <option value="space" data-ru="Космос" data-en="Space">Space</option>
+            </select>
+            <small data-ru="Выберите тему сайта" data-en="Select site theme"></small>
+            <label for="languageSelect" data-ru="Язык" data-en="Language"></label>
+            <select id="languageSelect" onchange="changeLanguage()">
+                <option value="ru" data-ru="Русский" data-en="Russian">Русский</option>
+                <option value="en" data-ru="Английский" data-en="English">English</option>
+            </select>
+            <small data-ru="Выберите язык сайта" data-en="Select site language"></small>
+        </div>
+    </div>
+
     <script>
-        const TELEGRAM_BOT_TOKEN = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE'; // Замени на свой токен
-        const TELEGRAM_CHAT_ID = '5180010738'; // Замени на свой chat_id
-        let scripts = [];
+        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // Замени на свой токен
+        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID'; // Замени на свой chat_id
+        let scripts = [
+            { name: 'Script 1', user: 'User1', desc: 'Описание скрипта 1', target: 'Roblox, фарм', code: '// Код скрипта 1', avatar: 'images/script1.png' },
+            { name: 'Script 2', user: 'User2', desc: 'Описание скрипта 2', target: 'Roblox, читы', code: '// Код скрипта 2', avatar: 'images/script2.png' },
+            { name: 'Script 3', user: 'User3', desc: 'Описание скрипта 3', target: 'Roblox, автоматизация', code: '// Код скрипта 3', avatar: 'images/script3.png' }
+        ];
         let username = localStorage.getItem('username') || null;
         let currentLanguage = 'ru';
 
-        async function
+        function changeLanguage() {
+            currentLanguage = document.getElementById('languageSelect').value;
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-ru]').forEach(element => {
+                const text = element.getAttribute(`data-${currentLanguage}`);
+                if (element.tagName === 'INPUT') {
+                    element.placeholder = element.getAttribute(`data-${currentLanguage}-placeholder`);
+                } else if (element.tagName === 'LABEL') {
+                    element.textContent = text + ':';
+                } else {
+                    element.textContent = text;
+                }
+            });
+            const themeSelect = document.getElementById('themeSelect');
+            const languageSelect = document.getElementById('languageSelect');
+            Array.from(themeSelect.options).forEach(option => {
+                option.text = option.getAttribute(`data-${currentLanguage}`);
+            });
+            Array.from(languageSelect.options).forEach(option => {
+                option.text = option.getAttribute(`data-${currentLanguage}`);
+            });
+        }
+
+        function changeTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            document.body.classList.remove('light-theme', 'space-theme');
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+            } else if (theme === 'space') {
+                document.body.classList.add('space-theme');
+            }
+            updateThemeClasses();
+        }
+
+        function updateThemeClasses() {
+            const isLight = document.body.classList.contains('light-theme');
+            const isSpace = document.body.classList.contains('space-theme');
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search, .modal-content, .fullscreen-content, .settings-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .modal-content small, .settings-content small').forEach(el => {
+                el.classList.remove('light-theme', 'space-theme');
+                if (isLight) el.classList.add('light-theme');
+                if (isSpace) el.classList.add('space-theme');
+            });
+        }
+
+        function openModal() {
+            document.getElementById('submitModal').style.display = 'flex';
+            createRipple(event);
+        }
+
+        function closeModal() {
+            document.getElementById('submitModal').style.display = 'none';
+        }
+
+        function openFullscreen(index) {
+            const script = scripts[index];
+            document.getElementById('fullAvatar').src = script.avatar;
+            document.getElementById('fullName').textContent = script.name;
+            document.getElementById('fullUser').textContent = script.user;
+            document.getElementById('fullDesc').textContent = script.desc;
+            document.getElementById('fullTarget').textContent = `Target: ${script.target}`;
+            document.getElementById('fullCode').textContent = script.code;
+            document.getElementById('fullscreenWindow').style.display = 'flex';
+            updateThemeClasses();
+            createRipple(event);
+        }
+
+        function closeFullscreen() {
+            document.getElementById('fullscreenWindow').style.display = 'none';
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+            document.getElementById('themeSelect').value = document.body.classList.contains('light-theme') ? 'light' : document.body.classList.contains('space-theme') ? 'space' : 'dark';
+            document.getElementById('languageSelect').value = currentLanguage;
+            updateLanguage();
+            updateThemeClasses();
+            createRipple(event);
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function checkCodeLength() {
+            const code = document.getElementById('scriptCode').value;
+            const lines = code.split('\n').length;
+            document.getElementById('lineCount').textContent = `Строк: ${lines}`;
+            if (lines > 8000) {
+                document.getElementById('scriptCode').value = code.split('\n').slice(0, 8000).join('\n');
+                alert(currentLanguage === 'ru' ? 'Превышен лимит в 8000 строк!' : 'Exceeded 8000 line limit!');
+            }
+        }
+
+        function submitScript() {
+            const avatarInput = document.getElementById('avatarInput').files[0];
+            const name = document.getElementById('scriptName').value;
+            const desc = document.getElementById('scriptDesc').value;
+            const code = document.getElementById('scriptCode').value;
+            const target = document.getElementById('scriptTarget').value;
+            const user = document.getElementById('userName').value;
+
+            if (!avatarInput || !name || !desc || !code || !target || !user) {
+                alert(currentLanguage === 'ru' ? 'Заполните все поля!' : 'Fill in all fields!');
+                return;
+            }
+
+            if (!username) {
+                username = user;
+                localStorage.setItem('username', username);
+            } else if (username !== user) {
+                alert(currentLanguage === 'ru' ? 'Имя пользователя не может быть изменено!' : 'Username cannot be changed!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const script = { name, user: username, desc, target, code, avatar: e.target.result };
+                scripts.push(script);
+                sendToTelegram(script);
+                closeModal();
+                renderScripts();
+            };
+            reader.readAsDataURL(avatarInput);
+            createRipple(event);
+        }
+
+        function sendToTelegram(script) {
+            const message = `Новый скрипт:\nНазвание: ${script.name}\nАвтор: ${script.user}\nОписание: ${script.desc}\nЦель: ${script.target}\nКод:\n${script.code}`;
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    photo: script.avatar,
+                    caption: message
+                })
+            }).catch(error => console.error('Ошибка отправки в Telegram:', error));
+        }
+
+        function renderScripts() {
+            const scriptList = document.getElementById('scriptList');
+            scriptList.innerHTML = `<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">`;
+            scripts.forEach((script, index) => {
+                const card = document.createElement('div');
+                card.className = 'script-card';
+                card.innerHTML = `
+                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://via.placeholder.com/200x150';">
+                    <div class="script-info">
+                        <h3>${script.name}</h3>
+                        <div class="username">${script.user}</div>
+                    </div>
+                `;
+                card.onclick = () => openFullscreen(index);
+                scriptList.appendChild(card);
+            });
+            updateThemeClasses();
+        }
+
+        function searchScripts() {
+            const searchValue = document.getElementById('searchField').value.toLowerCase();
+            const filteredScripts = scripts.filter(script => script.name.toLowerCase().includes(searchValue));
+            const scriptList = document.getElementById('scriptList');
+            scriptList.innerHTML = `<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()" value="${searchValue}">`;
+            filteredScripts.forEach((script, index) => {
+                const card = document.createElement('div');
+                card.className = 'script-card';
+                card.innerHTML = `
+                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://via.placeholder.com/200x150';">
+                    <div class="script-info">
+                        <h3>${script.name}</h3>
+                        <div class="username">${script.user}</div>
+                    </div>
+                `;
+                card.onclick = () => openFullscreen(scripts.indexOf(script));
+                scriptList.appendChild(card);
+            });
+            updateThemeClasses();
+        }
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3 + 1}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function createRipple(event) {
+            const button = event.target.closest('button');
+            if (!button) return;
+            const rect = button.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            ripple.style.width = ripple.style.height = `${diameter}px`;
+            ripple.style.left = `${event.clientX - rect.left - radius}px`;
+            ripple.style.top = `${event.clientY - rect.top - radius}px`;
+            button.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        document.querySelectorAll('.sidebar button').forEach(button => {
+            button.addEventListener('click', createRipple);
+        });
+
+        createStars();
+        renderScripts();
+        updateLanguage();
+    </script>
+</body>
+</html>

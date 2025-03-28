@@ -237,7 +237,7 @@
             transform: scale(1.1);
             box-shadow: 0 0 20px rgba(255, 111, 97, 0.5);
         }
-        .sidebar button {
+        .sidebar button, .sidebar a {
             background: linear-gradient(90deg, #ff6f61, #ff8787);
             border: none;
             padding: 12px 25px;
@@ -249,12 +249,17 @@
             position: relative;
             overflow: hidden;
             animation: flyIn 0.5s ease forwards;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .sidebar button:hover {
+        .sidebar button:hover, .sidebar a:hover {
             transform: scale(1.1);
             box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
         }
-        .sidebar button::after {
+        .sidebar button::after, .sidebar a::after {
             content: '';
             position: absolute;
             top: 50%;
@@ -266,7 +271,7 @@
             transform: translate(-50%, -50%);
             transition: all 0.3s ease;
         }
-        .sidebar button:hover::after {
+        .sidebar button:hover::after, .sidebar a:hover::after {
             width: 200px;
             height: 200px;
         }
@@ -397,6 +402,30 @@
         @keyframes rippleAnimation {
             to { transform: scale(4); opacity: 0; }
         }
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .notification.show {
+            opacity: 1;
+        }
+        @keyframes flash {
+            0%, 100% { background: linear-gradient(90deg, #ff6f61, #ff8787); }
+            50% { background: #fff; }
+        }
+        .flash {
+            animation: flash 0.5s ease 2;
+        }
     </style>
 </head>
 <body>
@@ -415,6 +444,10 @@
         </div>
         <div class="sidebar">
             <img src="https://placehold.co/80x80" class="avatar" id="userAvatar" alt="Аватар пользователя">
+            <button class="tooltip" onclick="openModal()" id="submitButton">
+                <i class="fas fa-upload"></i> <span data-ru="Выложить работу" data-en="Submit work"></span>
+                <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
+            </button>
             <button class="tooltip" onclick="signIn()" id="signInButton">
                 <i class="fas fa-sign-in-alt"></i> <span data-ru="Войти" data-en="Sign In"></span>
                 <span class="tooltiptext" data-ru="Войти через Google" data-en="Sign in with Google"></span>
@@ -422,10 +455,6 @@
             <button class="tooltip" onclick="signOut()" id="signOutButton" style="display: none;">
                 <i class="fas fa-sign-out-alt"></i> <span data-ru="Выйти" data-en="Sign Out"></span>
                 <span class="tooltiptext" data-ru="Выйти из аккаунта" data-en="Sign out of account"></span>
-            </button>
-            <button class="tooltip" onclick="openModal()" id="submitButton" style="display: none;">
-                <i class="fas fa-upload"></i> <span data-ru="Отправить работу" data-en="Submit work"></span>
-                <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
             </button>
             <button class="tooltip" onclick="window.location.href='/site/bypasser.html'">
                 <i class="fas fa-shield-alt"></i> <span data-ru="Обходчики" data-en="Bypassers"></span>
@@ -435,6 +464,14 @@
                 <i class="fas fa-cog"></i> <span data-ru="Настройки" data-en="Settings"></span>
                 <span class="tooltiptext" data-ru="Настроить сайт" data-en="Configure the site"></span>
             </button>
+            <a href="https://funpay.com/users/9532559/" target="_blank" class="tooltip">
+                <i class="fas fa-wallet"></i> <span data-ru="FunPay" data-en="FunPay"></span>
+                <span class="tooltiptext" data-ru="Перейти на FunPay" data-en="Go to FunPay"></span>
+            </a>
+            <a href="https://t.me/ezezuroyd" target="_blank" class="tooltip">
+                <i class="fab fa-telegram-plane"></i> <span data-ru="Telegram" data-en="Telegram"></span>
+                <span class="tooltiptext" data-ru="Связаться в Telegram" data-en="Contact on Telegram"></span>
+            </a>
         </div>
     </div>
 
@@ -501,6 +538,8 @@
         </div>
     </div>
 
+    <div class="notification" id="notification" data-ru="Перед тем как выложить работу или поставить лайк, войдите в Google аккаунт!" data-en="Before submitting work or liking, sign in with Google!"></div>
+
     <script>
         // Чтобы исправить ошибку с Firebase, добавьте домен 'kirill835346.github.io' в "Authorized domains" в Firebase Console:
         // 1. Зайдите в Firebase Console: https://console.firebase.google.com/
@@ -563,9 +602,10 @@
                 localStorage.removeItem('userPicture');
                 document.getElementById('signInButton').style.display = 'block';
                 document.getElementById('signOutButton').style.display = 'none';
-                document.getElementById('submitButton').style.display = 'none';
+                document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
                 createRipple(event);
+                loadScripts();
             }).catch(error => {
                 console.error("Error during sign out:", error);
             });
@@ -589,7 +629,7 @@
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('userAvatar').src = user.photoURL || 'https://placehold.co/80x80';
                 loadUserScripts();
-                renderScripts();
+                loadScripts();
             } else {
                 // Пользователь не авторизован
                 username = null;
@@ -599,8 +639,9 @@
                 localStorage.removeItem('userPicture');
                 document.getElementById('signInButton').style.display = 'block';
                 document.getElementById('signOutButton').style.display = 'none';
-                document.getElementById('submitButton').style.display = 'none';
+                document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
+                loadScripts();
             }
         });
 
@@ -658,8 +699,9 @@
         }
 
         function openModal() {
-            if (!username) {
-                alert(currentLanguage === 'ru' ? 'Пожалуйста, войдите через Google!' : 'Please sign in with Google!');
+            if (!userId) {
+                showNotification();
+                flashSignInButton();
                 return;
             }
             document.getElementById('submitModal').style.display = 'flex';
@@ -790,7 +832,8 @@
 
         function rateScript(index, type, event) {
             if (!userId) {
-                alert(currentLanguage === 'ru' ? 'Пожалуйста, войдите через Google, чтобы оценить!' : 'Please sign in with Google to rate!');
+                showNotification();
+                flashSignInButton();
                 return;
             }
 
@@ -923,6 +966,23 @@
             ripple.style.top = `${event.clientY - rect.top - radius}px`;
             button.appendChild(ripple);
             setTimeout(() => ripple.remove(), 600);
+        }
+
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.textContent = notification.getAttribute(`data-${currentLanguage}`);
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function flashSignInButton() {
+            const signInButton = document.getElementById('signInButton');
+            signInButton.classList.add('flash');
+            setTimeout(() => {
+                signInButton.classList.remove('flash');
+            }, 1000);
         }
 
         document.querySelectorAll('.sidebar button').forEach(button => {

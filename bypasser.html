@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Bypassers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2e2e2e);
+            color: #fff;
+            transition: all 0.5s ease;
+            overflow: hidden;
+            height: 100vh;
+        }
+        body.light-theme {
+            background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
+            color: #333;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .main-section {
+            flex: 4;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar {
+            flex: 0.7;
+            background: linear-gradient(180deg, #3a3a3a, #2e2e2e);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            transition: background 0.5s ease;
+        }
+        .sidebar.light-theme {
+            background: linear-gradient(180deg, #f0f0f0, #e0e0e0);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .bypass-banner {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .bypass-btn {
+            background: linear-gradient(45deg, #2E7D32, #4CAF50);
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+        .bypass-btn:hover {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+        }
+        .sidebar .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            border: 3px solid #ff6f61;
+        }
+        .theme-toggle, .language-toggle {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.5s ease;
+            margin: 15px 0;
+        }
+        .theme-toggle.light-theme, .language-toggle.light-theme {
+            color: #333;
+        }
+        .bypass-section, .player-check {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+        .player-info {
+            display: flex;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .player-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #03A9F4;
+        }
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid transparent;
+            border-top: 5px solid #03A9F4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="bypassContainer">
+        <div class="main-section" id="bypassSection">
+            <div class="bypass-banner">
+                <h2 data-ru="Обходники" data-en="Bypassers"></h2>
+                <button class="bypass-btn" onclick="showBypassMethod('bypass1')" data-ru="Обход 1" data-en="Bypass 1"></button>
+                <button class="bypass-btn" onclick="showBypassMethod('bypass2')" data-ru="Обход 2" data-en="Bypass 2"></button>
+                <button class="bypass-btn" onclick="showPlayerCheck()" data-ru="Проверить игрока" data-en="Check Player"></button>
+                <button class="bypass-btn" onclick="window.location.href='/site/index.html'" data-ru="На главную" data-en="Back to Main"></button>
+            </div>
+        </div>
+        <div class="sidebar">
+            <img src="images/Avatar.png" class="avatar" alt="Аватар пользователя" onerror="this.src='https://via.placeholder.com/80';">
+            <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+            <button class="language-toggle" onclick="toggleLanguage()"><i class="fas fa-globe"></i></button>
+        </div>
+    </div>
+
+    <div class="main-section bypass-section" id="bypass1Content">
+        <div class="bypass-banner">
+            <h2 data-ru="Обход 1" data-en="Bypass 1"></h2>
+            <input type="text" id="bypass1Input" data-ru-placeholder="Введи текст..." data-en-placeholder="Enter text...">
+            <button class="bypass-btn" onclick="applyBypass('bypass1')">Применить</button>
+            <div id="bypass1Output"></div>
+        </div>
+    </div>
+
+    <div class="main-section bypass-section" id="bypass2Content">
+        <div class="bypass-banner">
+            <h2 data-ru="Обход 2" data-en="Bypass 2"></h2>
+            <input type="text" id="bypass2Input" data-ru-placeholder="Введи текст..." data-en-placeholder="Enter text...">
+            <button class="bypass-btn" onclick="applyBypass('bypass2')">Применить</button>
+            <textarea id="bypass2Output" readonly></textarea>
+        </div>
+    </div>
+
+    <div class="main-section player-check" id="playerCheckContent">
+        <div class="bypass-banner">
+            <h2 data-ru="Проверить игрока" data-en="Check Player"></h2>
+            <input type="text" id="playerInput" data-ru-placeholder="Введи ник..." data-en-placeholder="Enter username...">
+            <button class="bypass-btn" onclick="checkPlayer()">Проверить</button>
+            <div class="loader" id="playerLoader"></div>
+            <div id="playerOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'ru';
+
+        function showBypassMethod(method) {
+            document.getElementById('bypassSection').style.display = 'none';
+            document.getElementById(`${method}Content`).style.display = 'flex';
+        }
+
+        function showPlayerCheck() {
+            document.getElementById('bypassSection').style.display = 'none';
+            document.getElementById('playerCheckContent').style.display = 'flex';
+        }
+
+        function applyBypass(method) {
+            if (method === 'bypass1') {
+                const input = document.getElementById('bypass1Input').value;
+                const output = document.getElementById('bypass1Output');
+                const charMap = { 'А': '🅰', 'а': '🅰', 'В': '🅱', 'в': '🅱', 'С': '🅲', 'с': '🅲' /* и так далее */ };
+                const result = input.split('').map(char => charMap[char] || char).join('');
+                output.innerHTML = result;
+            } else if (method === 'bypass2') {
+                const input = document.getElementById('bypass2Input').value;
+                const output = document.getElementById('bypass2Output');
+                const fancyMap = { 'A': 'Λ', 'a': 'α', 'B': 'Ɓ', 'b': 'в' /* и так далее */ };
+                if (/[А-Яа-яЁё]/.test(input)) {
+                    output.value = currentLanguage === 'ru' ? 'Только английский!' : 'English only!';
+                } else {
+                    output.value = input.split('').map(char => fancyMap[char] || char).join('');
+                }
+            }
+        }
+
+        async function checkPlayer() {
+            const username = document.getElementById('playerInput').value.trim();
+            const output = document.getElementById('playerOutput');
+            const loader = document.getElementById('playerLoader');
+
+            if (!username) {
+                alert(currentLanguage === 'ru' ? 'Введите ник!' : 'Enter username!');
+                return;
+            }
+
+            loader.style.display = 'block';
+            output.innerHTML = '';
+
+            try {
+                const userRes = await fetch(`https://users.roblox.com/v1/users/search?keyword=${username}&limit=10`);
+                const userData = await userRes.json();
+                const user = userData.data.find(u => u.name.toLowerCase() === username.toLowerCase());
+                if (!user) throw new Error('User not found');
+                const userId = user.id;
+
+                const [profileRes, avatarRes, gamesRes] = await Promise.all([
+                    fetch(`https://users.roblox.com/v1/users/${userId}`),
+                    fetch(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=150x150&format=Png&isCircular=true`),
+                    fetch(`https://games.roblox.com/v2/users/${userId}/favorite/games?limit=5`)
+                ]);
+
+                const profile = await profileRes.json();
+                const avatar = await avatarRes.json();
+                const games = await gamesRes.json();
+
+                const avatarUrl = avatar.data[0]?.imageUrl || 'https://via.placeholder.com/100';
+                const gameList = games.data.map(game => game.name).join('</li><li>') || (currentLanguage === 'ru' ? 'Нет игр' : 'No games');
+
+                loader.style.display = 'none';
+                output.innerHTML = `
+                    <div class="player-info">
+                        <img src="${avatarUrl}" class="player-avatar">
+                        <div>
+                            <h3>${profile.name}</h3>
+                            <p>ID: ${userId}</p>
+                            <p>${currentLanguage === 'ru' ? 'Дисплей:' : 'Display:'} ${profile.displayName}</p>
+                            <p>${currentLanguage === 'ru' ? 'Избранные игры:' : 'Favorite Games:'}</p>
+                            <ul><li>${gameList}</li></ul>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                output.innerHTML = currentLanguage === 'ru' ? 'Ошибка или игрок не найден!' : 'Error or player not found!';
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            document.querySelectorAll('.sidebar, .bypass-banner, .player-info').forEach(el => el.classList.toggle('light-theme'));
+            const toggle = document.querySelector('.theme-toggle');
+            toggle.innerHTML = document.body.classList.contains('light-theme') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-ru]').forEach(el => {
+                const key = currentLanguage === 'ru' ? 'data-ru' : 'data-en';
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.placeholder = el.getAttribute(key);
+                } else {
+                    el.textContent = el.getAttribute(key);
+                }
+            });
+        }
+
+        window.onload = () => {
+            updateLanguage();
+        };
+    </script>
+</body>
+</html>

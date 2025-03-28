@@ -75,6 +75,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            width: calc(100% - 40px);
         }
         .header img {
             width: 40px;
@@ -84,6 +85,15 @@
         .header h1 {
             font-size: 24px;
             margin: 0;
+            flex-grow: 1;
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
         }
         .main-section {
             flex: 4;
@@ -102,7 +112,7 @@
             flex-direction: column;
             align-items: center;
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-            transition: background 0.5s ease;
+            transition: background 0.5s ease, transform 0.3s ease;
             position: relative;
         }
         .sidebar.light-theme {
@@ -112,6 +122,26 @@
         .sidebar.space-theme {
             background: linear-gradient(180deg, #1a1a3d, #0d0d2b);
             box-shadow: -5px 0 15px rgba(255, 255, 255, 0.1);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: 0;
+                height: 100%;
+                width: 100%;
+                transform: translateX(100%);
+                z-index: 1000;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .main-section {
+                flex: 1;
+            }
         }
         .search-container {
             display: flex;
@@ -481,7 +511,7 @@
             flex: 0 0 auto;
             width: 200px;
         }
-        .history-content .script-card .delete-btn {
+        .history-content .script-card .delete-btn, .history-content .script-card .accept-btn, .history-content .script-card .reject-btn {
             background: linear-gradient(45deg, #ff4d4d, #ff6666);
             border: none;
             padding: 5px 10px;
@@ -489,11 +519,22 @@
             cursor: pointer;
             border-radius: 10px;
             margin-top: 5px;
+            margin-right: 5px;
             transition: all 0.3s ease;
         }
-        .history-content .script-card .delete-btn:hover {
-            background: linear-gradient(45deg, #ff6666, #ff8787);
+        .history-content .script-card .accept-btn {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+        }
+        .history-content .script-card .reject-btn {
+            background: linear-gradient(45deg, #ff4d4d, #ff6666);
+        }
+        .history-content .script-card .delete-btn:hover, .history-content .script-card .accept-btn:hover, .history-content .script-card .reject-btn:hover {
             transform: scale(1.05);
+        }
+        .history-content .script-card .status {
+            font-size: 12px;
+            color: #bbb;
+            margin-top: 5px;
         }
         .like-animation {
             position: absolute;
@@ -539,6 +580,7 @@
     <div class="header">
         <img id="headerAvatar" src="images/ava.png" alt="Site Avatar">
         <h1>Roblox Script Hub</h1>
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
     </div>
     <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
@@ -552,7 +594,7 @@
             </div>
             <div class="script-list" id="scriptListContainer"></div>
         </div>
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <img src="images/ava.png" class="avatar" id="userAvatar" alt="Аватар пользователя">
             <div class="user-name" id="userName"></div>
             <button class="tooltip" onclick="openModal()" id="submitButton">
@@ -712,7 +754,7 @@
         let isAuthChecked = false;
         let hasSubmitted = localStorage.getItem('hasSubmitted') || false;
         let notificationPreference = localStorage.getItem('notificationPreference') || null;
-        let telegramMessages = {}; // Для хранения chat_id и message_id
+        let telegramMessages = {};
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
@@ -859,6 +901,13 @@
             });
         }
 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            sidebar.classList.toggle('open');
+            menuToggle.innerHTML = sidebar.classList.contains('open') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        }
+
         function openModal() {
             if (!isAuthChecked) return;
             if (!userId) {
@@ -923,19 +972,26 @@
         function openHistory() {
             const historyList = document.getElementById('historyList');
             historyList.innerHTML = '';
-            userScripts.forEach((script, index) => {
+            const allScripts = [...userScripts, ...Object.keys(pendingScripts).map(key => ({ ...pendingScripts[key], id: key, isPending: true }))];
+            allScripts.forEach((script, index) => {
                 const card = document.createElement('div');
                 card.className = 'script-card';
+                const status = script.isPending ? (currentLanguage === 'ru' ? 'Ожидает модерации' : 'Pending moderation') : (currentLanguage === 'ru' ? 'Принят' : 'Accepted');
                 card.innerHTML = `
-                    <img src="${script.avatar || 'https://placehold.co/200x1500x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
+                    <img src="${script.avatar || 'https://placehold.co/200x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
                     <div class="script-info">
                         <h3>${script.name || 'Без названия'}</h3>
                         <div class="username">${script.user || 'Аноним'}</div>
+                        <div class="status">${status}</div>
+                        ${script.isPending ? `
+                            <button class="accept-btn" onclick="simulateTelegramCallback('accept_${script.id}', event)">Принять</button>
+                            <button class="reject-btn" onclick="simulateTelegramCallback('reject_${script.id}', event)">Отказать</button>
+                        ` : ''}
                         <button class="delete-btn" onclick="deleteUserScript('${script.id}', event)">Удалить</button>
                     </div>
                 `;
                 card.onclick = (e) => {
-                    if (!e.target.classList.contains('delete-btn')) {
+                    if (!e.target.classList.contains('delete-btn') && !e.target.classList.contains('accept-btn') && !e.target.classList.contains('reject-btn')) {
                         closeHistory();
                         openFullscreen(scripts.findIndex(s => s.name === script.name && s.user === script.user));
                     }
@@ -1087,6 +1143,11 @@
             });
         }
 
+        function simulateTelegramCallback(callbackData, event) {
+            event.stopPropagation();
+            handleTelegramCallback(callbackData);
+        }
+
         function handleTelegramCallback(callbackData) {
             const [action, scriptId] = callbackData.split('_');
             console.log(`Handling Telegram callback: ${action} for script ${scriptId}`);
@@ -1200,6 +1261,10 @@
                     .then(() => {
                         database.ref('userScripts/' + userId + '/' + scriptId).remove()
                             .then(() => {
+                                if (pendingScripts[scriptId]) {
+                                    delete pendingScripts[scriptId];
+                                    removeTelegramButtons(scriptId);
+                                }
                                 loadUserScripts();
                                 loadScripts();
                             })
@@ -1397,6 +1462,7 @@
             }, 1000);
         }
 
+        document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
         document.querySelectorAll('.sidebar button').forEach(button => {
             button.addEventListener('click', createRipple);
         });
@@ -1406,8 +1472,7 @@
         changeTheme();
         loadScripts();
 
-        // Для обработки Telegram callback (нужен серверный код, здесь для примВера)
         window.handleTelegramCallback = handleTelegramCallback;
     </script>
 </body>
-</html>
+    </html>

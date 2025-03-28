@@ -229,13 +229,19 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border: 3px solid #ff6f61;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .sidebar .avatar:hover {
             transform: scale(1.1);
             box-shadow: 0 0 20px rgba(255, 111, 97, 0.5);
+        }
+        .sidebar .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #fff;
         }
         .sidebar button, .sidebar a {
             background: linear-gradient(90deg, #ff6f61, #ff8787);
@@ -426,11 +432,35 @@
         .flash {
             animation: flash 0.5s ease 2;
         }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--background-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1001;
+        }
+        .loading i {
+            font-size: 40px;
+            color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <div class="loading" id="loading">
+        <i class="fas fa-spinner"></i>
+    </div>
     <div class="stars" id="stars"></div>
-    <div class="container" id="mainContainer">
+    <div class="container" id="mainContainer" style="display: none;">
         <div class="main-section" id="scriptList">
             <div class="search-container">
                 <i class="fas fa-search"></i>
@@ -444,6 +474,7 @@
         </div>
         <div class="sidebar">
             <img src="https://placehold.co/80x80" class="avatar" id="userAvatar" alt="Аватар пользователя">
+            <div class="user-name" id="userName"></div>
             <button class="tooltip" onclick="openModal()" id="submitButton">
                 <i class="fas fa-upload"></i> <span data-ru="Выложить работу" data-en="Submit work"></span>
                 <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
@@ -577,6 +608,7 @@
         let userId = localStorage.getItem('userId') || null;
         let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentTheme = localStorage.getItem('theme') || 'dark';
+        let isAuthChecked = false; // Флаг для отслеживания завершения проверки авторизации
 
         // Настройка провайдера Google для Firebase Authentication
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -604,6 +636,7 @@
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
+                document.getElementById('userName').textContent = '';
                 createRipple(event);
                 loadScripts();
             }).catch(error => {
@@ -613,6 +646,8 @@
 
         // Проверка состояния авторизации
         auth.onAuthStateChanged(user => {
+            const loading = document.getElementById('loading');
+            const mainContainer = document.getElementById('mainContainer');
             if (user) {
                 // Пользователь авторизован
                 username = user.displayName;
@@ -628,6 +663,7 @@
                 document.getElementById('signOutButton').style.display = 'block';
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('userAvatar').src = user.photoURL || 'https://placehold.co/80x80';
+                document.getElementById('userName').textContent = username;
                 loadUserScripts();
                 loadScripts();
             } else {
@@ -641,8 +677,13 @@
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
+                document.getElementById('userName').textContent = '';
                 loadScripts();
             }
+            // Скрываем индикатор загрузки и показываем основной контент
+            loading.style.display = 'none';
+            mainContainer.style.display = 'flex';
+            isAuthChecked = true;
         });
 
         function changeLanguage() {
@@ -699,6 +740,7 @@
         }
 
         function openModal() {
+            if (!isAuthChecked) return; // Не открываем модалку, пока не проверили авторизацию
             if (!userId) {
                 showNotification();
                 flashSignInButton();
@@ -831,6 +873,7 @@
         }
 
         function rateScript(index, type, event) {
+            if (!isAuthChecked) return; // Не обрабатываем, если авторизация не проверена
             if (!userId) {
                 showNotification();
                 flashSignInButton();
@@ -991,9 +1034,9 @@
 
         // Инициализация
         createStars();
-        loadScripts();
         updateLanguage();
         changeTheme();
+        // Не загружаем скрипты до завершения проверки авторизации
     </script>
 </body>
 </html>

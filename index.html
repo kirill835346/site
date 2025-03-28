@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roblox Script Hub</title>
-    <!-- Иконки FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Шрифты Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Стили оставляем без изменений */
         body {
             margin: 0;
             padding: 0;
@@ -429,13 +426,839 @@
             margin-right: 5px;
             color: #ffd700;
         }
+        /* Стили для второго файла (index (1).html) */
+        body.light-theme {
+            background: linear-gradient(135deg, #e0e0e0, #f5f5f5);
+        }
+        body.light-theme .banner {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        body.light-theme .banner-title {
+            color: #333;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme input,
+        body.light-theme textarea,
+        body.light-theme #bypass1Output,
+        body.light-theme #bypass2Output {
+            background: #fff;
+            color: #000;
+        }
+        body.light-theme .top-banner {
+            background: linear-gradient(45deg, #d0d0d0, #e8e8e8);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        body.light-theme .top-banner a,
+        body.light-theme .top-banner span {
+            color: #333;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .top-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(45deg, #2a2a4a, #4a4a7a);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: glowBanner 2s ease-in-out infinite;
+        }
+        @keyframes glowBanner {
+            0% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
+        }
+        .top-banner a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .top-banner a:hover {
+            transform: scale(1.05);
+            color: #ff8787;
+        }
+        .top-banner .roblox-icon {
+            font-size: 20px;
+        }
+        .top-banner .banner-text {
+            font-size: 18px;
+            color: white;
+            text-shadow: 0 1px 5px rgba(255, 255, 255, 0.3);
+            animation: shineText 3s ease-in-out infinite;
+        }
+        @keyframes shineText {
+            0% { text-shadow: 0 1px 5px rgba(255, 255, 255, 0.3); }
+            50% { text-shadow: 0 1px 10px rgba(255, 255, 255, 0.8); }
+            100% { text-shadow: 0 1px 5px rgba(255, 255, 255, 0.3); }
+        }
+        .warning-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: absolute;
+            right: -120px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .warning-cloud {
+            width: 20px;
+            height: 20px;
+            background: #ff4d4d;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            animation: pulseCloud 1.5s ease-in-out infinite;
+        }
+        @keyframes pulseCloud {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+        .warning-text {
+            color: #ff4d4d;
+            font-size: 14px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        body.light-theme .warning-text {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .bypass2-warning {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            color: #ff4d4d;
+            font-size: 14px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        body.light-theme .bypass2-warning {
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translate(0, 0); opacity: 0.7; }
+            100% { transform: translate(50vw, 50vh); opacity: 0.2; }
+        }
+        .cursor-glow {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 0.1s ease;
+            z-index: 1000;
+        }
+        .container {
+            text-align: center;
+            color: white;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        @keyframes fadeIn { to { opacity: 1; } }
+        .theme-toggle {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            transform: translateY(-50%) scale(1.2);
+        }
+        body.light-theme .theme-toggle {
+            color: #333;
+        }
+        .language-toggle {
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .language-toggle:hover {
+            transform: translateY(-50%) scale(1.2);
+        }
+        body.light-theme .language-toggle {
+            color: #333;
+        }
+        .menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+        .menu-title {
+            font-size: 36px;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        body.light-theme .menu-title {
+            color: #333;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .menu-title span {
+            display: inline-block;
+            animation: wave 1.5s infinite;
+        }
+        .menu-title span:nth-child(1) { animation-delay: 0s; }
+        .menu-title span:nth-child(2) { animation-delay: 0.1s; }
+        .menu-title span:nth-child(3) { animation-delay: 0.2s; }
+        .menu-title span:nth-child(4) { animation-delay: 0.3s; }
+        .menu-title span:nth-child(5) { animation-delay: 0.4s; }
+        .menu-title span:nth-child(6) { animation-delay: 0.5s; }
+        .menu-title span:nth-child(7) { animation-delay: 0.6s; }
+        .menu-title span:nth-child(8) { animation-delay: 0.7s; }
+        .menu-title span:nth-child(9) { animation-delay: 0.8s; }
+        .menu-title span:nth-child(10) { animation-delay: 0.9s; }
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: flyIn 0.5s ease forwards;
+        }
+        .btn:hover {
+            transform: scale(1.1) translateY(-3px);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        body.light-theme .btn {
+            color: #333;
+        }
+        .menu-btn {
+            background: #ff4d4d;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            animation: pulseButton 2s ease-in-out infinite;
+        }
+        .menu-btn:hover {
+            background: #ff6666;
+            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.5);
+        }
+        body.light-theme .menu-btn {
+            background: #ff8787;
+            box-shadow: 0 4px 15px rgba(255, 135, 135, 0.3);
+        }
+        body.light-theme .menu-btn:hover {
+            background: #ff9f9f;
+            box-shadow: 0 6px 20px rgba(255, 135, 135, 0.5);
+        }
+        .check-btn {
+            background: linear-gradient(45deg, #0288D1, #03A9F4);
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
+            animation: pulseButton 2s ease-in-out infinite;
+        }
+        .check-btn:hover {
+            background: linear-gradient(45deg, #03A9F4, #4FC3F7);
+            box-shadow: 0 6px 20px rgba(2, 136, 209, 0.5);
+        }
+        body.light-theme .check-btn {
+            background: linear-gradient(45deg, #4FC3F7, #81D4FA);
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.2);
+        }
+        body.light-theme .check-btn:hover {
+            background: linear-gradient(45deg, #81D4FA, #B3E5FC);
+            box-shadow: 0 6px 20px rgba(2, 136, 209, 0.4);
+        }
+        .bypass-btn {
+            background: linear-gradient(45deg, #2E7D32, #4CAF50);
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+        }
+        .bypass-btn:hover {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.5);
+        }
+        body.light-theme .bypass-btn {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
+        }
+        body.light-theme .bypass-btn:hover {
+            background: linear-gradient(45deg, #66BB6A, #81C784);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+        }
+        @keyframes pulseButton {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        @keyframes flyIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            animation: slideIn 0.5s ease forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(50px); opacity: 0; }
+        }
+        .banner {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .banner-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            animation: pulseText 2s ease-in-out infinite;
+        }
+        @keyframes pulseText {
+            0% { transform: scale(1); text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+            50% { transform: scale(1.05); text-shadow: 0 2px 10px rgba(255, 255, 255, 0.5); }
+            100% { transform: scale(1); text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        textarea {
+            resize: none;
+            height: 100px;
+            background: #e0e0e0;
+            color: #000;
+        }
+        #bypass1Output {
+            width: 100%;
+            height: 100px;
+            overflow-y: auto;
+            background: #e0e0e0;
+            border-radius: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            color: #000;
+        }
+        .arrow-container {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            position: relative;
+        }
+        .arrow-btn {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: pulseButton 2s ease-in-out infinite, flyIn 0.5s ease forwards;
+        }
+        .arrow-btn:hover {
+            background: linear-gradient(45deg, #66BB6A, #81C784);
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+        .arrow-btn:active {
+            transform: scale(0.9);
+        }
+        .arrow-icon {
+            font-size: 24px;
+            color: white;
+        }
+        .arrow-btn.glow {
+            animation: glowEffect 1s ease;
+        }
+        @keyframes glowEffect {
+            0% { box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.5); }
+            100% { box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); }
+        }
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkleAnimation 0.6s ease forwards;
+        }
+        @keyframes sparkleAnimation {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .copy-btn {
+            background: linear-gradient(45deg, #2196F3, #42A5F5);
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+            animation: pulseButton 2s ease-in-out infinite, flyIn 0.5s ease forwards;
+        }
+        .copy-btn:hover {
+            background: linear-gradient(45deg, #42A5F5, #64B5F6);
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        .copy-icon {
+            font-size: 18px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff4d4d, #ff6666);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: pulseButton 2s ease-in-out infinite, flyIn 0.5s ease forwards;
+        }
+        .close-btn:hover {
+            background: linear-gradient(45deg, #ff6666, #ff8787);
+            transform: rotate(90deg);
+            box-shadow: 0 6px 20px rgba(255, 77, 77, 0.5);
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 12px;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .arrow-btn:hover .tooltiptext,
+        .close-btn:hover .tooltiptext {
+            transform: translateX(-50%);
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: rippleAnimation 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes rippleAnimation {
+            to { transform: scale(4); opacity: 0; }
+        }
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleAnimation 1s ease forwards;
+        }
+        @keyframes particleAnimation {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)); opacity: 0; }
+        }
+        .hover-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: hoverParticleAnimation 0.8s ease forwards;
+        }
+        @keyframes hoverParticleAnimation {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)); opacity: 0; }
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .glow-circle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: glowCircleAnimation 5s ease infinite;
+        }
+        @keyframes glowCircleAnimation {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(50px, 50px) scale(1.5); opacity: 0.8; }
+            100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        }
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid transparent;
+            border-top: 5px solid #03A9F4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: relative;
+            margin: 20px 0;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 5px solid transparent;
+            border-top: 5px solid #0288D1;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+        }
+        .loader::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 5px solid transparent;
+            border-top: 5px solid #4FC3F7;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .player-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .player-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #03A9F4;
+            box-shadow: 0 0 10px rgba(3, 169, 244, 0.5);
+            transition: transform 0.3s ease;
+        }
+        .player-avatar:hover {
+            transform: scale(1.1);
+        }
+        .player-details {
+            flex: 1;
+            color: white;
+            text-align: left;
+        }
+        body.light-theme .player-details {
+            color: #333;
+        }
+        .player-details h3 {
+            margin: 0 0 5px;
+            font-size: 20px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        .player-details p {
+            margin: 5px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .player-details .label {
+            font-weight: bold;
+            color: #03A9F4;
+        }
+        .player-details ul {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0;
+        }
+        .player-details ul li {
+            font-size: 14px;
+            margin: 3px 0;
+        }
     </style>
 </head>
 <body>
     <div class="контейнер">
         <!-- Главная секция для скриптов -->
-        <div class="главная-секция" id="списокСкриптов">
-            <input type="text" class="поиск" id="полеПоиска" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="поискСкриптов()">
+        <div class="главная-секция" id="mainContent">
+            <div id="generalContent">
+                <input type="text" class="поиск" id="полеПоиска" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="поискСкриптов()">
+            </div>
+            <div id="bypassContent" style="display: none;">
+                <div class="top-banner">
+                    <a href="https://github.com/kirill835346" target="_blank">
+                        <i class="fab fa-github"></i>
+                        <span data-ru="GitHub: kirill835346" data-en="GitHub: kirill835346"></span>
+                    </a>
+                    <span class="banner-text" data-ru="Roblox Обход" data-en="Roblox Bypass"></span>
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <a href="https://funpay.com/users/9532559/" target="_blank">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span data-ru="FunPay" data-en="FunPay"></span>
+                        </a>
+                        <span class="roblox-icon" data-ru="🎮 Roblox" data-en="🎮 Roblox"></span>
+                    </div>
+                </div>
+
+                <div class="stars" id="stars"></div>
+                <div class="cursor-glow" id="cursorGlow"></div>
+
+                <div class="container">
+                    <div class="menu" id="bypassMenu">
+                        <div class="menu-title">
+                            <span data-ru="R" data-en="R"></span>
+                            <span data-ru="o" data-en="o"></span>
+                            <span data-ru="b" data-en="b"></span>
+                            <span data-ru="l" data-en="l"></span>
+                            <span data-ru="o" data-en="o"></span>
+                            <span data-ru="x" data-en="x"></span>
+                            <span> </span>
+                            <span data-ru="О" data-en="B"></span>
+                            <span data-ru="б" data-en="y"></span>
+                            <span data-ru="х" data-en="p"></span>
+                            <span data-ru="о" data-en="a"></span>
+                            <span data-ru="д" data-en="s"></span>
+                            <span data-ru="" data-en="s"></span>
+                        </div>
+
+                        <button class="language-toggle tooltip" onclick="toggleLanguage()">
+                            <i class="fas fa-globe"></i>
+                            <span class="tooltiptext" data-ru="Сменить язык" data-en="Change language"></span>
+                        </button>
+
+                        <button class="btn menu-btn tooltip" onclick="showBypass()" data-ru="Обход" data-en="Bypass">
+                            <span class="tooltiptext" data-ru="Открыть меню обхода" data-en="Open bypass menu"></span>
+                        </button>
+                        <button class="btn check-btn tooltip" onclick="showPlayerCheck()" data-ru="Проверить игрока" data-en="Check Player">
+                            <span class="tooltiptext" data-ru="Проверить профиль игрока" data-en="Check player profile"></span>
+                        </button>
+
+                        <button class="theme-toggle tooltip" onclick="toggleTheme()">
+                            <i class="fas fa-moon"></i>
+                            <span class="tooltiptext" data-ru="Переключить тему" data-en="Toggle theme"></span>
+                        </button>
+                    </div>
+
+                    <div class="content" id="bypassSubContent">
+                        <button class="close-btn tooltip" onclick="backToMenu()">
+                            <i class="fas fa-times"></i>
+                            <span class="tooltiptext" data-ru="Закрыть" data-en="Close"></span>
+                        </button>
+                        <div class="banner">
+                            <div class="banner-title" data-ru="Выбери тип обхода" data-en="Choose bypass type"></div>
+                            <button class="btn bypass-btn tooltip" onclick="showBypassMethod('bypass1')" data-ru="Обход 1" data-en="Bypass 1">
+                                <span class="tooltiptext" data-ru="Эффект 🆃🅴🆂🆃🅸🅺" data-en="Effect 🆃🅴🆂🆃🅸🅺"></span>
+                            </button>
+                            <div style="position: relative;">
+                                <button class="btn bypass-btn tooltip" onclick="showBypassMethod('bypass2')" data-ru="Обход 2" data-en="Bypass 2">
+                                    <span class="tooltiptext" data-ru="Эффект ƬΣƧƬIK (только англ)" data-en="Effect ƬΣƧƬIK (Eng only)"></span>
+                                </button>
+                                <div class="warning-container">
+                                    <div class="warning-cloud"></div>
+                                    <span class="warning-text" data-ru="Только англ" data-en="Eng only"></span>
+                                    <i class="fas fa-language" style="color: #ff4d4d;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content" id="bypass1Content">
+                        <button class="close-btn tooltip" onclick="backToBypassMenu()">
+                            <i class="fas fa-times"></i>
+                            <span class="tooltiptext" data-ru="Вернуться к выбору" data-en="Back to selection"></span>
+                        </button>
+                        <div class="banner">
+                            <div class="banner-title" data-ru="Обход 1" data-en="Bypass 1"></div>
+                            <input type="text" id="bypass1Input" placeholder="Введи текст..." data-placeholder-ru="Введи текст..." data-placeholder-en="Enter text...">
+                            <div class="arrow-container">
+                                <button class="arrow-btn tooltip" onclick="applyBypass('bypass1')">
+                                    <i class="fas fa-arrow-right arrow-icon"></i>
+                                    <span class="tooltiptext" data-ru="Преобразовать текст" data-en="Transform text"></span>
+                                </button>
+                            </div>
+                            <div id="bypass1Output"></div>
+                            <button class="copy-btn tooltip" onclick="copyText('bypass1Output')">
+                                <i class="fas fa-copy copy-icon"></i>
+                                <span data-ru="Копировать" data-en="Copy"></span>
+                                <span class="tooltiptext" data-ru="Скопировать текст" data-en="Copy text"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="content" id="bypass2Content">
+                        <button class="close-btn tooltip" onclick="backToBypassMenu()">
+                            <i class="fas fa-times"></i>
+                            <span class="tooltiptext" data-ru="Вернуться к выбору" data-en="Back to selection"></span>
+                        </button>
+                        <div class="banner">
+                            <div class="banner-title" data-ru="Обход 2" data-en="Bypass 2"></div>
+                            <input type="text" id="bypass2Input" placeholder="Введи текст..." data-placeholder-ru="Введи текст..." data-placeholder-en="Enter text...">
+                            <div class="arrow-container">
+                                <button class="arrow-btn tooltip" onclick="applyBypass('bypass2')">
+                                    <i class="fas fa-arrow-right arrow-icon"></i>
+                                    <span class="tooltiptext" data-ru="Преобразовать текст" data-en="Transform text"></span>
+                                </button>
+                                <div class="bypass2-warning" style="position: absolute; bottom: -25px;">
+                                    <div class="warning-cloud"></div>
+                                    <span data-ru="Только англ" data-en="Eng only"></span>
+                                    <i class="fas fa-language"></i>
+                                </div>
+                            </div>
+                            <textarea id="bypass2Output" readonly></textarea>
+                            <button class="copy-btn tooltip" onclick="copyText('bypass2Output')">
+                                <i class="fas fa-copy copy-icon"></i>
+                                <span data-ru="Копировать" data-en="Copy"></span>
+                                <span class="tooltiptext" data-ru="Скопировать текст" data-en="Copy text"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="content" id="playerCheckContent">
+                        <button class="close-btn tooltip" onclick="backToMenu()">
+                            <i class="fas fa-times"></i>
+                            <span class="tooltiptext" data-ru="Закрыть" data-en="Close"></span>
+                        </button>
+                        <div class="banner">
+                            <div class="banner-title" data-ru="Проверить игрока" data-en="Check Player"></div>
+                            <input type="text" id="playerInput" placeholder="Введи ник..." data-placeholder-ru="Введи ник..." data-placeholder-en="Enter username...">
+                            <div class="arrow-container">
+                                <button class="arrow-btn tooltip" onclick="checkPlayer(event)">
+                                    <i class="fas fa-arrow-right arrow-icon"></i>
+                                    <span class="tooltiptext" data-ru="Проверить" data-en="Check"></span>
+                                </button>
+                            </div>
+                            <div class="loader" id="playerLoader"></div>
+                            <div id="playerOutput"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Боковая панель -->
@@ -445,6 +1268,7 @@
             <button onclick="показатьУведомление()"><i class="fas fa-key иконка"></i> <span data-ru="Получить ключ" data-en="Get key"></span></button>
             <button class="переключатель-темы" onclick="переключитьТему()"><i class="fas fa-moon"></i></button>
             <button class="переключатель-языка" onclick="переключитьЯзык()"><i class="fas fa-globe"></i></button>
+            <button onclick="navigateToBypass()"><i class="fas fa-key иконка"></i> <span data-ru="Обход" data-en="Bypass"></span></button>
         </div>
     </div>
 
@@ -495,23 +1319,63 @@
     </div>
 
     <script>
-        const REPO_OWNER = 'kirill835346'; // Твой username
-        const REPO_NAME = 'ihpdfgbdnjfg'; // Название репозитория
-        const SCRIPTS_PATH = 'scripts.json'; // Путь к файлу scripts.json
-        const IMAGES_PATH = 'images'; // Папка для изображений
-        const DISPATCH_TOKEN = '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'; // Вставь новый токен сюда
+        const REPO_OWNER = 'kirill835346';
+        const REPO_NAME = 'ihpdfgbdnjfg';
+        const SCRIPTS_PATH = 'scripts.json';
+        const IMAGES_PATH = 'images';
+        const DISPATCH_TOKEN = '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';
 
         let scripts = [];
         let имяПользователя = localStorage.getItem('имяПользователя') || null;
         let текущийЯзык = 'ru';
+        let currentLanguage = 'ru';
+        const corsProxyUrl = 'https://proxy.cors.sh/';
+        const corsProxyToken = 'temp_d8a2c622e0809bbbef724e72048d3ba1';
 
-        // Загрузка скриптов из GitHub
+        // Маршрутизация
+        function navigateToGeneral() {
+            history.pushState({ page: 'general' }, 'General', '/general');
+            document.getElementById('generalContent').style.display = 'block';
+            document.getElementById('bypassContent').style.display = 'none';
+            updateLanguage();
+        }
+
+        function navigateToBypass() {
+            history.pushState({ page: 'bypass' }, 'Bypass', '/bypass');
+            document.getElementById('generalContent').style.display = 'none';
+            document.getElementById('bypassContent').style.display = 'block';
+            updateLanguage();
+            createStars();
+            createGlowCircles();
+        }
+
+        window.onpopstate = function(event) {
+            if (event.state && event.state.page === 'general') {
+                navigateToGeneral();
+            } else if (event.state && event.state.page === 'bypass') {
+                navigateToBypass();
+            }
+        };
+
+        // Инициализация маршрута при загрузке
+        window.onload = function() {
+            const path = window.location.pathname;
+            if (path === '/bypass') {
+                navigateToBypass();
+            } else {
+                navigateToGeneral();
+            }
+            определитьЯзыкПоIP();
+            загрузитьСкрипты();
+        };
+
+        // Функции для первого файла
         async function загрузитьСкрипты() {
             try {
                 const response = await fetch(`https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${SCRIPTS_PATH}`);
                 scripts = await response.json();
 
-                const списокСкриптов = document.getElementById('списокСкриптов');
+                const списокСкриптов = document.getElementById('generalContent');
                 списокСкриптов.innerHTML = '<input type="text" class="поиск" id="полеПоиска" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="поискСкриптов()">';
                 scripts.forEach((скрипт, индекс) => {
                     const карточка = document.createElement('div');
@@ -535,7 +1399,6 @@
             }
         }
 
-        // Открыть модальное окно
         function открытьМодальное() {
             const модальное = document.getElementById('модальноеОтправки');
             модальное.style.display = 'flex';
@@ -546,7 +1409,6 @@
             обновитьЯзык();
         }
 
-        // Проверить длину кода
         function проверитьДлинуКода() {
             const код = document.getElementById('кодСкрипта').value;
             const строк = код.split('\n').length;
@@ -557,7 +1419,6 @@
             }
         }
 
-        // Очистить форму после отправки
         function очиститьФорму() {
             document.getElementById('вводАватара').value = '';
             document.getElementById('названиеСкрипта').value = '';
@@ -570,7 +1431,6 @@
             document.getElementById('счётчикСтрок').textContent = текущийЯзык === 'ru' ? 'Строк: 0' : 'Lines: 0';
         }
 
-        // Отправить скрипт через repository_dispatch
         async function отправитьСкрипт() {
             const аватар = document.getElementById('вводАватара').files[0];
             const название = document.getElementById('названиеСкрипта').value;
@@ -591,14 +1451,12 @@
             }
 
             try {
-                // Читаем аватар как base64
                 const reader = new FileReader();
                 reader.onload = async function() {
                     const base64Image = reader.result.split(',')[1];
                     const avatarFilename = `${Date.now()}_avatar.jpg`;
                     const avatarUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${IMAGES_PATH}/${avatarFilename}`;
 
-                    // Формируем данные скрипта
                     const newScript = {
                         id: Date.now().toString(),
                         аватар: avatarUrl,
@@ -608,10 +1466,9 @@
                         цель: цель,
                         пользователь: имя,
                         естьКлюч: естьКлюч,
-                        avatar: base64Image // Передаём аватар как base64
+                        avatar: base64Image
                     };
 
-                    // Отправляем событие repository_dispatch
                     const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/dispatches`, {
                         method: 'POST',
                         headers: {
@@ -630,7 +1487,6 @@
                         alert(текущийЯзык === 'ru' ? 'Скрипт отправлен! Обновите страницу через несколько секунд.' : 'Script submitted! Refresh the page in a few seconds.');
                         очиститьФорму();
                         document.getElementById('модальноеОтправки').style.display = 'none';
-                        // Автоматическое обновление через 5 секунд
                         setTimeout(() => {
                             загрузитьСкрипты();
                         }, 5000);
@@ -645,7 +1501,6 @@
             }
         }
 
-        // Открыть полноэкранное окно
         function открытьПолноэкранное(скрипт, индекс) {
             const окно = document.getElementById('полноэкранноеОкно');
             const содержимое = document.getElementById('содержимоеПолноэкранного');
@@ -653,134 +1508,4 @@
             document.getElementById('полноэкранноеНазвание').textContent = скрипт.название;
             document.getElementById('полноэкранноеИмя').textContent = скрипт.пользователь;
             document.getElementById('полноэкранноеОписание').textContent = `${текущийЯзык === 'ru' ? 'Описание:' : 'Description:'} ${скрипт.описание}`;
-            document.getElementById('полноэкраннаяЦель').textContent = `${текущийЯзык === 'ru' ? 'На что код:' : 'What the code is for:'} ${скрипт.цель}`;
-            document.getElementById('полноэкранныйКод').textContent = скрипт.код;
-            const статусКлюча = document.getElementById('полноэкранныйСтатусКлюча');
-            if (скрипт.естьКлюч) {
-                статусКлюча.innerHTML = `
-                    <i class="fas fa-key иконка-ключа"></i>
-                    ${текущийЯзык === 'ru' ? 'Ключ доступа' : 'Access Key'}
-                `;
-            } else {
-                статусКлюча.innerHTML = '';
-            }
-            if (document.body.classList.contains('светлый-режим')) {
-                содержимое.classList.add('светлый-режим');
-                document.getElementById('полноэкранноеИмя').classList.add('светлый-режим');
-                document.getElementById('полноэкранныйКод').classList.add('светлый-режим');
-                document.querySelector('.крестик').classList.add('светлый-режим');
-            }
-            окно.classList.add('открыто');
-            содержимое.classList.add('открыто');
-        }
-
-        // Закрыть полноэкранное окно
-        function закрытьПолноэкранное() {
-            const окно = document.getElementById('полноэкранноеОкно');
-            const содержимое = document.getElementById('содержимоеПолноэкранного');
-            окно.classList.remove('открыто');
-            содержимое.classList.remove('открыто');
-        }
-
-        // Скопировать код
-        function скопироватьКод() {
-            const код = document.getElementById('полноэкранныйКод').textContent;
-            navigator.clipboard.writeText(код).then(() => {
-                alert(текущийЯзык === 'ru' ? 'Код скопирован!' : 'Code copied!');
-            }).catch(err => {
-                console.error('Ошибка копирования:', err);
-                alert(текущийЯзык === 'ru' ? 'Не удалось скопировать код.' : 'Failed to copy code.');
-            });
-        }
-
-        // Поиск скриптов по названию
-        function поискСкриптов() {
-            const запрос = document.getElementById('полеПоиска').value.toLowerCase();
-            const карточки = document.querySelectorAll('.карточка-скрипта');
-            карточки.forEach(карточка => {
-                const название = карточка.querySelector('h3').textContent.toLowerCase();
-                карточка.style.display = название.includes(запрос) ? 'block' : 'none';
-            });
-        }
-
-        // Показать уведомление
-        function показатьУведомление() {
-            const уведомление = document.getElementById('уведомление');
-            уведомление.style.display = 'block';
-            setTimeout(() => {
-                уведомление.style.display = 'none';
-            }, 3000);
-        }
-
-        // Переключить тему
-        function переключитьТему() {
-            const тело = document.body;
-            const переключатель = document.querySelector('.переключатель-темы');
-            тело.classList.toggle('светлый-режим');
-            document.querySelector('.боковая-панель').classList.toggle('светлый-режим');
-            document.querySelector('.поиск').classList.toggle('светлый-режим');
-            document.querySelectorAll('.карточка-скрипта').forEach(карточка => карточка.classList.toggle('светлый-режим'));
-            document.querySelectorAll('.инфо-скрипта').forEach(инфо => инфо.classList.toggle('светлый-режим'));
-            document.querySelectorAll('.имя-юзера').forEach(имя => имя.classList.toggle('светлый-режим'));
-            if (document.getElementById('модальноеОтправки').style.display === 'flex') {
-                document.querySelector('.содержимое-модального').classList.toggle('светлый-режим');
-                document.querySelectorAll('.содержимое-модального input, .содержимое-модального textarea').forEach(поле => поле.classList.toggle('светлый-режим'));
-                document.querySelectorAll('.содержимое-модального small').forEach(подсказка => подсказка.classList.toggle('светлый-режим'));
-                document.querySelector('.метка-галочки').classList.toggle('светлый-режим');
-            }
-            if (document.getElementById('полноэкранноеОкно').classList.contains('открыто')) {
-                document.getElementById('содержимоеПолноэкранного').classList.toggle('светлый-режим');
-                document.getElementById('полноэкранноеИмя').classList.toggle('светлый-режим');
-                document.getElementById('полноэкранныйКод').classList.toggle('светлый-режим');
-                document.querySelector('.крестик').classList.toggle('светлый-режим');
-            }
-            переключатель.innerHTML = тело.classList.contains('светлый-режим') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        }
-
-        // Определение языка по IP
-        async function определитьЯзыкПоIP() {
-            try {
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                const страна = data.country_code;
-                текущийЯзык = (страна === 'RU' || страна === 'UA' || страна === 'BY') ? 'ru' : 'en';
-                обновитьЯзык();
-            } catch (error) {
-                console.error('Ошибка определения языка по IP:', error);
-                текущийЯзык = 'ru';
-                обновитьЯзык();
-            }
-        }
-
-        // Переключить язык вручную
-        function переключитьЯзык() {
-            текущийЯзык = текущийЯзык === 'ru' ? 'en' : 'ru';
-            обновитьЯзык();
-        }
-
-        // Обновить текст на странице в зависимости от языка
-        function обновитьЯзык() {
-            document.querySelectorAll('[data-ru]').forEach(element => {
-                const ключ = текущийЯзык === 'ru' ? 'data-ru' : 'data-en';
-                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                    element.placeholder = element.getAttribute(ключ);
-                } else {
-                    element.textContent = element.getAttribute(ключ);
-                }
-            });
-        }
-
-        // Обновление текста галочки
-        document.getElementById('естьКлюч').addEventListener('change', function() {
-            const текстГалочки = document.querySelector('.текст-галочки');
-            текстГалочки.textContent = this.checked ? (текущийЯзык === 'ru' ? 'Есть ключ' : 'Has key') : (текущийЯзык === 'ru' ? 'Нет ключа' : 'No key');
-        });
-
-        // Загрузка скриптов при старте
-        window.onload = function() {
-            определитьЯзыкПоIP();
-            загрузитьСкрипты();
-        };
-    </script>
-</body>
-</html>
+            document.getElementById('полноэкраннаяЦель').textContent = `${текущийЯзык === 'ru' ? 'На что код:' : '

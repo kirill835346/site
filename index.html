@@ -6,9 +6,9 @@
     <title>Roblox Script Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://accounts.google.com/gsi/client" async defer onload="onGoogleScriptLoad()"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         body {
             margin: 0;
@@ -526,7 +526,6 @@
     <script>
         const TELEGRAM_BOT_TOKEN = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
         const TELEGRAM_CHAT_ID = '5180010738';
-        const GOOGLE_CLIENT_ID = '878815748925-cqdq5i0hqht47hun8o9jdr8046nkrmqg.apps.googleusercontent.com';
 
         // Firebase конфигурация
         const firebaseConfig = {
@@ -547,6 +546,7 @@
             console.error("Firebase initialization failed:", error);
         }
         const database = firebase.database();
+        const auth = firebase.auth();
 
         let scripts = [];
         let userScripts = [];
@@ -555,100 +555,70 @@
         let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentTheme = localStorage.getItem('theme') || 'dark';
 
-        function onGoogleScriptLoad() {
-            console.log("Google Sign-In script loaded successfully");
-            initializeGoogleSignIn();
-        }
+        // Настройка провайдера Google для Firebase Authentication
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('profile');
+        provider.addScope('email');
 
-        function initializeGoogleSignIn() {
-            if (typeof google === 'undefined') {
-                console.error("Google Sign-In script not loaded yet");
-                return;
-            }
-            try {
-                console.log("Initializing Google Sign-In with client_id:", GOOGLE_CLIENT_ID);
-                google.accounts.id.initialize({
-                    client_id: GOOGLE_CLIENT_ID,
-                    callback: handleCredentialResponse,
-                    auto_select: false,
-                    cancel_on_tap_outside: true
-                });
-                console.log("Google Sign-In initialized successfully");
-            } catch (error) {
-                console.error("Google Sign-In initialization failed:", error);
-            }
-        }
-
+        // Функция входа через Google
         function signIn() {
-            if (typeof google === 'undefined') {
-                console.error("Google Sign-In not available");
-                alert(currentLanguage === 'ru' ? 'Ошибка: Google Sign-In не доступен. Проверьте подключение.' : 'Error: Google Sign-In not available. Check your connection.');
-                return;
-            }
-            try {
-                google.accounts.id.prompt((notification) => {
-                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                        console.error("Google Sign-In prompt not displayed or skipped:", notification.getNotDisplayedReason());
-                        alert(currentLanguage === 'ru' ? 'Не удалось открыть окно входа. Проверьте настройки браузера.' : 'Failed to open sign-in prompt. Check browser settings.');
-                    }
-                });
-            } catch (error) {
-                console.error("Error during Google Sign-In prompt:", error);
+            auth.signInWithRedirect(provider).catch(error => {
+                console.error("Error during Google Sign-In redirect:", error);
                 alert(currentLanguage === 'ru' ? 'Ошибка при входе через Google: ' + error.message : 'Error during Google Sign-In: ' + error.message);
-            }
+            });
             createRipple(event);
         }
 
+        // Функция выхода
         function signOut() {
-            username = null;
-            userId = null;
-            localStorage.removeItem('username');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('userPicture');
-            document.getElementById('signInButton').style.display = 'block';
-            document.getElementById('signOutButton').style.display = 'none';
-            document.getElementById('submitButton').style.display = 'none';
-            document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
-            createRipple(event);
+            auth.signOut().then(() => {
+                username = null;
+                userId = null;
+                localStorage.removeItem('username');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userPicture');
+                document.getElementById('signInButton').style.display = 'block';
+                document.getElementById('signOutButton').style.display = 'none';
+                document.getElementById('submitButton').style.display = 'none';
+                document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
+                createRipple(event);
+            }).catch(error => {
+                console.error("Error during sign out:", error);
+            });
         }
 
-        function handleCredentialResponse(response) {
-            if (!response.credential) {
-                console.error("No credential received from Google Sign-In");
-                alert(currentLanguage === 'ru' ? 'Ошибка: Не удалось получить данные авторизации.' : 'Error: Failed to retrieve authorization data.');
-                return;
-            }
-            try {
-                const data = parseJwt(response.credential);
-                username = data.name;
-                userId = data.sub;
+        // Проверка состояния авторизации
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // Пользователь авторизован
+                username = user.displayName;
+                userId = user.uid;
                 localStorage.setItem('username', username);
                 localStorage.setItem('userId', userId);
-                localStorage.setItem('userPicture', data.picture);
+                localStorage.setItem('userPicture', user.photoURL || 'https://placehold.co/80x80');
                 database.ref('users/' + userId).set({
                     username: username,
-                    picture: data.picture
+                    picture: user.photoURL || 'https://placehold.co/80x80'
                 });
                 document.getElementById('signInButton').style.display = 'none';
                 document.getElementById('signOutButton').style.display = 'block';
                 document.getElementById('submitButton').style.display = 'block';
-                document.getElementById('userAvatar').src = data.picture || 'https://placehold.co/80x80';
+                document.getElementById('userAvatar').src = user.photoURL || 'https://placehold.co/80x80';
                 loadUserScripts();
                 renderScripts();
-            } catch (error) {
-                console.error("Error handling Google Sign-In response:", error);
-                alert(currentLanguage === 'ru' ? 'Ошибка при обработке ответа Google: ' + error.message : 'Error handling Google response: ' + error.message);
+            } else {
+                // Пользователь не авторизован
+                username = null;
+                userId = null;
+                localStorage.removeItem('username');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userPicture');
+                document.getElementById('signInButton').style.display = 'block';
+                document.getElementById('signOutButton').style.display = 'none';
+                document.getElementById('submitButton').style.display = 'none';
+                document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
             }
-        }
-
-        function parseJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
-        }
+        });
 
         function changeLanguage() {
             currentLanguage = document.getElementById('languageSelect').value;
@@ -980,13 +950,6 @@
         loadScripts();
         updateLanguage();
         changeTheme();
-        if (username) {
-            document.getElementById('signInButton').style.display = 'none';
-            document.getElementById('signOutButton').style.display = 'block';
-            document.getElementById('submitButton').style.display = 'block';
-            document.getElementById('userAvatar').src = localStorage.getItem('userPicture') || 'https://placehold.co/80x80';
-            loadUserScripts();
-        }
     </script>
 </body>
 </html>

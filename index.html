@@ -348,8 +348,8 @@
             padding: 25px;
             border-radius: 15px;
             width: 550px;
-            max-height: 80vh;
-            overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
             transition: all 0.5s ease;
             position: relative;
         }
@@ -460,6 +460,20 @@
         .history-content .script-list .script-card {
             flex: 0 0 auto;
             width: 200px;
+        }
+        .history-content .script-card .delete-btn {
+            background: linear-gradient(45deg, #ff4d4d, #ff6666);
+            border: none;
+            padding: 5px 10px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+        }
+        .history-content .script-card .delete-btn:hover {
+            background: linear-gradient(45deg, #ff6666, #ff8787);
+            transform: scale(1.05);
         }
         .like-animation {
             position: absolute;
@@ -590,6 +604,7 @@
                 <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
                 <button class="dislike-btn" id="fullDislikeBtn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
                 <button class="delete-btn" id="deleteBtn" style="display: none;"><i class="fas fa-trash"></i> Удалить</button>
+                <button class="admin-delete-btn" id="adminDeleteBtn" style="display: none;"><i class="fas fa-trash"></i> Удалить (Админ)</button>
             </div>
         </div>
     </div>
@@ -669,6 +684,7 @@
         let pendingScripts = {};
         let username = localStorage.getItem('username') || null;
         let userId = localStorage.getItem('userId') || null;
+        let userEmail = localStorage.getItem('userEmail') || null;
         let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentTheme = localStorage.getItem('theme') || 'dark';
         let isAuthChecked = false;
@@ -694,8 +710,10 @@
             auth.signOut().then(() => {
                 username = null;
                 userId = null;
+                userEmail = null;
                 localStorage.removeItem('username');
                 localStorage.removeItem('userId');
+                localStorage.removeItem('userEmail');
                 localStorage.removeItem('userPicture');
                 document.getElementById('signInButton').style.display = 'block';
                 document.getElementById('signOutButton').style.display = 'none';
@@ -716,8 +734,10 @@
             } else {
                 username = null;
                 userId = null;
+                userEmail = null;
                 localStorage.removeItem('username');
                 localStorage.removeItem('userId');
+                localStorage.removeItem('userEmail');
                 localStorage.removeItem('userPicture');
                 document.getElementById('signInButton').style.display = 'block';
                 document.getElementById('signOutButton').style.display = 'none';
@@ -733,11 +753,14 @@
         function updateUI(user) {
             username = user.displayName;
             userId = user.uid;
+            userEmail = user.email;
             localStorage.setItem('username', username);
             localStorage.setItem('userId', userId);
+            localStorage.setItem('userEmail', userEmail);
             localStorage.setItem('userPicture', user.photoURL || 'https://placehold.co/80x80');
             database.ref('users/' + userId).set({
                 username: username,
+                email: userEmail,
                 picture: user.photoURL || 'https://placehold.co/80x80',
                 theme: currentTheme,
                 language: currentLanguage
@@ -837,6 +860,7 @@
             const likeBtn = document.getElementById('fullLikeBtn');
             const dislikeBtn = document.getElementById('fullDislikeBtn');
             const deleteBtn = document.getElementById('deleteBtn');
+            const adminDeleteBtn = document.getElementById('adminDeleteBtn');
             likeBtn.querySelector('.like-count').textContent = script.likes || 0;
             dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes || 0;
             likeBtn.classList.toggle('liked', script.userRatings && script.userRatings[userId] === 'like');
@@ -848,6 +872,12 @@
                 deleteBtn.onclick = () => deleteScript(index);
             } else {
                 deleteBtn.style.display = 'none';
+            }
+            if (userEmail === 'kt0r2023@gmail.com') {
+                adminDeleteBtn.style.display = 'block';
+                adminDeleteBtn.onclick = () => adminDeleteScript(index);
+            } else {
+                adminDeleteBtn.style.display = 'none';
             }
             document.getElementById('fullscreenWindow').style.display = 'flex';
             updateThemeClasses();
@@ -882,11 +912,14 @@
                     <div class="script-info">
                         <h3>${script.name || 'Без названия'}</h3>
                         <div class="username">${script.user || 'Аноним'}</div>
+                        <button class="delete-btn" onclick="deleteUserScript('${script.id}', event)">Удалить</button>
                     </div>
                 `;
-                card.onclick = () => {
-                    closeHistory();
-                    openFullscreen(scripts.findIndex(s => s.name === script.name && s.user === script.user));
+                card.onclick = (e) => {
+                    if (!e.target.classList.contains('delete-btn')) {
+                        closeHistory();
+                        openFullscreen(scripts.findIndex(s => s.name === script.name && s.user === script.user));
+                    }
                 };
                 historyList.appendChild(card);
             });
@@ -1039,6 +1072,28 @@ ${firstTenLines}
                 database.ref('scripts/' + script.id).remove();
                 database.ref('userScripts/' + userId + '/' + script.id).remove();
                 closeFullscreen();
+                loadScripts();
+            }
+        }
+
+        function adminDeleteScript(index) {
+            const script = scripts[index];
+            if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить этот скрипт? (Админ)' : 'Are you sure you want to delete this script? (Admin)')) {
+                database.ref('scripts/' + script.id).remove();
+                if (script.userId) {
+                    database.ref('userScripts/' + script.userId + '/' + script.id).remove();
+                }
+                closeFullscreen();
+                loadScripts();
+            }
+        }
+
+        function deleteUserScript(scriptId, event) {
+            event.stopPropagation();
+            if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить эту работу?' : 'Are you sure you want to delete this submission?')) {
+                database.ref('scripts/' + scriptId).remove();
+                database.ref('userScripts/' + userId + '/' + scriptId).remove();
+                loadUserScripts();
                 loadScripts();
             }
         }

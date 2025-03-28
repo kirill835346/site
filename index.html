@@ -439,7 +439,7 @@
         .ripple {
             position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255,  unregistered users255, 0.3);
+            background: rgba(255, 255, 255, 0.3);
             transform: scale(0);
             animation: rippleAnimation 0.6s linear;
             pointer-events: none;
@@ -712,6 +712,7 @@
         let isAuthChecked = false;
         let hasSubmitted = localStorage.getItem('hasSubmitted') || false;
         let notificationPreference = localStorage.getItem('notificationPreference') || null;
+        let telegramMessages = {}; // Для хранения chat_id и message_id
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
@@ -926,7 +927,7 @@
                 const card = document.createElement('div');
                 card.className = 'script-card';
                 card.innerHTML = `
-                    <img src="${script.avatar || 'https://placehold.co/200x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
+                    <img src="${script.avatar || 'https://placehold.co/200x1500x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
                     <div class="script-info">
                         <h3>${script.name || 'Без названия'}</h3>
                         <div class="username">${script.user || 'Аноним'}</div>
@@ -1030,7 +1031,13 @@
                 return response.json();
             })
             .then(data => {
-                if (!data.ok) {
+                if (data.ok) {
+                    telegramMessages[scriptId] = {
+                        chat_id: data.result.chat.id,
+                        message_id: data.result.message_id
+                    };
+                    console.log(`Telegram message sent for script ${scriptId}:`, telegramMessages[scriptId]);
+                } else {
                     console.error('Telegram API error:', data);
                     alert(currentLanguage === 'ru' ? 'Ошибка отправки в Telegram: ' + data.description : 'Error sending to Telegram: ' + data.description);
                 }
@@ -1041,23 +1048,93 @@
             });
         }
 
+        function removeTelegramButtons(scriptId) {
+            const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
+            const messageInfo = telegramMessages[scriptId];
+            if (!messageInfo) {
+                console.error(`No Telegram message info found for script ${scriptId}`);
+                return;
+            }
+
+            const url = `https://api.telegram.org/bot${token}/editMessageReplyMarkup`;
+            const params = {
+                chat_id: messageInfo.chat_id,
+                message_id: messageInfo.message_id,
+                reply_markup: JSON.stringify({ inline_keyboard: [] })
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(params)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.ok) {
+                    console.log(`Buttons removed for script ${scriptId}`);
+                    delete telegramMessages[scriptId];
+                } else {
+                    console.error('Telegram API error on removing buttons:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error removing Telegram buttons:', error);
+            });
+        }
+
         function handleTelegramCallback(callbackData) {
             const [action, scriptId] = callbackData.split('_');
+            console.log(`Handling Telegram callback: ${action} for script ${scriptId}`);
+            
             if (action === 'accept') {
                 const script = pendingScripts[scriptId];
                 if (script) {
                     const newScriptId = database.ref('scripts').push().key;
-                    database.ref('scripts/' + newScriptId).set(script);
-                    database.ref('userScripts/' + userId + '/' + newScriptId).set(script);
-                    delete pendingScripts[scriptId];
-                    if (notificationPreference === 'enabled') {
-                        new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
-                    }
+                    database.ref('scripts/' + newScriptId).set({ ...script, id: newScriptId })
+                        .then(() => {
+                            console.log(`Script ${newScriptId} added to scripts`);
+                            return database.ref('userScripts/' + userId + '/' + newScriptId).set({ ...script, id: newScriptId });
+                        })
+                        .then(() => {
+                            console.log(`Script ${newScriptId} added to userScripts for user ${userId}`);
+                            delete pendingScripts[scriptId];
+                            loadScripts();
+                            loadUserScripts();
+                            removeTelegramButtons(scriptId);
+                            if (notificationPreference === 'enabled') {
+                                if (Notification.permission === 'granted') {
+                                    new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
+                                } else {
+                                    console.log('Notifications not permitted by user');
+                                }
+                            } else {
+                                console.log('Notifications are disabled for this user');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error saving script to Firebase:', error);
+                        });
+                } else {
+                    console.error(`Script ${scriptId} not found in pendingScripts`);
                 }
             } else if (action === 'reject') {
                 delete pendingScripts[scriptId];
+                loadScripts();
+                loadUserScripts();
+                removeTelegramButtons(scriptId);
                 if (notificationPreference === 'enabled') {
-                    new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
+                    if (Notification.permission === 'granted') {
+                        new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
+                    } else {
+                        console.log('Notifications not permitted by user');
+                    }
+                } else {
+                    console.log('Notifications are disabled for this user');
                 }
             }
         }
@@ -1329,7 +1406,7 @@
         changeTheme();
         loadScripts();
 
-        // Для обработки Telegram callback (нужен серверный код, здесь для примера)
+        // Для обработки Telegram callback (нужен серверный код, здесь для примВера)
         window.handleTelegramCallback = handleTelegramCallback;
     </script>
 </body>

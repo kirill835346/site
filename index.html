@@ -121,17 +121,31 @@
             outline: none;
         }
         .filter-select {
-            background-color: transparent;
-            color: var(--text-color);
+            background-color: #666;
+            color: #fff;
             border: none;
             font-size: 16px;
             margin-left: 10px;
+            padding: 5px 25px 5px 10px;
+            border-radius: 5px;
             appearance: none;
             -webkit-appearance: none;
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="%23aaa"><polygon points="0,0 10,0 5,5"/></svg>');
             background-repeat: no-repeat;
             background-position: right 10px center;
-            padding-right: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .filter-select.light-theme {
+            background-color: #ddd;
+            color: #333;
+        }
+        .filter-select.space-theme {
+            background-color: #3b3b5e;
+            color: #ccc;
+        }
+        .filter-select:hover {
+            background-color: #777;
         }
         .filter-select:focus {
             outline: none;
@@ -330,8 +344,8 @@
             padding: 25px;
             border-radius: 15px;
             width: 550px;
-            max-height: 85vh;
-            overflow-y: auto;
+            max-height: 80vh;
+            overflow: hidden;
             transition: all 0.5s ease;
             position: relative;
         }
@@ -352,6 +366,7 @@
             border-radius: 10px;
             transition: all 0.5s ease;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+            resize: none;
         }
         .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme {
             background-color: #ddd;
@@ -471,6 +486,10 @@
                 <i class="fas fa-cog"></i> <span data-ru="Настройки" data-en="Settings"></span>
                 <span class="tooltiptext" data-ru="Настроить сайт" data-en="Configure the site"></span>
             </button>
+            <button class="tooltip" onclick="openHistory()" id="historyButton" style="display: none;">
+                <i class="fas fa-history"></i> <span data-ru="Работы" data-en="Submissions"></span>
+                <span class="tooltiptext" data-ru="Посмотреть ваши работы" data-en="View your submissions"></span>
+            </button>
             <a href="https://funpay.com/users/9532559/" target="_blank" class="tooltip">
                 <i class="fas fa-wallet"></i> <span data-ru="FunPay" data-en="FunPay"></span>
                 <span class="tooltiptext" data-ru="Перейти на FunPay" data-en="Go to FunPay"></span>
@@ -486,8 +505,8 @@
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
             <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
-            <input type="file" id="avatarInput" accept="image/*" required>
-            <small data-ru="Загрузите аватар скрипта" data-en="Upload script avatar"></small>
+            <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/gif" required>
+            <small data-ru="Загрузите аватар скрипта (PNG, JPG, GIF)" data-en="Upload script avatar (PNG, JPG, GIF)"></small>
             <input type="text" id="scriptName" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
             <small data-ru="Название (до 25 символов), например, 'Автокликер'" data-en="Name (up to 25 chars), e.g., 'Autoclicker'"></small>
             <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
@@ -513,6 +532,7 @@
             <div class="rating">
                 <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
                 <button class="dislike-btn" id="fullDislikeBtn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
+                <button class="delete-btn" id="deleteBtn" style="display: none;"><i class="fas fa-trash"></i> Удалить</button>
             </div>
         </div>
     </div>
@@ -548,7 +568,6 @@
     <div class="notification" id="notification" data-ru="Перед тем как выложить работу или поставить лайк, войдите в Google аккаунт!" data-en="Before submitting work or liking, sign in with Google!"></div>
 
     <script>
-        // Firebase конфигурация
         const firebaseConfig = {
             apiKey: "AIzaSyDkCcxWEzi2aiu8RhzQxIV2Rfw-3wWK2Vg",
             authDomain: "script-net.firebaseapp.com",
@@ -559,7 +578,6 @@
             appId: "1:384380150017:web:0112a5731d4b36dc44fb00"
         };
 
-        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const auth = firebase.auth();
@@ -572,12 +590,10 @@
         let currentTheme = localStorage.getItem('theme') || 'dark';
         let isAuthChecked = false;
 
-        // Настройка провайдера Google
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
         provider.addScope('email');
 
-        // Функция входа через Google
         function signIn() {
             auth.signInWithPopup(provider).then(result => {
                 const user = result.user;
@@ -589,7 +605,6 @@
             createRipple(event);
         }
 
-        // Функция выхода
         function signOut() {
             auth.signOut().then(() => {
                 username = null;
@@ -600,6 +615,7 @@
                 document.getElementById('signInButton').style.display = 'block';
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
+                document.getElementById('historyButton').style.display = 'none';
                 document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
                 document.getElementById('userName').textContent = '';
                 createRipple(event);
@@ -609,7 +625,6 @@
             });
         }
 
-        // Проверка состояния авторизации
         auth.onAuthStateChanged(user => {
             if (user) {
                 updateUI(user);
@@ -622,6 +637,7 @@
                 document.getElementById('signInButton').style.display = 'block';
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
+                document.getElementById('historyButton').style.display = 'none';
                 document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
                 document.getElementById('userName').textContent = '';
                 loadScripts();
@@ -629,7 +645,6 @@
             isAuthChecked = true;
         });
 
-        // Обновление интерфейса
         function updateUI(user) {
             username = user.displayName;
             userId = user.uid;
@@ -638,7 +653,9 @@
             localStorage.setItem('userPicture', user.photoURL || 'https://placehold.co/80x80');
             database.ref('users/' + userId).set({
                 username: username,
-                picture: user.photoURL || 'https://placehold.co/80x80'
+                picture: user.photoURL || 'https://placehold.co/80x80',
+                theme: currentTheme,
+                language: currentLanguage
             });
             document.getElementById('signInButton').style.display = 'none';
             document.getElementById('signOutButton').style.display = 'block';
@@ -652,6 +669,9 @@
         function changeLanguage() {
             currentLanguage = document.getElementById('languageSelect').value;
             localStorage.setItem('language', currentLanguage);
+            if (userId) {
+                database.ref('users/' + userId).update({ language: currentLanguage });
+            }
             updateLanguage();
         }
 
@@ -683,6 +703,9 @@
         function changeTheme() {
             currentTheme = document.getElementById('themeSelect').value;
             localStorage.setItem('theme', currentTheme);
+            if (userId) {
+                database.ref('users/' + userId).update({ theme: currentTheme });
+            }
             document.body.classList.remove('light-theme', 'space-theme');
             if (currentTheme === 'light') {
                 document.body.classList.add('light-theme');
@@ -727,12 +750,19 @@
             document.getElementById('fullCode').textContent = script.code || 'Код отсутствует';
             const likeBtn = document.getElementById('fullLikeBtn');
             const dislikeBtn = document.getElementById('fullDislikeBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
             likeBtn.querySelector('.like-count').textContent = script.likes || 0;
             dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes || 0;
             likeBtn.classList.toggle('liked', script.userRatings && script.userRatings[userId] === 'like');
             dislikeBtn.classList.toggle('disliked', script.userRatings && script.userRatings[userId] === 'dislike');
             likeBtn.onclick = () => rateScript(index, 'like', null);
             dislikeBtn.onclick = () => rateScript(index, 'dislike', null);
+            if (script.userId === userId) {
+                deleteBtn.style.display = 'block';
+                deleteBtn.onclick = () => deleteScript(index);
+            } else {
+                deleteBtn.style.display = 'none';
+            }
             document.getElementById('fullscreenWindow').style.display = 'flex';
             updateThemeClasses();
             createRipple(event);
@@ -806,7 +836,7 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {} };
+                const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {}, userId: userId };
                 const scriptId = database.ref('scripts').push().key;
                 database.ref('scripts/' + scriptId).set(script);
                 database.ref('userScripts/' + userId + '/' + scriptId).set(script);
@@ -815,6 +845,16 @@
             };
             reader.readAsDataURL(avatarInput);
             createRipple(event);
+        }
+
+        function deleteScript(index) {
+            const script = scripts[index];
+            if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить этот скрипт?' : 'Are you sure you want to delete this script?')) {
+                database.ref('scripts/' + script.id).remove();
+                database.ref('userScripts/' + userId + '/' + script.id).remove();
+                closeFullscreen();
+                loadScripts();
+            }
         }
 
         function rateScript(index, type, event) {
@@ -827,7 +867,7 @@
 
             const script = scripts[index];
             const scriptId = script.id;
-            const previousRating = script.userRatings[userId];
+            const previousRating = script.userRatings ? script.userRatings[userId] : null;
 
             if (previousRating === type) {
                 if (type === 'like') script.likes--;
@@ -878,6 +918,13 @@
                     Object.keys(data).forEach(key => {
                         userScripts.push({ id: key, ...data[key] });
                     });
+                    if (userScripts.length > 0) {
+                        document.getElementById('historyButton').style.display = 'block';
+                    } else {
+                        document.getElementById('historyButton').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('historyButton').style.display = 'none';
                 }
             }, (error) => {
                 console.error("Error loading user scripts from Firebase:", error);
@@ -981,12 +1028,10 @@
             }, 1000);
         }
 
-        // Добавление обработчиков событий для кнопок
         document.querySelectorAll('.sidebar button').forEach(button => {
             button.addEventListener('click', createRipple);
         });
 
-        // Инициализация
         createStars();
         updateLanguage();
         changeTheme();

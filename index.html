@@ -176,12 +176,24 @@
             background-color: #ddd;
             color: #333;
         }
+        .modal-content small {
+            display: block;
+            color: #bbb;
+            font-size: 12px;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            transition: color 0.5s ease;
+        }
+        .modal-content small.light-theme {
+            color: #555;
+        }
         .bypass-section {
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100%;
+            width: 100%;
         }
         .bypass-banner {
             background: rgba(255, 255, 255, 0.1);
@@ -200,6 +212,7 @@
             border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin: 10px 0;
         }
         .bypass-btn:hover {
             background: linear-gradient(45deg, #4CAF50, #66BB6A);
@@ -256,12 +269,12 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
             <input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">
         </div>
         <div class="sidebar">
-            <img src="images/Avatar.png" class="avatar" alt="Аватар пользователя">
+            <img src="images/Avatar.png" class="avatar" alt="Аватар пользователя" onerror="this.src='https://via.placeholder.com/80';">
             <button onclick="openModal()"><i class="fas fa-upload"></i> <span data-ru="Отправить работу" data-en="Submit work"></span></button>
             <button onclick="showBypassSection()"><i class="fas fa-shield-alt"></i> <span data-ru="Обходники" data-en="Bypassers"></span></button>
             <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
@@ -273,12 +286,18 @@
         <div class="modal-content">
             <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
             <input type="file" id="avatarInput" accept="image/*" required>
-            <input type="text" id="scriptName" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" required>
+            <small data-ru="Загрузите аватар скрипта" data-en="Upload script avatar"></small>
+            <input type="text" id="scriptName" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
+            <small data-ru="Название (до 25 символов), например, 'Автокликер'" data-en="Name (up to 25 chars), e.g., 'Autoclicker'"></small>
             <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
+            <small data-ru="Опишите, что делает скрипт" data-en="Describe what the script does"></small>
             <textarea id="scriptCode" data-ru-placeholder="Код (макс 8000 строк)" data-en-placeholder="Code (max 8000 lines)" required oninput="checkCodeLength()"></textarea>
+            <small data-ru="Вставьте код (до 8000 строк)" data-en="Insert code (up to 8000 lines)"></small>
             <p id="lineCount">Строк: 0</p>
             <input type="text" id="scriptTarget" data-ru-placeholder="Для чего код" data-en-placeholder="What the code is for" required>
+            <small data-ru="Например, 'Roblox, фарм'" data-en="E.g., 'Roblox, farming'"></small>
             <input type="text" id="userName" data-ru-placeholder="Ваше имя" data-en-placeholder="Your Name" required>
+            <small data-ru="Имя автора (нельзя изменить)" data-en="Author name (cannot be changed)"></small>
             <button onclick="submitScript()">Отправить</button>
         </div>
     </div>
@@ -295,17 +314,24 @@
         </div>
     </div>
 
-    <div class="main-section bypass-section" id="bypassSection">
-        <div class="bypass-banner">
-            <h2 data-ru="Обходники" data-en="Bypassers"></h2>
-            <button class="bypass-btn" onclick="showBypassMethod('bypass1')" data-ru="Обход 1" data-en="Bypass 1"></button>
-            <button class="bypass-btn" onclick="showBypassMethod('bypass2')" data-ru="Обход 2" data-en="Bypass 2"></button>
-            <button class="bypass-btn" onclick="showPlayerCheck()" data-ru="Проверить игрока" data-en="Check Player"></button>
-            <button class="bypass-btn" onclick="backToMain()" data-ru="На главную" data-en="Back to Main"></button>
+    <div class="container bypass-section" id="bypassSection" style="display: none;">
+        <div class="main-section">
+            <div class="bypass-banner">
+                <h2 data-ru="Обходники" data-en="Bypassers"></h2>
+                <button class="bypass-btn" onclick="showBypassMethod('bypass1')" data-ru="Обход 1" data-en="Bypass 1"></button>
+                <button class="bypass-btn" onclick="showBypassMethod('bypass2')" data-ru="Обход 2" data-en="Bypass 2"></button>
+                <button class="bypass-btn" onclick="showPlayerCheck()" data-ru="Проверить игрока" data-en="Check Player"></button>
+                <button class="bypass-btn" onclick="backToMain()" data-ru="На главную" data-en="Back to Main"></button>
+            </div>
+        </div>
+        <div class="sidebar">
+            <img src="images/Avatar.png" class="avatar" alt="Аватар пользователя" onerror="this.src='https://via.placeholder.com/80';">
+            <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+            <button class="language-toggle" onclick="toggleLanguage()"><i class="fas fa-globe"></i></button>
         </div>
     </div>
 
-    <div class="main-section bypass-section" id="bypass1Content">
+    <div class="main-section bypass-section" id="bypass1Content" style="display: none;">
         <div class="bypass-banner">
             <h2 data-ru="Обход 1" data-en="Bypass 1"></h2>
             <input type="text" id="bypass1Input" data-ru-placeholder="Введи текст..." data-en-placeholder="Enter text...">
@@ -314,7 +340,7 @@
         </div>
     </div>
 
-    <div class="main-section bypass-section" id="bypass2Content">
+    <div class="main-section bypass-section" id="bypass2Content" style="display: none;">
         <div class="bypass-banner">
             <h2 data-ru="Обход 2" data-en="Bypass 2"></h2>
             <input type="text" id="bypass2Input" data-ru-placeholder="Введи текст..." data-en-placeholder="Enter text...">
@@ -323,7 +349,7 @@
         </div>
     </div>
 
-    <div class="main-section player-check" id="playerCheckContent">
+    <div class="main-section player-check" id="playerCheckContent" style="display: none;">
         <div class="bypass-banner">
             <h2 data-ru="Проверить игрока" data-en="Check Player"></h2>
             <input type="text" id="playerInput" data-ru-placeholder="Введи ник..." data-en-placeholder="Enter username...">
@@ -334,15 +360,13 @@
     </div>
 
     <script>
-        const TELEGRAM_BOT_TOKEN = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE'; // Замени на свой токен
-        const TELEGRAM_CHAT_ID = '5180010738'; // Замени на свой chat_id
+        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // Замени на свой токен
+        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID'; // Замени на свой chat_id
         let scripts = [];
         let username = localStorage.getItem('username') || null;
         let currentLanguage = 'ru';
-        let currentSection = 'general';
 
         async function loadScripts() {
-            // Здесь можно подключить загрузку из GitHub, как в оригинале, но для примера оставим пустой массив
             const list = document.getElementById('scriptList');
             list.innerHTML = '<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">';
             scripts.forEach((script, index) => {
@@ -361,7 +385,7 @@
                 list.appendChild(card);
             });
             updateLanguage();
-            updateURL();
+            updateURL('/general');
         }
 
         function openModal() {
@@ -415,7 +439,6 @@
                     hasKey: false
                 };
 
-                // Отправка в Telegram
                 const message = `
                     Новый скрипт:
                     Название: ${name}
@@ -476,17 +499,15 @@
         }
 
         function showBypassSection() {
-            document.getElementById('scriptList').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'none';
             document.getElementById('bypassSection').style.display = 'flex';
-            currentSection = 'bypass';
-            updateURL();
+            updateURL('/bypass');
         }
 
         function backToMain() {
             document.querySelectorAll('.bypass-section, .player-check').forEach(section => section.style.display = 'none');
-            document.getElementById('scriptList').style.display = 'block';
-            currentSection = 'general';
-            updateURL();
+            document.getElementById('mainContainer').style.display = 'flex';
+            updateURL('/general');
         }
 
         function showBypassMethod(method) {
@@ -503,13 +524,13 @@
             if (method === 'bypass1') {
                 const input = document.getElementById('bypass1Input').value;
                 const output = document.getElementById('bypass1Output');
-                const charMap = { 'А': '🅰', 'а': '🅰', 'В': '🅱', 'в': '🅱', /* и так далее */ };
+                const charMap = { 'А': '🅰', 'а': '🅰', 'В': '🅱', 'в': '🅱', 'С': '🅲', 'с': '🅲' /* и так далее */ };
                 const result = input.split('').map(char => charMap[char] || char).join('');
                 output.innerHTML = result;
             } else if (method === 'bypass2') {
                 const input = document.getElementById('bypass2Input').value;
                 const output = document.getElementById('bypass2Output');
-                const fancyMap = { 'A': 'Λ', 'a': 'α', /* и так далее */ };
+                const fancyMap = { 'A': 'Λ', 'a': 'α', 'B': 'Ɓ', 'b': 'в' /* и так далее */ };
                 if (/[А-Яа-яЁё]/.test(input)) {
                     output.value = currentLanguage === 'ru' ? 'Только английский!' : 'English only!';
                 } else {
@@ -573,7 +594,7 @@
 
         function toggleTheme() {
             document.body.classList.toggle('light-theme');
-            document.querySelectorAll('.sidebar, .search, .script-card, .script-info, .username, .modal-content, .modal-content input, .modal-content textarea, .fullscreen-content').forEach(el => el.classList.toggle('light-theme'));
+            document.querySelectorAll('.sidebar, .search, .script-card, .script-info, .username, .modal-content, .modal-content input, .modal-content textarea, .modal-content small, .fullscreen-content').forEach(el => el.classList.toggle('light-theme'));
             const toggle = document.querySelector('.theme-toggle');
             toggle.innerHTML = document.body.classList.contains('light-theme') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         }
@@ -586,7 +607,7 @@
         function updateLanguage() {
             document.querySelectorAll('[data-ru]').forEach(el => {
                 const key = currentLanguage === 'ru' ? 'data-ru' : 'data-en';
-                if (el.tagName === 'INPUT') {
+                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
                     el.placeholder = el.getAttribute(key);
                 } else {
                     el.textContent = el.getAttribute(key);
@@ -594,9 +615,8 @@
             });
         }
 
-        function updateURL() {
-            const url = currentSection === 'general' ? '/general' : '/bypass';
-            window.history.pushState({}, '', url);
+        function updateURL(path) {
+            window.history.pushState({}, '', path);
         }
 
         window.onload = () => {
@@ -608,6 +628,9 @@
                     showBypassSection();
                 }
             };
+            if (window.location.pathname === '/bypass') {
+                showBypassSection();
+            }
         };
     </script>
 </body>

@@ -436,7 +436,7 @@
             <div class="script-list" id="scriptListContainer"></div>
         </div>
         <div class="sidebar">
-            <img src="https://via.placeholder.com/80" class="avatar" id="userAvatar" alt="Аватар пользователя">
+            <img src="https://placehold.co/80x80" class="avatar" id="userAvatar" alt="Аватар пользователя">
             <button class="tooltip" onclick="signIn()" id="signInButton">
                 <i class="fas fa-sign-in-alt"></i> <span data-ru="Войти" data-en="Sign In"></span>
                 <span class="tooltiptext" data-ru="Войти через Google" data-en="Sign in with Google"></span>
@@ -545,7 +545,6 @@
             console.log("Firebase initialized successfully");
         } catch (error) {
             console.error("Firebase initialization failed:", error);
-            alert("Failed to initialize Firebase. Check your configuration and internet connection.");
         }
         const database = firebase.database();
 
@@ -563,20 +562,20 @@
 
         function initializeGoogleSignIn() {
             if (typeof google === 'undefined') {
-                console.error("Google Sign-In script not loaded");
-                alert(currentLanguage === 'ru' ? 'Ошибка: Google Sign-In не загрузился. Проверьте подключение.' : 'Error: Google Sign-In failed to load. Check your connection.');
+                console.error("Google Sign-In script not loaded yet");
                 return;
             }
             try {
                 console.log("Initializing Google Sign-In with client_id:", GOOGLE_CLIENT_ID);
                 google.accounts.id.initialize({
                     client_id: GOOGLE_CLIENT_ID,
-                    callback: handleCredentialResponse
+                    callback: handleCredentialResponse,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
                 });
                 console.log("Google Sign-In initialized successfully");
             } catch (error) {
                 console.error("Google Sign-In initialization failed:", error);
-                alert(currentLanguage === 'ru' ? 'Ошибка инициализации Google Sign-In. Проверьте client_id.' : 'Google Sign-In initialization failed. Check client_id.');
             }
         }
 
@@ -586,7 +585,17 @@
                 alert(currentLanguage === 'ru' ? 'Ошибка: Google Sign-In не доступен. Проверьте подключение.' : 'Error: Google Sign-In not available. Check your connection.');
                 return;
             }
-            google.accounts.id.prompt();
+            try {
+                google.accounts.id.prompt((notification) => {
+                    if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                        console.error("Google Sign-In prompt not displayed or skipped:", notification.getNotDisplayedReason());
+                        alert(currentLanguage === 'ru' ? 'Не удалось открыть окно входа. Проверьте настройки браузера.' : 'Failed to open sign-in prompt. Check browser settings.');
+                    }
+                });
+            } catch (error) {
+                console.error("Error during Google Sign-In prompt:", error);
+                alert(currentLanguage === 'ru' ? 'Ошибка при входе через Google: ' + error.message : 'Error during Google Sign-In: ' + error.message);
+            }
             createRipple(event);
         }
 
@@ -599,32 +608,37 @@
             document.getElementById('signInButton').style.display = 'block';
             document.getElementById('signOutButton').style.display = 'none';
             document.getElementById('submitButton').style.display = 'none';
-            document.getElementById('userAvatar').src = 'https://via.placeholder.com/80';
+            document.getElementById('userAvatar').src = 'https://placehold.co/80x80';
             createRipple(event);
         }
 
         function handleCredentialResponse(response) {
-            console.log("Google Sign-In response received:", response);
-            const data = parseJwt(response.credential);
-            username = data.name;
-            userId = data.sub;
-            localStorage.setItem('username', username);
-            localStorage.setItem('userId', userId);
-            localStorage.setItem('userPicture', data.picture);
-            database.ref('users/' + userId).set({
-                username: username,
-                picture: data.picture
-            }).then(() => {
-                console.log("User data saved to Firebase");
-            }).catch(error => {
-                console.error("Failed to save user data to Firebase:", error);
-            });
-            document.getElementById('signInButton').style.display = 'none';
-            document.getElementById('signOutButton').style.display = 'block';
-            document.getElementById('submitButton').style.display = 'block';
-            document.getElementById('userAvatar').src = data.picture || 'https://via.placeholder.com/80';
-            loadUserScripts();
-            renderScripts();
+            if (!response.credential) {
+                console.error("No credential received from Google Sign-In");
+                alert(currentLanguage === 'ru' ? 'Ошибка: Не удалось получить данные авторизации.' : 'Error: Failed to retrieve authorization data.');
+                return;
+            }
+            try {
+                const data = parseJwt(response.credential);
+                username = data.name;
+                userId = data.sub;
+                localStorage.setItem('username', username);
+                localStorage.setItem('userId', userId);
+                localStorage.setItem('userPicture', data.picture);
+                database.ref('users/' + userId).set({
+                    username: username,
+                    picture: data.picture
+                });
+                document.getElementById('signInButton').style.display = 'none';
+                document.getElementById('signOutButton').style.display = 'block';
+                document.getElementById('submitButton').style.display = 'block';
+                document.getElementById('userAvatar').src = data.picture || 'https://placehold.co/80x80';
+                loadUserScripts();
+                renderScripts();
+            } catch (error) {
+                console.error("Error handling Google Sign-In response:", error);
+                alert(currentLanguage === 'ru' ? 'Ошибка при обработке ответа Google: ' + error.message : 'Error handling Google response: ' + error.message);
+            }
         }
 
         function parseJwt(token) {
@@ -747,7 +761,7 @@
                 const card = document.createElement('div');
                 card.className = 'script-card';
                 card.innerHTML = `
-                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://via.placeholder.com/200x150';">
+                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://placehold.co/200x150';">
                     <div class="script-info">
                         <h3>${script.name}</h3>
                         <div class="username">${script.user}</div>
@@ -793,16 +807,8 @@
             reader.onload = function(e) {
                 const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {} };
                 const scriptId = database.ref('scripts').push().key;
-                database.ref('scripts/' + scriptId).set(script).then(() => {
-                    console.log("Script saved to Firebase scripts");
-                }).catch(error => {
-                    console.error("Failed to save script to Firebase:", error);
-                });
-                database.ref('userScripts/' + userId + '/' + scriptId).set(script).then(() => {
-                    console.log("Script saved to Firebase userScripts");
-                }).catch(error => {
-                    console.error("Failed to save user script to Firebase:", error);
-                });
+                database.ref('scripts/' + scriptId).set(script);
+                database.ref('userScripts/' + userId + '/' + scriptId).set(script);
                 sendToTelegram(script);
                 closeModal();
                 openHistory();
@@ -854,10 +860,6 @@
                 likes: script.likes,
                 dislikes: script.dislikes,
                 userRatings: script.userRatings
-            }).then(() => {
-                console.log("Script rating updated in Firebase");
-            }).catch(error => {
-                console.error("Failed to update script rating in Firebase:", error);
             });
 
             renderScripts();
@@ -878,7 +880,7 @@
                 }
                 renderScripts();
             }, (error) => {
-                console.error("Failed to load scripts from Firebase:", error);
+                console.error("Error loading scripts from Firebase:", error);
             });
         }
 
@@ -893,7 +895,7 @@
                     });
                 }
             }, (error) => {
-                console.error("Failed to load user scripts from Firebase:", error);
+                console.error("Error loading user scripts from Firebase:", error);
             });
         }
 
@@ -904,7 +906,7 @@
                 const card = document.createElement('div');
                 card.className = 'script-card';
                 card.innerHTML = `
-                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://via.placeholder.com/200x150';">
+                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://placehold.co/200x150';">
                     <div class="script-info">
                         <h3>${script.name}</h3>
                         <div class="username">${script.user}</div>
@@ -982,7 +984,7 @@
             document.getElementById('signInButton').style.display = 'none';
             document.getElementById('signOutButton').style.display = 'block';
             document.getElementById('submitButton').style.display = 'block';
-            document.getElementById('userAvatar').src = localStorage.getItem('userPicture') || 'https://via.placeholder.com/80';
+            document.getElementById('userAvatar').src = localStorage.getItem('userPicture') || 'https://placehold.co/80x80';
             loadUserScripts();
         }
     </script>

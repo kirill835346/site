@@ -6,6 +6,9 @@
     <title>Roblox Script Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         body {
             margin: 0;
@@ -85,26 +88,75 @@
             background: linear-gradient(180deg, #1a1a3d, #0d0d2b);
             box-shadow: -5px 0 15px rgba(255, 255, 255, 0.1);
         }
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: linear-gradient(145deg, #444, #555);
+            padding: 10px 15px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s ease;
+        }
+        .search-container.light-theme {
+            background: linear-gradient(145deg, #ddd, #eee);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .search-container.space-theme {
+            background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+        }
         .search {
             width: 300px;
-            padding: 12px;
-            margin-bottom: 20px;
-            background-color: #444;
+            padding: 12px 20px;
+            background: transparent;
             border: none;
             border-radius: 25px;
             color: #fff;
             font-size: 16px;
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
         .search.light-theme {
-            background-color: #ddd;
             color: #333;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
         .search.space-theme {
-            background-color: #2e2e5e;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            color: #ccc;
+        }
+        .search:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .filter-select {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .filter-select.light-theme {
+            color: #333;
+        }
+        .filter-select.space-theme {
+            color: #ccc;
+        }
+        .filter-select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .filter-icon {
+            color: #ff6f61;
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+        .filter-icon.light-theme {
+            color: #ff8787;
+        }
+        .filter-icon.space-theme {
+            color: #66b3ff;
         }
         .script-list {
             display: flex;
@@ -116,10 +168,9 @@
             width: 200px;
             border-radius: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
-            animation: slideIn 0.5s ease forwards;
         }
         .script-card.light-theme {
             background: #eee;
@@ -137,10 +188,6 @@
             height: 150px;
             object-fit: cover;
             border-radius: 15px 15px 0 0;
-            transition: all 0.3s ease;
-        }
-        .script-card:hover .script-avatar {
-            filter: brightness(1.2);
         }
         .script-info {
             background: #666;
@@ -165,6 +212,25 @@
         .username.space-theme {
             color: #ccc;
         }
+        .rating {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .rating button {
+            background: none;
+            border: none;
+            color: #bbb;
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+        .rating button.liked {
+            color: #00ff00;
+        }
+        .rating button.disliked {
+            color: #ff0000;
+        }
         .key-message {
             position: absolute;
             top: 10px;
@@ -187,17 +253,11 @@
             border-radius: 50%;
             margin-bottom: 20px;
             border: 3px solid #ff6f61;
-            transition: all 0.3s ease;
-            animation: bounceIn 1s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .sidebar .avatar:hover {
             transform: scale(1.1);
             box-shadow: 0 0 20px rgba(255, 111, 97, 0.5);
-        }
-        @keyframes bounceIn {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
         }
         .sidebar button {
             background: linear-gradient(90deg, #ff6f61, #ff8787);
@@ -260,7 +320,7 @@
             visibility: visible;
             opacity: 1;
         }
-        .modal, .fullscreen, .settings-modal {
+        .modal, .fullscreen, .settings-modal, .history-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -276,7 +336,7 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        .modal-content, .fullscreen-content, .settings-content {
+        .modal-content, .fullscreen-content, .settings-content, .history-content {
             background: linear-gradient(145deg, #444, #555);
             padding: 25px;
             border-radius: 15px;
@@ -285,20 +345,15 @@
             overflow-y: auto;
             transition: all 0.5s ease;
             position: relative;
-            animation: popIn 0.5s ease;
         }
-        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme {
+        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
         }
-        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme {
+        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme {
             background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .modal-content input, .modal-content textarea, .settings-content select {
+        .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre {
             width: 100%;
             margin: 10px 0;
             padding: 12px;
@@ -306,19 +361,19 @@
             border: none;
             color: #fff;
             border-radius: 10px;
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
-        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme {
+        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme {
             background-color: #ddd;
             color: #333;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme {
+        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme, .fullscreen-content pre.space-theme {
             background-color: #3b3b5e;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
-        .modal-content small, .settings-content small {
+        .modal-content small, .settings-content small, .history-content small {
             display: block;
             color: #bbb;
             font-size: 12px;
@@ -326,10 +381,10 @@
             margin-bottom: 10px;
             transition: color 0.5s ease;
         }
-        .modal-content small.light-theme, .settings-content small.light-theme {
+        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme {
             color: #555;
         }
-        .modal-content small.space-theme, .settings-content small.space-theme {
+        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme {
             color: #ccc;
         }
         .close-btn {
@@ -370,20 +425,27 @@
     <div class="stars" id="stars"></div>
     <div class="container" id="mainContainer">
         <div class="main-section" id="scriptList">
-            <input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">
-            <div class="script-list">
-                <div class="script-card" onclick="openFullscreen(0)">
-                    <img src="images/script1.png" class="script-avatar" alt="Script 1" onerror="this.src='https://via.placeholder.com/200x150';">
-                    <div class="script-info">
-                        <h3>Script 1</h3>
-                        <div class="username">User1</div>
-                    </div>
-                </div>
+            <div class="search-container">
+                <i class="fas fa-search filter-icon"></i>
+                <input type="text" class="search" id="searchField" data-ru-placeholder="Поиск..." data-en-placeholder="Search..." onkeyup="searchScripts()">
+                <select id="filterSelect" onchange="searchScripts()">
+                    <option value="script" data-ru="По названию" data-en="By script name">По названию</option>
+                    <option value="author" data-ru="По автору" data-en="By author">По автору</option>
+                </select>
             </div>
+            <div class="script-list" id="scriptListContainer"></div>
         </div>
         <div class="sidebar">
-            <img src="images/avatar.png" class="avatar" alt="Аватар пользователя" onerror="this.src='https://via.placeholder.com/80';">
-            <button class="tooltip" onclick="openModal()">
+            <img src="https://via.placeholder.com/80" class="avatar" id="userAvatar" alt="Аватар пользователя">
+            <button class="tooltip" onclick="signIn()" id="signInButton">
+                <i class="fas fa-sign-in-alt"></i> <span data-ru="Войти" data-en="Sign In"></span>
+                <span class="tooltiptext" data-ru="Войти через Google" data-en="Sign in with Google"></span>
+            </button>
+            <button class="tooltip" onclick="signOut()" id="signOutButton" style="display: none;">
+                <i class="fas fa-sign-out-alt"></i> <span data-ru="Выйти" data-en="Sign Out"></span>
+                <span class="tooltiptext" data-ru="Выйти из аккаунта" data-en="Sign out of account"></span>
+            </button>
+            <button class="tooltip" onclick="openModal()" id="submitButton" style="display: none;">
                 <i class="fas fa-upload"></i> <span data-ru="Отправить работу" data-en="Submit work"></span>
                 <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
             </button>
@@ -413,8 +475,6 @@
             <p id="lineCount">Строк: 0</p>
             <input type="text" id="scriptTarget" data-ru-placeholder="Для чего код" data-en-placeholder="What the code is for" required>
             <small data-ru="Например, 'Roblox, фарм'" data-en="E.g., 'Roblox, farming'"></small>
-            <input type="text" id="userName" data-ru-placeholder="Ваше имя" data-en-placeholder="Your Name" required>
-            <small data-ru="Имя автора (нельзя изменить)" data-en="Author name (cannot be changed)"></small>
             <button onclick="submitScript()">Отправить</button>
         </div>
     </div>
@@ -428,6 +488,10 @@
             <p id="fullDesc"></p>
             <p id="fullTarget"></p>
             <pre id="fullCode"></pre>
+            <div class="rating">
+                <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
+                <button class="dislike-btn" id="fullDislikeBtn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
+            </div>
         </div>
     </div>
 
@@ -451,17 +515,95 @@
         </div>
     </div>
 
+    <div class="history-modal" id="historyModal">
+        <div class="history-content">
+            <button class="close-btn" onclick="closeHistory()"><i class="fas fa-times"></i></button>
+            <h2 data-ru="Ваши работы" data-en="Your Submissions"></h2>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
     <script>
-        const TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'; // Замени на свой токен
-        const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID'; // Замени на свой chat_id
-        let scripts = [
-            { name: 'Script 1', user: 'User1', desc: 'Описание скрипта 1', target: 'Roblox, фарм', code: '// Код скрипта 1', avatar: 'images/script1.png' }
-        ];
+        const TELEGRAM_BOT_TOKEN = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE'; // Замени на свой токен
+        const TELEGRAM_CHAT_ID = '5180010738'; // Замени на свой chat_id
+        const GOOGLE_CLIENT_ID = '878815748925-cqdq5i0hqht47hun8o9jdr8046nkrmqg.apps.googleusercontent.com'; // Замени на свой Google Client ID
+
+        // Firebase конфигурация
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkCcxWEzi2aiu8RhzQxIV2Rfw-3wWK2Vg",
+            authDomain: "script-net.firebaseapp.com",
+            databaseURL: "https://script-net-default-rtdb.firebaseio.com",
+            projectId: "script-net",
+            storageBucket: "script-net.firebasestorage.app",
+            messagingSenderId: "384380150017",
+            appId: "1:384380150017:web:0112a5731d4b36dc44fb00",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let scripts = [];
+        let userScripts = [];
         let username = localStorage.getItem('username') || null;
-        let currentLanguage = 'ru';
+        let userId = localStorage.getItem('userId') || null;
+        let currentLanguage = localStorage.getItem('language') || 'ru';
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+
+        function initializeGoogleSignIn() {
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleCredentialResponse
+            });
+        }
+
+        function signIn() {
+            google.accounts.id.prompt();
+            createRipple(event);
+        }
+
+        function signOut() {
+            username = null;
+            userId = null;
+            localStorage.removeItem('username');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userPicture');
+            document.getElementById('signInButton').style.display = 'block';
+            document.getElementById('signOutButton').style.display = 'none';
+            document.getElementById('submitButton').style.display = 'none';
+            document.getElementById('userAvatar').src = 'https://via.placeholder.com/80';
+            createRipple(event);
+        }
+
+        function handleCredentialResponse(response) {
+            const data = parseJwt(response.credential);
+            username = data.name;
+            userId = data.sub;
+            localStorage.setItem('username', username);
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('userPicture', data.picture);
+            database.ref('users/' + userId).set({
+                username: username,
+                picture: data.picture
+            });
+            document.getElementById('signInButton').style.display = 'none';
+            document.getElementById('signOutButton').style.display = 'block';
+            document.getElementById('submitButton').style.display = 'block';
+            document.getElementById('userAvatar').src = data.picture || 'https://via.placeholder.com/80';
+            loadUserScripts();
+            renderScripts();
+        }
+
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
 
         function changeLanguage() {
             currentLanguage = document.getElementById('languageSelect').value;
+            localStorage.setItem('language', currentLanguage);
             updateLanguage();
         }
 
@@ -478,20 +620,25 @@
             });
             const themeSelect = document.getElementById('themeSelect');
             const languageSelect = document.getElementById('languageSelect');
+            const filterSelect = document.getElementById('filterSelect');
             Array.from(themeSelect.options).forEach(option => {
                 option.text = option.getAttribute(`data-${currentLanguage}`);
             });
             Array.from(languageSelect.options).forEach(option => {
                 option.text = option.getAttribute(`data-${currentLanguage}`);
             });
+            Array.from(filterSelect.options).forEach(option => {
+                option.text = option.getAttribute(`data-${currentLanguage}`);
+            });
         }
 
         function changeTheme() {
-            const theme = document.getElementById('themeSelect').value;
+            currentTheme = document.getElementById('themeSelect').value;
+            localStorage.setItem('theme', currentTheme);
             document.body.classList.remove('light-theme', 'space-theme');
-            if (theme === 'light') {
+            if (currentTheme === 'light') {
                 document.body.classList.add('light-theme');
-            } else if (theme === 'space') {
+            } else if (currentTheme === 'space') {
                 document.body.classList.add('space-theme');
             }
             updateThemeClasses();
@@ -500,7 +647,7 @@
         function updateThemeClasses() {
             const isLight = document.body.classList.contains('light-theme');
             const isSpace = document.body.classList.contains('space-theme');
-            document.querySelectorAll('.script-card, .script-info, .sidebar, .search, .modal-content, .fullscreen-content, .settings-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .modal-content small, .settings-content small').forEach(el => {
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .filter-icon, .modal-content, .fullscreen-content, .settings-content, .history-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content small, .settings-content small, .history-content small').forEach(el => {
                 el.classList.remove('light-theme', 'space-theme');
                 if (isLight) el.classList.add('light-theme');
                 if (isSpace) el.classList.add('space-theme');
@@ -508,6 +655,10 @@
         }
 
         function openModal() {
+            if (!username) {
+                alert(currentLanguage === 'ru' ? 'Пожалуйста, войдите через Google!' : 'Please sign in with Google!');
+                return;
+            }
             document.getElementById('submitModal').style.display = 'flex';
             createRipple(event);
         }
@@ -524,6 +675,14 @@
             document.getElementById('fullDesc').textContent = script.desc;
             document.getElementById('fullTarget').textContent = `Target: ${script.target}`;
             document.getElementById('fullCode').textContent = script.code;
+            const likeBtn = document.getElementById('fullLikeBtn');
+            const dislikeBtn = document.getElementById('fullDislikeBtn');
+            likeBtn.querySelector('.like-count').textContent = script.likes;
+            dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes;
+            likeBtn.classList.toggle('liked', script.userRatings[userId] === 'like');
+            dislikeBtn.classList.toggle('disliked', script.userRatings[userId] === 'dislike');
+            likeBtn.onclick = () => rateScript(index, 'like', null);
+            dislikeBtn.onclick = () => rateScript(index, 'dislike', null);
             document.getElementById('fullscreenWindow').style.display = 'flex';
             updateThemeClasses();
             createRipple(event);
@@ -535,7 +694,7 @@
 
         function openSettings() {
             document.getElementById('settingsModal').style.display = 'flex';
-            document.getElementById('themeSelect').value = document.body.classList.contains('light-theme') ? 'light' : document.body.classList.contains('space-theme') ? 'space' : 'dark';
+            document.getElementById('themeSelect').value = currentTheme;
             document.getElementById('languageSelect').value = currentLanguage;
             updateLanguage();
             updateThemeClasses();
@@ -544,6 +703,33 @@
 
         function closeSettings() {
             document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function openHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            userScripts.forEach((script, index) => {
+                const card = document.createElement('div');
+                card.className = 'script-card';
+                card.innerHTML = `
+                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://via.placeholder.com/200x150';">
+                    <div class="script-info">
+                        <h3>${script.name}</h3>
+                        <div class="username">${script.user}</div>
+                    </div>
+                `;
+                card.onclick = () => {
+                    closeHistory();
+                    openFullscreen(scripts.findIndex(s => s.name === script.name && s.user === script.user));
+                };
+                historyList.appendChild(card);
+            });
+            document.getElementById('historyModal').style.display = 'flex';
+            updateThemeClasses();
+        }
+
+        function closeHistory() {
+            document.getElementById('historyModal').style.display = 'none';
         }
 
         function checkCodeLength() {
@@ -562,28 +748,21 @@
             const desc = document.getElementById('scriptDesc').value;
             const code = document.getElementById('scriptCode').value;
             const target = document.getElementById('scriptTarget').value;
-            const user = document.getElementById('userName').value;
 
-            if (!avatarInput || !name || !desc || !code || !target || !user) {
+            if (!avatarInput || !name || !desc || !code || !target) {
                 alert(currentLanguage === 'ru' ? 'Заполните все поля!' : 'Fill in all fields!');
-                return;
-            }
-
-            if (!username) {
-                username = user;
-                localStorage.setItem('username', username);
-            } else if (username !== user) {
-                alert(currentLanguage === 'ru' ? 'Имя пользователя не может быть изменено!' : 'Username cannot be changed!');
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const script = { name, user: username, desc, target, code, avatar: e.target.result };
-                scripts.push(script);
+                const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {} };
+                const scriptId = database.ref('scripts').push().key;
+                database.ref('scripts/' + scriptId).set(script);
+                database.ref('userScripts/' + userId + '/' + scriptId).set(script);
                 sendToTelegram(script);
                 closeModal();
-                renderScripts();
+                openHistory();
             };
             reader.readAsDataURL(avatarInput);
             createRipple(event);
@@ -602,35 +781,70 @@
             }).catch(error => console.error('Ошибка отправки в Telegram:', error));
         }
 
-        function renderScripts() {
-            const scriptList = document.getElementById('scriptList');
-            scriptList.innerHTML = `<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()">`;
-            const scriptListContainer = document.createElement('div');
-            scriptListContainer.className = 'script-list';
-            scripts.forEach((script, index) => {
-                const card = document.createElement('div');
-                card.className = 'script-card';
-                card.innerHTML = `
-                    <img src="${script.avatar}" class="script-avatar" alt="${script.name}" onerror="this.src='https://via.placeholder.com/200x150';">
-                    <div class="script-info">
-                        <h3>${script.name}</h3>
-                        <div class="username">${script.user}</div>
-                    </div>
-                `;
-                card.onclick = () => openFullscreen(index);
-                scriptListContainer.appendChild(card);
+        function rateScript(index, type, event) {
+            if (!userId) {
+                alert(currentLanguage === 'ru' ? 'Пожалуйста, войдите через Google, чтобы оценить!' : 'Please sign in with Google to rate!');
+                return;
+            }
+
+            const script = scripts[index];
+            const scriptId = script.id;
+            const previousRating = script.userRatings[userId];
+
+            if (previousRating === type) {
+                if (type === 'like') script.likes--;
+                else script.dislikes--;
+                delete script.userRatings[userId];
+            } else {
+                if (previousRating === 'like') script.likes--;
+                else if (previousRating === 'dislike') script.dislikes--;
+                if (type === 'like') script.likes++;
+                else script.dislikes++;
+                script.userRatings[userId] = type;
+            }
+
+            database.ref('scripts/' + scriptId).update({
+                likes: script.likes,
+                dislikes: script.dislikes,
+                userRatings: script.userRatings
             });
-            scriptList.appendChild(scriptListContainer);
-            updateThemeClasses();
+
+            renderScripts();
+            if (document.getElementById('fullscreenWindow').style.display === 'flex') {
+                openFullscreen(index);
+            }
+            if (event) createRipple(event);
         }
 
-        function searchScripts() {
-            const searchValue = document.getElementById('searchField').value.toLowerCase();
-            const filteredScripts = scripts.filter(script => script.name.toLowerCase().includes(searchValue));
-            const scriptList = document.getElementById('scriptList');
-            scriptList.innerHTML = `<input type="text" class="search" id="searchField" data-ru-placeholder="Поиск по названию..." data-en-placeholder="Search by script name..." onkeyup="searchScripts()" value="${searchValue}">`;
-            const scriptListContainer = document.createElement('div');
-            scriptListContainer.className = 'script-list';
+        function loadScripts() {
+            database.ref('scripts').on('value', (snapshot) => {
+                scripts = [];
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        scripts.push({ id: key, ...data[key] });
+                    });
+                }
+                renderScripts();
+            });
+        }
+
+        function loadUserScripts() {
+            if (!userId) return;
+            database.ref('userScripts/' + userId).on('value', (snapshot) => {
+                userScripts = [];
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        userScripts.push({ id: key, ...data[key] });
+                    });
+                }
+            });
+        }
+
+        function renderScripts(filteredScripts = scripts) {
+            const scriptListContainer = document.getElementById('scriptListContainer');
+            scriptListContainer.innerHTML = '';
             filteredScripts.forEach((script, index) => {
                 const card = document.createElement('div');
                 card.className = 'script-card';
@@ -639,13 +853,35 @@
                     <div class="script-info">
                         <h3>${script.name}</h3>
                         <div class="username">${script.user}</div>
+                        <div class="rating">
+                            <button class="like-btn ${script.userRatings[userId] === 'like' ? 'liked' : ''}" onclick="rateScript(${index}, 'like', event)">
+                                <i class="fas fa-thumbs-up"></i> <span class="like-count">${script.likes}</span>
+                            </button>
+                            <button class="dislike-btn ${script.userRatings[userId] === 'dislike' ? 'disliked' : ''}" onclick="rateScript(${index}, 'dislike', event)">
+                                <i class="fas fa-thumbs-down"></i> <span class="dislike-count">${script.dislikes}</span>
+                            </button>
+                        </div>
                     </div>
                 `;
-                card.onclick = () => openFullscreen(scripts.indexOf(script));
+                card.onclick = (e) => {
+                    if (!e.target.closest('.rating')) openFullscreen(index);
+                };
                 scriptListContainer.appendChild(card);
             });
-            scriptList.appendChild(scriptListContainer);
             updateThemeClasses();
+        }
+
+        function searchScripts() {
+            const searchValue = document.getElementById('searchField').value.toLowerCase();
+            const filterType = document.getElementById('filterSelect').value;
+            const filteredScripts = scripts.filter(script => {
+                if (filterType === 'script') {
+                    return script.name.toLowerCase().includes(searchValue);
+                } else {
+                    return script.user.toLowerCase().includes(searchValue);
+                }
+            });
+            renderScripts(filteredScripts);
         }
 
         function createStars() {
@@ -682,9 +918,19 @@
             button.addEventListener('click', createRipple);
         });
 
+        // Инициализация
         createStars();
-        renderScripts();
+        loadScripts();
         updateLanguage();
+        changeTheme();
+        initializeGoogleSignIn();
+        if (username) {
+            document.getElementById('signInButton').style.display = 'none';
+            document.getElementById('signOutButton').style.display = 'block';
+            document.getElementById('submitButton').style.display = 'block';
+            document.getElementById('userAvatar').src = localStorage.getItem('userPicture') || 'https://via.placeholder.com/80';
+            loadUserScripts();
+        }
     </script>
 </body>
 </html>

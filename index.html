@@ -6,7 +6,7 @@
     <title>Roblox Script Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://accounts.google.com/gsi/client" async defer onload="onGoogleSignInLoaded()"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer onload="onGoogleScriptLoad()"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
@@ -534,11 +534,19 @@
             authDomain: "script-net.firebaseapp.com",
             databaseURL: "https://script-net-default-rtdb.firebaseio.com",
             projectId: "script-net",
-            storageBucket: "script-net.appspot.com", // Исправлено
+            storageBucket: "script-net.appspot.com",
             messagingSenderId: "384380150017",
             appId: "1:384380150017:web:0112a5731d4b36dc44fb00"
         };
-        firebase.initializeApp(firebaseConfig);
+
+        // Инициализация Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase initialized successfully");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            alert("Failed to initialize Firebase. Check your configuration and internet connection.");
+        }
         const database = firebase.database();
 
         let scripts = [];
@@ -548,25 +556,34 @@
         let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentTheme = localStorage.getItem('theme') || 'dark';
 
-        function onGoogleSignInLoaded() {
+        function onGoogleScriptLoad() {
+            console.log("Google Sign-In script loaded successfully");
             initializeGoogleSignIn();
         }
 
         function initializeGoogleSignIn() {
             if (typeof google === 'undefined') {
-                console.error('Google Sign-In library not loaded yet. Retrying in 500ms...');
-                setTimeout(initializeGoogleSignIn, 500);
+                console.error("Google Sign-In script not loaded");
+                alert(currentLanguage === 'ru' ? 'Ошибка: Google Sign-In не загрузился. Проверьте подключение.' : 'Error: Google Sign-In failed to load. Check your connection.');
                 return;
             }
-            google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID,
-                callback: handleCredentialResponse
-            });
+            try {
+                console.log("Initializing Google Sign-In with client_id:", GOOGLE_CLIENT_ID);
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleCredentialResponse
+                });
+                console.log("Google Sign-In initialized successfully");
+            } catch (error) {
+                console.error("Google Sign-In initialization failed:", error);
+                alert(currentLanguage === 'ru' ? 'Ошибка инициализации Google Sign-In. Проверьте client_id.' : 'Google Sign-In initialization failed. Check client_id.');
+            }
         }
 
         function signIn() {
             if (typeof google === 'undefined') {
-                console.error('Google Sign-In library not loaded yet.');
+                console.error("Google Sign-In not available");
+                alert(currentLanguage === 'ru' ? 'Ошибка: Google Sign-In не доступен. Проверьте подключение.' : 'Error: Google Sign-In not available. Check your connection.');
                 return;
             }
             google.accounts.id.prompt();
@@ -587,6 +604,7 @@
         }
 
         function handleCredentialResponse(response) {
+            console.log("Google Sign-In response received:", response);
             const data = parseJwt(response.credential);
             username = data.name;
             userId = data.sub;
@@ -596,6 +614,10 @@
             database.ref('users/' + userId).set({
                 username: username,
                 picture: data.picture
+            }).then(() => {
+                console.log("User data saved to Firebase");
+            }).catch(error => {
+                console.error("Failed to save user data to Firebase:", error);
             });
             document.getElementById('signInButton').style.display = 'none';
             document.getElementById('signOutButton').style.display = 'block';
@@ -771,8 +793,16 @@
             reader.onload = function(e) {
                 const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {} };
                 const scriptId = database.ref('scripts').push().key;
-                database.ref('scripts/' + scriptId).set(script);
-                database.ref('userScripts/' + userId + '/' + scriptId).set(script);
+                database.ref('scripts/' + scriptId).set(script).then(() => {
+                    console.log("Script saved to Firebase scripts");
+                }).catch(error => {
+                    console.error("Failed to save script to Firebase:", error);
+                });
+                database.ref('userScripts/' + userId + '/' + scriptId).set(script).then(() => {
+                    console.log("Script saved to Firebase userScripts");
+                }).catch(error => {
+                    console.error("Failed to save user script to Firebase:", error);
+                });
                 sendToTelegram(script);
                 closeModal();
                 openHistory();
@@ -791,7 +821,11 @@
                     photo: script.avatar,
                     caption: message
                 })
-            }).catch(error => console.error('Ошибка отправки в Telegram:', error));
+            }).then(response => {
+                console.log("Telegram message sent successfully:", response);
+            }).catch(error => {
+                console.error('Ошибка отправки в Telegram:', error);
+            });
         }
 
         function rateScript(index, type, event) {
@@ -820,6 +854,10 @@
                 likes: script.likes,
                 dislikes: script.dislikes,
                 userRatings: script.userRatings
+            }).then(() => {
+                console.log("Script rating updated in Firebase");
+            }).catch(error => {
+                console.error("Failed to update script rating in Firebase:", error);
             });
 
             renderScripts();
@@ -839,6 +877,8 @@
                     });
                 }
                 renderScripts();
+            }, (error) => {
+                console.error("Failed to load scripts from Firebase:", error);
             });
         }
 
@@ -852,6 +892,8 @@
                         userScripts.push({ id: key, ...data[key] });
                     });
                 }
+            }, (error) => {
+                console.error("Failed to load user scripts from Firebase:", error);
             });
         }
 

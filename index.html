@@ -791,7 +791,6 @@
         let isAuthChecked = false;
         let hasSubmitted = localStorage.getItem('hasSubmitted') || false;
         let notificationPreference = localStorage.getItem('notificationPreference') || null;
-        let telegramMessages = {};
         let reviewQueue = [];
         let currentReviewIndex = 0;
 
@@ -1025,15 +1024,11 @@
                         <h3>${script.name || 'Без названия'}</h3>
                         <div class="username">${script.user || 'Аноним'}</div>
                         <div class="status">${status}</div>
-                        ${script.isPending && userEmail === 'kt0r2023@gmail.com' ? `
-                            <button class="accept-btn" onclick="simulateTelegramCallback('accept_${script.id}', event)">Принять</button>
-                            <button class="reject-btn" onclick="simulateTelegramCallback('reject_${script.id}', event)">Отказать</button>
-                        ` : ''}
                         <button class="delete-btn" onclick="deleteUserScript('${script.id}', event)">Удалить</button>
                     </div>
                 `;
                 card.onclick = (e) => {
-                    if (!e.target.classList.contains('delete-btn') && !e.target.classList.contains('accept-btn') && !e.target.classList.contains('reject-btn')) {
+                    if (!e.target.classList.contains('delete-btn')) {
                         closeHistory();
                         openFullscreen(scripts.findIndex(s => s.name === script.name && s.user === script.user));
                     }
@@ -1064,6 +1059,7 @@
         function showReviewItem() {
             if (currentReviewIndex >= reviewQueue.length) {
                 closeReview();
+                checkPendingScripts();
                 return;
             }
             const script = reviewQueue[currentReviewIndex];
@@ -1079,13 +1075,61 @@
         }
 
         function handleReviewAction(action, scriptId) {
-            handleTelegramCallback(`${action}_${scriptId}`);
-            currentReviewIndex++;
-            showReviewItem();
+            const script = pendingScripts[scriptId];
+            if (!script) {
+                console.error(`Script ${scriptId} not found in pendingScripts`);
+                return;
+            }
+
+            if (action === 'accept') {
+                const newScriptId = database.ref('scripts').push().key;
+                database.ref('scripts/' + newScriptId).set({ ...script, id: newScriptId })
+                    .then(() => {
+                        console.log(`Script ${newScriptId} added to scripts`);
+                        return database.ref('userScripts/' + script.userId + '/' + newScriptId).set({ ...script, id: newScriptId });
+                    })
+                    .then(() => {
+                        console.log(`Script ${newScriptId} added to userScripts for user ${script.userId}`);
+                        return database.ref('pendingScripts/' + scriptId).remove();
+                    })
+                    .then(() => {
+                        delete pendingScripts[scriptId];
+                        loadScripts();
+                        loadUserScripts();
+                        currentReviewIndex++;
+                        showReviewItem();
+                        if (notificationPreference === 'enabled') {
+                            if (Notification.permission === 'granted') {
+                                new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error accepting script:', error);
+                    });
+            } else if (action === 'reject') {
+                database.ref('pendingScripts/' + scriptId).remove()
+                    .then(() => {
+                        delete pendingScripts[scriptId];
+                        loadScripts();
+                        loadUserScripts();
+                        currentReviewIndex++;
+                        showReviewItem();
+                        if (notificationPreference === 'enabled') {
+                            if (Notification.permission === 'granted') {
+                                new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error rejecting script:', error);
+                    });
+            }
         }
 
         function closeReview() {
             document.getElementById('reviewModal').style.display = 'none';
+            checkPendingScripts();
         }
 
         function limitCodeLines() {
@@ -1115,81 +1159,38 @@
             reader.onload = function(e) {
                 const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {}, userId: userId, hasKey };
                 const scriptId = database.ref('pendingScripts').push().key;
-                pendingScripts[scriptId] = script;
-                sendToTelegram(scriptId, script);
-                notifyAdmin(scriptId, script);
+                database.ref('pendingScripts/' + scriptId).set(script)
+                    .then(() => {
+                        pendingScripts[scriptId] = script;
+                        notifyAdmin(scriptId, script);
+                        checkPendingScripts();
 
-                if (!hasSubmitted && !notificationPreference) {
-                    showNewUserNotification();
-                    localStorage.setItem('hasSubmitted', 'true');
-                    hasSubmitted = true;
-                }
+                        if (!hasSubmitted && !notificationPreference) {
+                            showNewUserNotification();
+                            localStorage.setItem('hasSubmitted', 'true');
+                            hasSubmitted = true;
+                        }
 
-                document.getElementById('avatarInput').value = '';
-                document.getElementById('scriptName').value = '';
-                document.getElementById('scriptDesc').value = '';
-                document.getElementById('scriptCode').value = '';
-                document.getElementById('scriptTarget').value = '';
-                document.getElementById('hasKey').checked = false;
-                document.getElementById('lineCount').textContent = 'Строк: 0';
-                closeModal();
+                        document.getElementById('avatarInput').value = '';
+                        document.getElementById('scriptName').value = '';
+                        document.getElementById('scriptDesc').value = '';
+                        document.getElementById('scriptCode').value = '';
+                        document.getElementById('scriptTarget').value = '';
+                        document.getElementById('hasKey').checked = false;
+                        document.getElementById('lineCount').textContent = 'Строк: 0';
+                        closeModal();
+                    })
+                    .catch(error => {
+                        console.error('Error submitting script:', error);
+                    });
             };
             reader.readAsDataURL(avatarInput);
             createRipple(event);
         }
 
-        function sendToTelegram(scriptId, script) {
-            const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
-            const chatId = '5180010738';
-            const firstTenLines = script.code.split('\n').slice(0, 10).join('\n');
-            const message = `Новая работа:\nНазвание: ${script.name}\nАвтор: ${script.user}\nОписание: ${script.desc}\nЦель: ${script.target}\nКлюч: ${script.hasKey ? 'Есть' : 'Нет'}\nКод:\n${firstTenLines}`;
-            
-            const url = `https://api.telegram.org/bot${token}/sendMessage`;
-            const params = {
-                chat_id: chatId,
-                text: message,
-                reply_markup: JSON.stringify({
-                    inline_keyboard: [
-                        [
-                            { text: 'Принять', callback_data: `accept_${scriptId}` },
-                            { text: 'Отказать', callback_data: `reject_${scriptId}` }
-                        ]
-                    ]
-                })
-            };
-
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(params)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.ok) {
-                    telegramMessages[scriptId] = {
-                        chat_id: data.result.chat.id,
-                        message_id: data.result.message_id
-                    };
-                    console.log(`Telegram message sent for script ${scriptId}:`, telegramMessages[scriptId]);
-                } else {
-                    console.error('Telegram API error:', data);
-                    alert(currentLanguage === 'ru' ? 'Ошибка отправки в Telegram: ' + data.description : 'Error sending to Telegram: ' + data.description);
-                }
-            })
-            .catch(error => {
-                console.error('Error sending to Telegram:', error);
-                alert(currentLanguage === 'ru' ? 'Ошибка отправки в Telegram: ' + error.message : 'Error sending to Telegram: ' + error.message);
-            });
-        }
-
         function notifyAdmin(scriptId, script) {
             const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
-            const adminChatId = '5180010738'; // Замени на chat_id админа
+            const adminChatId = '5180010738'; // Убедись, что это правильный chat_id админа
             const message = `Новая работа ожидает проверки!\nНазвание: ${script.name}\nАвтор: ${script.user}`;
             
             const url = `https://api.telegram.org/bot${token}/sendMessage`;
@@ -1214,109 +1215,13 @@
                     console.log('Admin notified via Telegram');
                 } else {
                     console.error('Telegram API error:', data);
+                    alert(currentLanguage === 'ru' ? 'Ошибка отправки уведомления админу: ' + data.description : 'Error sending notification to admin: ' + data.description);
                 }
             })
             .catch(error => {
                 console.error('Error notifying admin:', error);
+                alert(currentLanguage === 'ru' ? 'Ошибка отправки уведомления админу: ' + error.message : 'Error sending notification to admin: ' + error.message);
             });
-        }
-
-        function removeTelegramButtons(scriptId) {
-            const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
-            const messageInfo = telegramMessages[scriptId];
-            if (!messageInfo) {
-                console.error(`No Telegram message info found for script ${scriptId}`);
-                return;
-            }
-
-            const url = `https://api.telegram.org/bot${token}/editMessageReplyMarkup`;
-            const params = {
-                chat_id: messageInfo.chat_id,
-                message_id: messageInfo.message_id,
-                reply_markup: JSON.stringify({ inline_keyboard: [] })
-            };
-
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(params)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.ok) {
-                    console.log(`Buttons removed for script ${scriptId}`);
-                    delete telegramMessages[scriptId];
-                } else {
-                    console.error('Telegram API error on removing buttons:', data);
-                }
-            })
-            .catch(error => {
-                console.error('Error removing Telegram buttons:', error);
-            });
-        }
-
-        function simulateTelegramCallback(callbackData, event) {
-            event.stopPropagation();
-            handleTelegramCallback(callbackData);
-        }
-
-        function handleTelegramCallback(callbackData) {
-            const [action, scriptId] = callbackData.split('_');
-            console.log(`Handling Telegram callback: ${action} for script ${scriptId}`);
-            
-            if (action === 'accept') {
-                const script = pendingScripts[scriptId];
-                if (script) {
-                    const newScriptId = database.ref('scripts').push().key;
-                    database.ref('scripts/' + newScriptId).set({ ...script, id: newScriptId })
-                        .then(() => {
-                            console.log(`Script ${newScriptId} added to scripts`);
-                            return database.ref('userScripts/' + script.userId + '/' + newScriptId).set({ ...script, id: newScriptId });
-                        })
-                        .then(() => {
-                            console.log(`Script ${newScriptId} added to userScripts for user ${script.userId}`);
-                            delete pendingScripts[scriptId];
-                            loadScripts();
-                            loadUserScripts();
-                            checkPendingScripts();
-                            removeTelegramButtons(scriptId);
-                            if (notificationPreference === 'enabled') {
-                                if (Notification.permission === 'granted') {
-                                    new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
-                                } else {
-                                    console.log('Notifications not permitted by user');
-                                }
-                            } else {
-                                console.log('Notifications are disabled for this user');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error saving script to Firebase:', error);
-                        });
-                } else {
-                    console.error(`Script ${scriptId} not found in pendingScripts`);
-                }
-            } else if (action === 'reject') {
-                delete pendingScripts[scriptId];
-                loadScripts();
-                loadUserScripts();
-                checkPendingScripts();
-                removeTelegramButtons(scriptId);
-                if (notificationPreference === 'enabled') {
-                    if (Notification.permission === 'granted') {
-                        new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
-                    } else {
-                        console.log('Notifications not permitted by user');
-                    }
-                } else {
-                    console.log('Notifications are disabled for this user');
-                }
-            }
         }
 
         function checkPendingScripts() {
@@ -1393,12 +1298,20 @@
                         database.ref('userScripts/' + userId + '/' + scriptId).remove()
                             .then(() => {
                                 if (pendingScripts[scriptId]) {
-                                    delete pendingScripts[scriptId];
-                                    removeTelegramButtons(scriptId);
-                                    checkPendingScripts();
+                                    database.ref('pendingScripts/' + scriptId).remove()
+                                        .then(() => {
+                                            delete pendingScripts[scriptId];
+                                            checkPendingScripts();
+                                            loadUserScripts();
+                                            loadScripts();
+                                        })
+                                        .catch(error => {
+                                            console.error("Error removing from pendingScripts:", error);
+                                        });
+                                } else {
+                                    loadUserScripts();
+                                    loadScripts();
                                 }
-                                loadUserScripts();
-                                loadScripts();
                             })
                             .catch(error => {
                                 console.error("Error removing from userScripts:", error);
@@ -1479,6 +1392,8 @@
                     Object.keys(data).forEach(key => {
                         pendingScripts[key] = { id: key, ...data[key] };
                     });
+                } else {
+                    pendingScripts = {};
                 }
                 checkPendingScripts();
             }, (error) => {
@@ -1616,6 +1531,6 @@
         updateLanguage();
         changeTheme();
         loadScripts();
-
-        window.handleTelegramCallback = handleTelegramCallback;
     </script>
+</body>
+</html>

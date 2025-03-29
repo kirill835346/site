@@ -344,7 +344,7 @@
             transform: translate(-50%, -50%);
             transition: all 0.3s ease;
         }
-        .sidebar button:hover::after, .sidebar a:hover::after 🙂 {
+        .sidebar button:hover::after, .sidebar a:hover::after {
             width: 200px;
             height: 200px;
         }
@@ -376,7 +376,7 @@
             visibility: visible;
             opacity: 1;
         }
-        .modal, .fullscreen, .settings-modal, .history-modal, .notification-modal, .review-modal, .admin-notification-modal {
+        .modal, .fullscreen, .settings-modal, .history-modal, .notification-modal, .review-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -392,7 +392,7 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .admin-notification-content {
+        .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content {
             background: linear-gradient(145deg, #444, #555);
             padding: 25px;
             border-radius: 15px;
@@ -402,10 +402,10 @@
             transition: all 0.5s ease;
             position: relative;
         }
-        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme, .review-content.light-theme, .admin-notification-content.light-theme {
+        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme, .review-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
         }
-        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme, .review-content.space-theme, .admin-notification-content.space-theme {
+        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme, .review-content.space-theme {
             background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -431,7 +431,7 @@
             background-color: #3b3b5e;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
-        .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small, .admin-notification-content small {
+        .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small {
             display: block;
             color: #bbb;
             font-size: 12px;
@@ -439,10 +439,10 @@
             margin-bottom: 10px;
             transition: color 0.5s ease;
         }
-        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme, .notification-content small.light-theme, .review-content small.light-theme, .admin-notification-content small.light-theme {
+        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme, .notification-content small.light-theme, .review-content small.light-theme {
             color: #555;
         }
-        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme, .notification-content small.space-theme, .review-content small.space-theme, .admin-notification-content small.space-theme {
+        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme, .notification-content small.space-theme, .review-content small.space-theme {
             color: #ccc;
         }
         .close-btn {
@@ -582,11 +582,11 @@
         .checkbox-container input {
             width: auto;
         }
-        .notification-content .warning, .admin-notification-content .warning {
+        .notification-content .warning {
             color: red;
             text-decoration: underline;
         }
-        .notification-content button, .admin-notification-content button {
+        .notification-content button {
             background: linear-gradient(90deg, #ff6f61, #ff8787);
             border: none;
             padding: 10px 20px;
@@ -596,9 +596,16 @@
             border-radius: 25px;
             transition: all 0.3s ease;
         }
-        .notification-content button:hover, .admin-notification-content button:hover {
+        .notification-content button:hover {
             transform: scale(1.1);
             box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
+        }
+        .fullscreen-content img.script-avatar {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 15px;
         }
     </style>
 </head>
@@ -709,14 +716,14 @@
             <button class="close-btn" onclick="closeSettings()"><i class="fas fa-times"></i></button>
             <h2 data-ru="Настройки" data-en="Settings"></h2>
             <label for="themeSelect" data-ru="Тема сайта" data-en="Site Theme"></label>
-            <select id="themeSelect" onchange="changeTheme()">
+            <select id="themeSelect" onchange="changeTheme(this.value)">
                 <option value="dark" data-ru="Тёмная" data-en="Dark">Dark</option>
                 <option value="light" data-ru="Светлая" data-en="Light">Light</option>
                 <option value="space" data-ru="Космос" data-en="Space">Space</option>
             </select>
             <small data-ru="Выберите тему сайта" data-en="Select site theme"></small>
             <label for="languageSelect" data-ru="Язык" data-en="Language"></label>
-            <select id="languageSelect" onchange="changeLanguage()">
+            <select id="languageSelect" onchange="changeLanguage(this.value)">
                 <option value="ru" data-ru="Русский" data-en="Russian">Русский</option>
                 <option value="en" data-ru="Английский" data-en="English">English</option>
             </select>
@@ -779,15 +786,6 @@
         </div>
     </div>
 
-    <div class="admin-notification-modal" id="adminNotificationModal">
-        <div class="admin-notification-content">
-            <button class="close-btn" onclick="closeAdminNotification()"><i class="fas fa-times"></i></button>
-            <h2 data-ru="Уведомление для админа" data-en="Admin Notification"></h2>
-            <p id="adminPendingCount" data-ru="Работ на проверку: " data-en="Submissions to review: "></p>
-            <button onclick="openReviewFromNotification()">Перейти к проверке</button>
-        </div>
-    </div>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDkCcxWEzi2aiu8RhzQxIV2Rfw-3wWK2Vg",
@@ -817,6 +815,7 @@
         let reviewQueue = [];
         let currentReviewIndex = 0;
         let hasNotifiedAdmin = false;
+        let lastPendingCount = 0;
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
@@ -860,6 +859,7 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 updateUI(user);
+                loadUserPreferences(user.uid);
             } else {
                 username = null;
                 userId = null;
@@ -877,9 +877,27 @@
                 document.getElementById('headerAvatar').src = 'images/ava.png';
                 document.getElementById('userName').textContent = '';
                 loadScripts();
+                changeTheme(currentTheme);
+                changeLanguage(currentLanguage);
             }
             isAuthChecked = true;
         });
+
+        function loadUserPreferences(userId) {
+            database.ref('users/' + userId).once('value').then(snapshot => {
+                const userData = snapshot.val();
+                if (userData) {
+                    currentTheme = userData.theme || 'dark';
+                    currentLanguage = userData.language || 'ru';
+                    localStorage.setItem('theme', currentTheme);
+                    localStorage.setItem('language', currentLanguage);
+                    changeTheme(currentTheme);
+                    changeLanguage(currentLanguage);
+                }
+            }).catch(error => {
+                console.error("Error loading user preferences:", error);
+            });
+        }
 
         function updateUI(user) {
             username = user.displayName;
@@ -907,8 +925,8 @@
             checkPendingScripts();
         }
 
-        function changeLanguage() {
-            currentLanguage = document.getElementById('languageSelect').value;
+        function changeLanguage(newLanguage) {
+            currentLanguage = newLanguage || document.getElementById('languageSelect').value;
             localStorage.setItem('language', currentLanguage);
             if (userId) {
                 database.ref('users/' + userId).update({ language: currentLanguage });
@@ -939,11 +957,13 @@
             Array.from(filterSelect.options).forEach(option => {
                 option.text = option.getAttribute(`data-${currentLanguage}`) || '';
             });
-            updateAdminNotification();
+            themeSelect.value = currentTheme;
+            languageSelect.value = currentLanguage;
+            filterSelect.value = filterSelect.value || 'script';
         }
 
-        function changeTheme() {
-            currentTheme = document.getElementById('themeSelect').value;
+        function changeTheme(newTheme) {
+            currentTheme = newTheme || document.getElementById('themeSelect').value;
             localStorage.setItem('theme', currentTheme);
             if (userId) {
                 database.ref('users/' + userId).update({ theme: currentTheme });
@@ -960,7 +980,7 @@
         function updateThemeClasses() {
             const isLight = document.body.classList.contains('light-theme');
             const isSpace = document.body.classList.contains('space-theme');
-            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .admin-notification-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small, .admin-notification-content small').forEach(el => {
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small').forEach(el => {
                 el.classList.remove('light-theme', 'space-theme');
                 if (isLight) el.classList.add('light-theme');
                 if (isSpace) el.classList.add('space-theme');
@@ -1082,11 +1102,6 @@
             document.getElementById('reviewModal').style.display = 'flex';
             updateThemeClasses();
             createRipple(event);
-        }
-
-        function openReviewFromNotification() {
-            closeAdminNotification();
-            openReview();
         }
 
         function showReviewItem() {
@@ -1252,67 +1267,47 @@
 
         function notifyAdmin() {
             const pendingCount = Object.keys(pendingScripts).length;
-            if (pendingCount === 0 || hasNotifiedAdmin) return;
-
-            // Уведомление через Telegram
-            const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
-            const adminChatId = '5180010738';
-            const message = currentLanguage === 'ru' ? `Есть новые работы на проверку: ${pendingCount}` : `New submissions to review: ${pendingCount}`;
-
-            const url = `https://api.telegram.org/bot${token}/sendMessage`;
-            const params = {
-                chat_id: adminChatId,
-                text: message
-            };
-
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(params)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.ok) {
-                    console.log('Admin notified via Telegram');
-                    hasNotifiedAdmin = true;
-                } else {
-                    console.error('Telegram API error:', data);
-                }
-            })
-            .catch(error => {
-                console.error('Error notifying admin via Telegram:', error);
-            });
-
-            // Уведомление на сайте
-            if (userEmail === 'kt0r2023@gmail.com') {
-                showAdminNotification();
+            if (pendingCount === 0) {
+                hasNotifiedAdmin = false;
+                lastPendingCount = 0;
+                return;
             }
-        }
 
-        function showAdminNotification() {
-            const pendingCount = Object.keys(pendingScripts).length;
-            if (pendingCount === 0) return;
+            if (pendingCount > lastPendingCount) {
+                const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
+                const adminChatId = '5180010738';
+                const message = currentLanguage === 'ru' ? `Есть новые работы на проверку: ${pendingCount}` : `New submissions to review: ${pendingCount}`;
 
-            const adminNotificationModal = document.getElementById('adminNotificationModal');
-            const adminPendingCount = document.getElementById('adminPendingCount');
-            adminPendingCount.textContent = (currentLanguage === 'ru' ? 'Работ на проверку: ' : 'Submissions to review: ') + pendingCount;
-            adminNotificationModal.style.display = 'flex';
-            updateThemeClasses();
-        }
+                const url = `https://api.telegram.org/bot${token}/sendMessage`;
+                const params = {
+                    chat_id: adminChatId,
+                    text: message
+                };
 
-        function closeAdminNotification() {
-            document.getElementById('adminNotificationModal').style.display = 'none';
-        }
-
-        function updateAdminNotification() {
-            const pendingCount = Object.keys(pendingScripts).length;
-            const adminPendingCount = document.getElementById('adminPendingCount');
-            adminPendingCount.textContent = (currentLanguage === 'ru' ? 'Работ на проверку: ' : 'Submissions to review: ') + pendingCount;
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.ok) {
+                        console.log('Admin notified via Telegram');
+                        hasNotifiedAdmin = true;
+                        lastPendingCount = pendingCount;
+                    } else {
+                        console.error('Telegram API error:', data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error notifying admin via Telegram:', error);
+                });
+            }
         }
 
         function checkPendingScripts() {
@@ -1321,11 +1316,10 @@
                 const reviewButton = document.getElementById('reviewButton');
                 if (pendingCount > 0) {
                     reviewButton.style.display = 'block';
-                    showAdminNotification();
                 } else {
                     reviewButton.style.display = 'none';
-                    closeAdminNotification();
                     hasNotifiedAdmin = false;
+                    lastPendingCount = 0;
                 }
             }
         }
@@ -1468,7 +1462,6 @@
         function cleanDatabase() {
             const scriptIds = scripts.map(script => script.id);
 
-            // Очистка userScripts
             database.ref('userScripts').once('value', (snapshot) => {
                 const userScriptsData = snapshot.val();
                 if (userScriptsData) {
@@ -1486,7 +1479,6 @@
                 }
             });
 
-            // Очистка pendingScripts
             database.ref('pendingScripts').once('value', (snapshot) => {
                 const pendingData = snapshot.val();
                 if (pendingData) {
@@ -1552,7 +1544,6 @@
                 } else {
                     document.getElementById('historyButton').style.display = 'none';
                 }
-                openHistory();
             }, (error) => {
                 console.error("Error loading user scripts from Firebase:", error);
             });
@@ -1653,8 +1644,8 @@
 
         document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
         createStars();
-        changeTheme();
-        updateLanguage();
+        changeTheme(currentTheme);
+        changeLanguage(currentLanguage);
         loadScripts();
     </script>
 </body>

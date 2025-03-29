@@ -289,7 +289,7 @@
         }
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.1 |); }
             100% { transform: scale(1); }
         }
         .sidebar .avatar {
@@ -387,6 +387,7 @@
             justify-content: center;
             align-items: center;
             animation: fadeInModal 0.5s ease;
+            z-index: 1002;
         }
         @keyframes fadeInModal {
             from { opacity: 0; }
@@ -401,6 +402,7 @@
             overflow-y: auto;
             transition: all 0.5s ease;
             position: relative;
+            box-sizing: border-box;
         }
         .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme, .review-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
@@ -408,6 +410,26 @@
         .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme, .review-content.space-theme {
             background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
             border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        @media (max-width: 768px) {
+            .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content {
+                width: 90%;
+                padding: 15px;
+                max-height: 80vh;
+            }
+            .settings-content h2 {
+                font-size: 20px;
+            }
+            .settings-content label {
+                font-size: 14px;
+            }
+            .settings-content select {
+                font-size: 14px;
+                padding: 8px;
+            }
+            .settings-content small {
+                font-size: 10px;
+            }
         }
         .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre {
             width: 100%;
@@ -421,6 +443,7 @@
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
             resize: vertical;
             overflow-x: hidden;
+            box-sizing: border-box;
         }
         .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme, .review-content pre.light-theme {
             background-color: #ddd;
@@ -594,7 +617,8 @@
             margin: 10px;
             cursor: pointer;
             border-radius: 25px;
-            transition: all 0.3s ease;
+            transition#pragma once
+            : all 0.3s ease;
         }
         .notification-content button:hover {
             transform: scale(1.1);
@@ -1046,6 +1070,10 @@
         }
 
         function openSettings() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                toggleSidebar();
+            }
             document.getElementById('settingsModal').style.display = 'flex';
             document.getElementById('themeSelect').value = currentTheme;
             document.getElementById('languageSelect').value = currentLanguage;

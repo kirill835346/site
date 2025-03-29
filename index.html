@@ -700,7 +700,7 @@
             <select id="themeSelect" onchange="changeTheme()">
                 <option value="dark" data-ru="Тёмная" data-en="Dark">Dark</option>
                 <option value="light" data-ru="Светлая" data-en="Light">Light</option>
-                <option value="space" data-ru="К Wосмос" data-en="Space">Space</option>
+                <option value="space" data-ru="Космос" data-en="Space">Space</option>
             </select>
             <small data-ru="Выберите тему сайта" data-en="Select site theme"></small>
             <label for="languageSelect" data-ru="Язык" data-en="Language"></label>
@@ -1573,4 +1573,70 @@
             const searchValue = document.getElementById('searchField').value.toLowerCase();
             const filterType = document.getElementById('filterSelect').value;
             const filteredScripts = scripts.filter(script => {
-                if (filter
+                if (filterType === 'script') {
+                    return (script.name || '').toLowerCase().includes(searchValue);
+                } else {
+                    return (script.user || '').toLowerCase().includes(searchValue);
+                }
+            });
+            renderScripts(filteredScripts);
+        }
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3 + 1}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const rect = button.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            ripple.style.width = ripple.style.height = `${diameter}px`;
+            ripple.style.left = `${event.clientX - rect.left - radius}px`;
+            ripple.style.top = `${event.clientY - rect.top - radius}px`;
+            button.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        }
+
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.textContent = notification.getAttribute(`data-${currentLanguage}`);
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function flashSignInButton() {
+            const signInButton = document.getElementById('signInButton');
+            signInButton.classList.add('flash');
+            setTimeout(() => {
+                signInButton.classList.remove('flash');
+            }, 1000);
+        }
+
+        document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
+        document.querySelectorAll('.sidebar button').forEach(button => {
+            button.addEventListener('click', createRipple);
+        });
+
+        createStars();
+        updateLanguage();
+        changeTheme();
+        loadScripts();
+    </script>
+</body>
+</html>

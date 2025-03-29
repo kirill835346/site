@@ -344,7 +344,7 @@
             transform: translate(-50%, -50%);
             transition: all 0.3s ease;
         }
-        .sidebar button:hover::after, .sidebar a:hover::after {
+        .sidebar button:hover::after, .sidebar a:hover::after 🙂 {
             width: 200px;
             height: 200px;
         }
@@ -376,7 +376,7 @@
             visibility: visible;
             opacity: 1;
         }
-        .modal, .fullscreen, .settings-modal, .history-modal, .notification-modal, .review-modal {
+        .modal, .fullscreen, .settings-modal, .history-modal, .notification-modal, .review-modal, .admin-notification-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -392,7 +392,7 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content {
+        .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .admin-notification-content {
             background: linear-gradient(145deg, #444, #555);
             padding: 25px;
             border-radius: 15px;
@@ -402,10 +402,10 @@
             transition: all 0.5s ease;
             position: relative;
         }
-        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme, .review-content.light-theme {
+        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme, .review-content.light-theme, .admin-notification-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
         }
-        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme, .review-content.space-theme {
+        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme, .review-content.space-theme, .admin-notification-content.space-theme {
             background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -431,7 +431,7 @@
             background-color: #3b3b5e;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
-        .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small {
+        .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small, .admin-notification-content small {
             display: block;
             color: #bbb;
             font-size: 12px;
@@ -439,10 +439,10 @@
             margin-bottom: 10px;
             transition: color 0.5s ease;
         }
-        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme, .notification-content small.light-theme, .review-content small.light-theme {
+        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme, .notification-content small.light-theme, .review-content small.light-theme, .admin-notification-content small.light-theme {
             color: #555;
         }
-        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme, .notification-content small.space-theme, .review-content small.space-theme {
+        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme, .notification-content small.space-theme, .review-content small.space-theme, .admin-notification-content small.space-theme {
             color: #ccc;
         }
         .close-btn {
@@ -549,6 +549,20 @@
             color: #fff;
             transition: all 0.3s ease;
         }
+        .review-content #currentReview {
+            animation: slideIn 0.5s ease forwards;
+        }
+        .review-content #currentReview.slide-out {
+            animation: slideOut 0.5s ease forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100%); opacity: 0; }
+        }
         .like-animation {
             position: absolute;
             font-size: 20px;
@@ -568,11 +582,11 @@
         .checkbox-container input {
             width: auto;
         }
-        .notification-content .warning {
+        .notification-content .warning, .admin-notification-content .warning {
             color: red;
             text-decoration: underline;
         }
-        .notification-content button {
+        .notification-content button, .admin-notification-content button {
             background: linear-gradient(90deg, #ff6f61, #ff8787);
             border: none;
             padding: 10px 20px;
@@ -582,7 +596,7 @@
             border-radius: 25px;
             transition: all 0.3s ease;
         }
-        .notification-content button:hover {
+        .notification-content button:hover, .admin-notification-content button:hover {
             transform: scale(1.1);
             box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
         }
@@ -668,7 +682,7 @@
                 <input type="checkbox" id="hasKey">
                 <label for="hasKey" data-ru="Есть ключ" data-en="Has key"></label>
             </div>
-            <button onclick="submitScript()">Отправить</button>
+            <button id="submitScriptBtn" onclick="submitScript()">Отправить</button>
         </div>
     </div>
 
@@ -765,6 +779,15 @@
         </div>
     </div>
 
+    <div class="admin-notification-modal" id="adminNotificationModal">
+        <div class="admin-notification-content">
+            <button class="close-btn" onclick="closeAdminNotification()"><i class="fas fa-times"></i></button>
+            <h2 data-ru="Уведомление для админа" data-en="Admin Notification"></h2>
+            <p id="adminPendingCount" data-ru="Работ на проверку: " data-en="Submissions to review: "></p>
+            <button onclick="openReviewFromNotification()">Перейти к проверке</button>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDkCcxWEzi2aiu8RhzQxIV2Rfw-3wWK2Vg",
@@ -793,6 +816,7 @@
         let notificationPreference = localStorage.getItem('notificationPreference') || null;
         let reviewQueue = [];
         let currentReviewIndex = 0;
+        let hasNotifiedAdmin = false;
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
@@ -915,6 +939,7 @@
             Array.from(filterSelect.options).forEach(option => {
                 option.text = option.getAttribute(`data-${currentLanguage}`) || '';
             });
+            updateAdminNotification();
         }
 
         function changeTheme() {
@@ -935,7 +960,7 @@
         function updateThemeClasses() {
             const isLight = document.body.classList.contains('light-theme');
             const isSpace = document.body.classList.contains('space-theme');
-            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small').forEach(el => {
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .admin-notification-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small, .admin-notification-content small').forEach(el => {
                 el.classList.remove('light-theme', 'space-theme');
                 if (isLight) el.classList.add('light-theme');
                 if (isSpace) el.classList.add('space-theme');
@@ -962,6 +987,9 @@
 
         function closeModal() {
             document.getElementById('submitModal').style.display = 'none';
+            const submitBtn = document.getElementById('submitScriptBtn');
+            submitBtn.textContent = currentLanguage === 'ru' ? 'Отправить' : 'Submit';
+            submitBtn.disabled = false;
         }
 
         function openFullscreen(index) {
@@ -1056,6 +1084,11 @@
             createRipple(event);
         }
 
+        function openReviewFromNotification() {
+            closeAdminNotification();
+            openReview();
+        }
+
         function showReviewItem() {
             if (currentReviewIndex >= reviewQueue.length) {
                 closeReview();
@@ -1081,50 +1114,54 @@
                 return;
             }
 
-            if (action === 'accept') {
-                const newScriptId = database.ref('scripts').push().key;
-                database.ref('scripts/' + newScriptId).set({ ...script, id: newScriptId })
-                    .then(() => {
-                        console.log(`Script ${newScriptId} added to scripts`);
-                        return database.ref('userScripts/' + script.userId + '/' + newScriptId).set({ ...script, id: newScriptId });
-                    })
-                    .then(() => {
-                        console.log(`Script ${newScriptId} added to userScripts for user ${script.userId}`);
-                        return database.ref('pendingScripts/' + scriptId).remove();
-                    })
-                    .then(() => {
-                        delete pendingScripts[scriptId];
-                        loadScripts();
-                        loadUserScripts();
-                        currentReviewIndex++;
-                        showReviewItem();
-                        if (notificationPreference === 'enabled') {
-                            if (Notification.permission === 'granted') {
-                                new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
+            const currentReview = document.getElementById('currentReview');
+            currentReview.classList.add('slide-out');
+            currentReview.addEventListener('animationend', () => {
+                if (action === 'accept') {
+                    const newScriptId = database.ref('scripts').push().key;
+                    database.ref('scripts/' + newScriptId).set({ ...script, id: newScriptId })
+                        .then(() => {
+                            console.log(`Script ${newScriptId} added to scripts`);
+                            return database.ref('userScripts/' + script.userId + '/' + newScriptId).set({ ...script, id: newScriptId });
+                        })
+                        .then(() => {
+                            console.log(`Script ${newScriptId} added to userScripts for user ${script.userId}`);
+                            return database.ref('pendingScripts/' + scriptId).remove();
+                        })
+                        .then(() => {
+                            delete pendingScripts[scriptId];
+                            loadScripts();
+                            loadUserScripts();
+                            currentReviewIndex++;
+                            showReviewItem();
+                            if (notificationPreference === 'enabled') {
+                                if (Notification.permission === 'granted') {
+                                    new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
+                                }
                             }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error accepting script:', error);
-                    });
-            } else if (action === 'reject') {
-                database.ref('pendingScripts/' + scriptId).remove()
-                    .then(() => {
-                        delete pendingScripts[scriptId];
-                        loadScripts();
-                        loadUserScripts();
-                        currentReviewIndex++;
-                        showReviewItem();
-                        if (notificationPreference === 'enabled') {
-                            if (Notification.permission === 'granted') {
-                                new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
+                        })
+                        .catch(error => {
+                            console.error('Error accepting script:', error);
+                        });
+                } else if (action === 'reject') {
+                    database.ref('pendingScripts/' + scriptId).remove()
+                        .then(() => {
+                            delete pendingScripts[scriptId];
+                            loadScripts();
+                            loadUserScripts();
+                            currentReviewIndex++;
+                            showReviewItem();
+                            if (notificationPreference === 'enabled') {
+                                if (Notification.permission === 'granted') {
+                                    new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
+                                }
                             }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error rejecting script:', error);
-                    });
-            }
+                        })
+                        .catch(error => {
+                            console.error('Error rejecting script:', error);
+                        });
+                }
+            }, { once: true });
         }
 
         function closeReview() {
@@ -1142,7 +1179,11 @@
             document.getElementById('lineCount').textContent = `Строк: ${lineCount}`;
         }
 
-        function submitScript() {
+        async function submitScript() {
+            const submitBtn = document.getElementById('submitScriptBtn');
+            submitBtn.textContent = currentLanguage === 'ru' ? 'Загрузка...' : 'Loading...';
+            submitBtn.disabled = true;
+
             const avatarInput = document.getElementById('avatarInput').files[0];
             const name = document.getElementById('scriptName').value;
             const desc = document.getElementById('scriptDesc').value;
@@ -1152,47 +1193,72 @@
 
             if (!avatarInput || !name || !desc || !code || !target) {
                 alert(currentLanguage === 'ru' ? 'Заполните все поля!' : 'Fill in all fields!');
+                submitBtn.textContent = currentLanguage === 'ru' ? 'Отправить' : 'Submit';
+                submitBtn.disabled = false;
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {}, userId: userId, hasKey };
+            const validFormats = ['image/png', 'image/jpeg', 'image/gif'];
+            if (!validFormats.includes(avatarInput.type)) {
+                alert(currentLanguage === 'ru' ? 'Пожалуйста, загрузите файл в формате PNG, JPG или GIF!' : 'Please upload a file in PNG, JPG, or GIF format!');
+                document.getElementById('avatarInput').value = '';
+                submitBtn.textContent = currentLanguage === 'ru' ? 'Отправить' : 'Submit';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            try {
+                const avatarData = await readFileAsDataURL(avatarInput);
+                const script = { name, user: username, desc, target, code, avatar: avatarData, likes: 0, dislikes: 0, userRatings: {}, userId: userId, hasKey };
                 const scriptId = database.ref('pendingScripts').push().key;
-                database.ref('pendingScripts/' + scriptId).set(script)
-                    .then(() => {
-                        pendingScripts[scriptId] = script;
-                        notifyAdmin(scriptId, script);
-                        checkPendingScripts();
 
-                        if (!hasSubmitted && !notificationPreference) {
-                            showNewUserNotification();
-                            localStorage.setItem('hasSubmitted', 'true');
-                            hasSubmitted = true;
-                        }
+                await database.ref('pendingScripts/' + scriptId).set(script);
+                pendingScripts[scriptId] = script;
+                notifyAdmin();
 
-                        document.getElementById('avatarInput').value = '';
-                        document.getElementById('scriptName').value = '';
-                        document.getElementById('scriptDesc').value = '';
-                        document.getElementById('scriptCode').value = '';
-                        document.getElementById('scriptTarget').value = '';
-                        document.getElementById('hasKey').checked = false;
-                        document.getElementById('lineCount').textContent = 'Строк: 0';
-                        closeModal();
-                    })
-                    .catch(error => {
-                        console.error('Error submitting script:', error);
-                    });
-            };
-            reader.readAsDataURL(avatarInput);
+                if (!hasSubmitted && !notificationPreference) {
+                    showNewUserNotification();
+                    localStorage.setItem('hasSubmitted', 'true');
+                    hasSubmitted = true;
+                }
+
+                document.getElementById('avatarInput').value = '';
+                document.getElementById('scriptName').value = '';
+                document.getElementById('scriptDesc').value = '';
+                document.getElementById('scriptCode').value = '';
+                document.getElementById('scriptTarget').value = '';
+                document.getElementById('hasKey').checked = false;
+                document.getElementById('lineCount').textContent = 'Строк: 0';
+                closeModal();
+                checkPendingScripts();
+            } catch (error) {
+                console.error('Error submitting script:', error);
+                alert(currentLanguage === 'ru' ? 'Ошибка при отправке скрипта: ' + error.message : 'Error submitting script: ' + error.message);
+            } finally {
+                submitBtn.textContent = currentLanguage === 'ru' ? 'Отправить' : 'Submit';
+                submitBtn.disabled = false;
+            }
             createRipple(event);
         }
 
-        function notifyAdmin(scriptId, script) {
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function notifyAdmin() {
+            const pendingCount = Object.keys(pendingScripts).length;
+            if (pendingCount === 0 || hasNotifiedAdmin) return;
+
+            // Уведомление через Telegram
             const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
-            const adminChatId = '5180010738'; // Убедись, что это правильный chat_id админа
-            const message = `Новая работа ожидает проверки!\nНазвание: ${script.name}\nАвтор: ${script.user}`;
-            
+            const adminChatId = '5180010738';
+            const message = currentLanguage === 'ru' ? `Есть новые работы на проверку: ${pendingCount}` : `New submissions to review: ${pendingCount}`;
+
             const url = `https://api.telegram.org/bot${token}/sendMessage`;
             const params = {
                 chat_id: adminChatId,
@@ -1213,15 +1279,40 @@
             .then(data => {
                 if (data.ok) {
                     console.log('Admin notified via Telegram');
+                    hasNotifiedAdmin = true;
                 } else {
                     console.error('Telegram API error:', data);
-                    alert(currentLanguage === 'ru' ? 'Ошибка отправки уведомления админу: ' + data.description : 'Error sending notification to admin: ' + data.description);
                 }
             })
             .catch(error => {
-                console.error('Error notifying admin:', error);
-                alert(currentLanguage === 'ru' ? 'Ошибка отправки уведомления админу: ' + error.message : 'Error sending notification to admin: ' + error.message);
+                console.error('Error notifying admin via Telegram:', error);
             });
+
+            // Уведомление на сайте
+            if (userEmail === 'kt0r2023@gmail.com') {
+                showAdminNotification();
+            }
+        }
+
+        function showAdminNotification() {
+            const pendingCount = Object.keys(pendingScripts).length;
+            if (pendingCount === 0) return;
+
+            const adminNotificationModal = document.getElementById('adminNotificationModal');
+            const adminPendingCount = document.getElementById('adminPendingCount');
+            adminPendingCount.textContent = (currentLanguage === 'ru' ? 'Работ на проверку: ' : 'Submissions to review: ') + pendingCount;
+            adminNotificationModal.style.display = 'flex';
+            updateThemeClasses();
+        }
+
+        function closeAdminNotification() {
+            document.getElementById('adminNotificationModal').style.display = 'none';
+        }
+
+        function updateAdminNotification() {
+            const pendingCount = Object.keys(pendingScripts).length;
+            const adminPendingCount = document.getElementById('adminPendingCount');
+            adminPendingCount.textContent = (currentLanguage === 'ru' ? 'Работ на проверку: ' : 'Submissions to review: ') + pendingCount;
         }
 
         function checkPendingScripts() {
@@ -1230,8 +1321,11 @@
                 const reviewButton = document.getElementById('reviewButton');
                 if (pendingCount > 0) {
                     reviewButton.style.display = 'block';
+                    showAdminNotification();
                 } else {
                     reviewButton.style.display = 'none';
+                    closeAdminNotification();
+                    hasNotifiedAdmin = false;
                 }
             }
         }
@@ -1371,6 +1465,44 @@
             if (event) createRipple(event);
         }
 
+        function cleanDatabase() {
+            const scriptIds = scripts.map(script => script.id);
+
+            // Очистка userScripts
+            database.ref('userScripts').once('value', (snapshot) => {
+                const userScriptsData = snapshot.val();
+                if (userScriptsData) {
+                    Object.keys(userScriptsData).forEach(userId => {
+                        const userScripts = userScriptsData[userId];
+                        Object.keys(userScripts).forEach(scriptId => {
+                            if (!scriptIds.includes(scriptId)) {
+                                database.ref(`userScripts/${userId}/${scriptId}`).remove()
+                                    .catch(error => {
+                                        console.error(`Error removing script ${scriptId} from userScripts/${userId}:`, error);
+                                    });
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Очистка pendingScripts
+            database.ref('pendingScripts').once('value', (snapshot) => {
+                const pendingData = snapshot.val();
+                if (pendingData) {
+                    Object.keys(pendingData).forEach(scriptId => {
+                        const script = pendingData[scriptId];
+                        if (script.userId && scriptIds.includes(scriptId)) {
+                            database.ref(`pendingScripts/${scriptId}`).remove()
+                                .catch(error => {
+                                    console.error(`Error removing script ${scriptId} from pendingScripts:`, error);
+                                });
+                        }
+                    });
+                }
+            });
+        }
+
         function loadScripts() {
             database.ref('scripts').on('value', (snapshot) => {
                 scripts = [];
@@ -1381,6 +1513,7 @@
                     });
                 }
                 renderScripts();
+                cleanDatabase();
             }, (error) => {
                 console.error("Error loading scripts from Firebase:", error);
             });
@@ -1396,6 +1529,7 @@
                     pendingScripts = {};
                 }
                 checkPendingScripts();
+                notifyAdmin();
             }, (error) => {
                 console.error("Error loading pending scripts from Firebase:", error);
             });
@@ -1476,6 +1610,19 @@
             renderScripts(filteredScripts);
         }
 
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function flashSignInButton() {
+            const signInButton = document.getElementById('signInButton');
+            signInButton.classList.add('flash');
+        }
+
         function createStars() {
             const starsContainer = document.getElementById('stars');
             for (let i = 0; i < 100; i++) {
@@ -1502,34 +1649,12 @@
             ripple.style.left = `${event.clientX - rect.left - radius}px`;
             ripple.style.top = `${event.clientY - rect.top - radius}px`;
             button.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 600);
         }
 
-        function showNotification() {
-            const notification = document.getElementById('notification');
-            notification.textContent = notification.getAttribute(`data-${currentLanguage}`);
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function flashSignInButton() {
-            const signInButton = document.getElementById('signInButton');
-            signInButton.classList.add('flash');
-            setTimeout(() => {
-                signInButton.classList.remove('flash');
-            }, 1000);
-        }
-
-        document.getElementById('menuToggle').onclick = toggleSidebar;
-        document.querySelectorAll('.sidebar button').forEach(button => {
-            button.addEventListener('click', createRipple);
-        });
-
+        document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
         createStars();
-        updateLanguage();
         changeTheme();
+        updateLanguage();
         loadScripts();
     </script>
 </body>

@@ -647,23 +647,17 @@
         .comment .comment-text {
             font-size: 14px;
         }
-        .modal-content button, .fullscreen-content button, .settings-content button, .history-content button, .notification-content button, .review-content button {
+        .modal-content button, .fullscreen-content button, .review-content button:not(.action-buttons button) {
             background: linear-gradient(90deg, #ff6f61, #ff8787);
             border: none;
-            padding: 12px 25px;
+            padding: 10px 20px;
             color: #fff;
-            margin: 15px 0;
+            margin: 10px 0;
             cursor: pointer;
             border-radius: 25px;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
-        .modal-content button:hover, .fullscreen-content button:hover, .settings-content button:hover, .history-content button:hover, .notification-content button:hover, .review-content button:hover {
+        .modal-content button:hover, .fullscreen-content button:hover, .review-content button:not(.action-buttons button):hover {
             transform: scale(1.1);
             box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
         }
@@ -751,7 +745,7 @@
                 <input type="checkbox" id="allowComments" checked>
                 <label for="allowComments" data-ru="Разрешить комментарии" data-en="Allow comments">Разрешить комментарии:</label>
             </div>
-            <button onclick="submitScript()"><span data-ru="Отправить" data-en="Submit">Отправить</span></button>
+            <button onclick="submitScript()" data-ru="Отправить" data-en="Submit">Отправить</button>
         </div>
     </div>
 
@@ -765,14 +759,14 @@
             <p id="keyStatus"></p>
             <pre id="fullCode"></pre>
             <div class="rating">
-                <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
-                <button class="dislike-btn" id="fullDislikeBtn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
-                <button class="admin-delete-btn" id="adminDeleteBtn" style="display: none;"><i class="fas fa-trash"></i> <span data-ru="Удалить (Админ)" data-en="Delete (Admin)">Удалить (Админ)</span></button>
+                <button class="like-btn" id="fullLikeBtn" onclick="rateScript(currentScriptIndex, 'like', event)"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
+                <button class="dislike-btn" id="fullDislikeBtn" onclick="rateScript(currentScriptIndex, 'dislike', event)"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
+                <button class="admin-delete-btn" id="adminDeleteBtn" style="display: none;" onclick="adminDeleteScript(currentScriptIndex)"><i class="fas fa-trash"></i> <span data-ru="Удалить (Админ)" data-en="Delete (Admin)">Удалить (Админ)</span></button>
             </div>
             <div class="comment-section">
                 <h4 data-ru="Комментарии" data-en="Comments">Комментарии</h4>
                 <textarea class="comment-input" id="commentInput" data-ru-placeholder="Напишите комментарий..." data-en-placeholder="Write a comment..." data-ru-disabled="Автор не хочет комментариев" data-en-disabled="Author does not want comments"></textarea>
-                <button onclick="submitComment()"><span data-ru="Отправить" data-en="Submit">Отправить</span></button>
+                <button onclick="submitComment()" data-ru="Отправить" data-en="Submit">Отправить</button>
                 <div class="comment-list" id="commentList"></div>
             </div>
         </div>
@@ -824,8 +818,8 @@
             <p id="reviewKeyStatus"></p>
             <pre id="reviewFullCode"></pre>
             <div class="action-buttons">
-                <button class="accept-btn" id="reviewAcceptBtn"><span data-ru="Принять" data-en="Accept">Принять</span></button>
-                <button class="reject-btn" id="reviewRejectBtn"><span data-ru="Отказать" data-en="Reject">Отказать</span></button>
+                <button class="accept-btn" id="reviewAcceptBtn" data-ru="Принять" data-en="Accept">Принять</button>
+                <button class="reject-btn" id="reviewRejectBtn" data-ru="Отказать" data-en="Reject">Отказать</button>
             </div>
         </div>
     </div>
@@ -835,10 +829,10 @@
     <div class="notification-modal" id="newUserNotification">
         <div class="notification-content">
             <h2 data-ru="Уведомления" data-en="Notifications">Уведомления</h2>
-            <p data-ru="Хотите включить уведомления, чтобы узнать, приняли ваш код или отказали?" data-en="Would you like to enable notifications to know if your script is accepted or rejected?"></p>
-            <p class="warning" data-ru="Больше потом нельзя изменить это решение!" data-en="You cannot change this decision later!"></p>
-            <button onclick="enableNotifications()"><span data-ru="Да" data-en="Yes">Да</span></button>
-            <button onclick="disableNotifications()"><span data-ru="Нет" data-en="No">Нет</span></button>
+            <p data-ru="Хотите включить уведомления, чтобы узнать, приняли ваш код или отказали?" data-en="Would you like to enable notifications to know if your script is accepted or rejected?">Хотите включить уведомления, чтобы узнать, приняли ваш код или отказали?</p>
+            <p class="warning" data-ru="Больше потом нельзя изменить это решение!" data-en="You cannot change this decision later!">Больше потом нельзя изменить это решение!</p>
+            <button onclick="enableNotifications()" data-ru="Да" data-en="Yes">Да</button>
+            <button onclick="disableNotifications()" data-ru="Нет" data-en="No">Нет</button>
         </div>
     </div>
 
@@ -853,7 +847,7 @@
         <div class="notification-content">
             <h2 data-ru="Жаль :(" data-en="Sorry :(">Жаль :(</h2>
             <p>:(</p>
-            <button onclick="signOut()"><span data-ru="Выйти" data-en="Sign Out">Выйти</span></button>
+            <button onclick="signOut()" data-ru="Выйти" data-en="Sign Out">Выйти</button>
         </div>
     </div>
 
@@ -884,19 +878,19 @@
         let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentTheme = localStorage.getItem('theme') || 'dark';
         let isAuthChecked = false;
-        let hasSubmitted = localStorage.getItem('hasSubmitted') || false;
+        let hasSubmitted = localStorage.getItem('hasSubmitted') === 'true';
         let notificationPreference = localStorage.getItem('notificationPreference') || null;
         let telegramMessages = {};
         let pendingScriptsList = [];
         let currentScriptIndex = null;
-        let displayedScriptIds = new Set(); // Для предотвращения дублирования
+        let displayedScriptIds = new Set();
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
         provider.addScope('email');
 
-        // Инициализация звезд для темы "Космос"
-        function initStars() {
+        // Создание эффекта "звезд" для темы "Космос"
+        function createStars() {
             const starsContainer = document.getElementById('stars');
             for (let i = 0; i < 100; i++) {
                 const star = document.createElement('div');
@@ -908,6 +902,19 @@
                 star.style.animationDelay = `${Math.random() * 5}s`;
                 starsContainer.appendChild(star);
             }
+        }
+
+        // Создание эффекта "ripple" при клике
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+            ripple.style.width = ripple.style.height = `${diameter}px`;
+            ripple.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
+            ripple.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
+            button.appendChild(ripple);
         }
 
         // Вход через Google
@@ -1011,6 +1018,22 @@
             } else {
                 document.getElementById('reviewButton').style.display = 'none';
             }
+        }
+
+        // Показ уведомления о необходимости входа
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.textContent = notification.getAttribute(`data-${currentLanguage}`);
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Анимация кнопки входа
+        function flashSignInButton() {
+            const signInButton = document.getElementById('signInButton');
+            signInButton.classList.add('flash');
         }
 
         // Смена языка
@@ -1121,11 +1144,8 @@
             dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes || 0;
             likeBtn.classList.toggle('liked', script.userRatings && script.userRatings[userId] === 'like');
             dislikeBtn.classList.toggle('disliked', script.userRatings && script.userRatings[userId] === 'dislike');
-            likeBtn.onclick = () => rateScript(index, 'like', event);
-            dislikeBtn.onclick = () => rateScript(index, 'dislike', event);
             if (userEmail === 'kt0r2023@gmail.com') {
                 adminDeleteBtn.style.display = 'block';
-                adminDeleteBtn.onclick = () => adminDeleteScript(index);
             } else {
                 adminDeleteBtn.style.display = 'none';
             }
@@ -1188,7 +1208,8 @@
                 card.onclick = (e) => {
                     if (!e.target.classList.contains('delete-btn') && !e.target.classList.contains('accept-btn') && !e.target.classList.contains('reject-btn')) {
                         closeHistory();
-                        openFullscreen(scripts.findIndex(s => s.name === script.name && s.user === script.user));
+                        const scriptIndex = scripts.findIndex(s => s.id === script.id);
+                        if (scriptIndex !== -1) openFullscreen(scriptIndex);
                     }
                 };
                 historyList.appendChild(card);
@@ -1269,7 +1290,7 @@
                 document.getElementById('scriptCode').value = lines.slice(0, 10).join('\n');
             }
             const lineCount = document.getElementById('scriptCode').value.split('\n').length;
-            document.getElementById('lineCount').textContent = `Строк: ${lineCount}`;
+            document.getElementById('lineCount').textContent = currentLanguage === 'ru' ? `Строк: ${lineCount}` : `Lines: ${lineCount}`;
         }
 
         // Отправка скрипта
@@ -1322,7 +1343,7 @@
                         document.getElementById('scriptCode').value = '';
                         document.getElementById('hasKey').checked = false;
                         document.getElementById('allowComments').checked = true;
-                        document.getElementById('lineCount').textContent = 'Строк: 0';
+                        document.getElementById('lineCount').textContent = currentLanguage === 'ru' ? 'Строк: 0' : 'Lines: 0';
                         closeModal();
                     })
                     .catch(error => {
@@ -1620,10 +1641,10 @@
 
         // Загрузка всех скриптов
         function loadScripts() {
-            database.ref('scripts').off(); // Отключаем предыдущие слушатели
+            database.ref('scripts').off();
             database.ref('scripts').on('value', (snapshot) => {
                 scripts = [];
-                displayedScriptIds.clear(); // Очищаем список отображаемых ID
+                displayedScriptIds.clear();
                 const data = snapshot.val();
                 if (data) {
                     Object.keys(data).forEach(key => {
@@ -1639,7 +1660,7 @@
         // Загрузка скриптов пользователя
         function loadUserScripts() {
             if (!userId) return;
-            database.ref('userScripts/' + userId).off(); // Отключаем предыдущие слушатели
+            database.ref('userScripts/' + userId).off();
             database.ref('userScripts/' + userId).on('value', (snapshot) => {
                 userScripts = [];
                 const data = snapshot.val();
@@ -1655,7 +1676,9 @@
                 } else {
                     document.getElementById('historyButton').style.display = 'none';
                 }
-                openHistory();
+                if (document.getElementById('historyModal').style.display === 'flex') {
+                    openHistory();
+                }
             }, (error) => {
                 console.error("Error loading user scripts from Firebase:", error);
             });
@@ -1663,25 +1686,5 @@
 
         // Загрузка ожидающих скриптов
         function loadPendingScripts() {
-            database.ref('pendingScripts').off(); // Отключаем предыдущие слушатели
-            database.ref('pendingScripts').on('value', (snapshot) => {
-                pendingScripts = {};
-                pendingScriptsList = [];
-                const data = snapshot.val();
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        pendingScripts[key] = data[key];
-                        pendingScriptsList.push({ ...data[key], id: key });
-                    });
-                }
-                checkAdminStatus();
-            }, (error) => {
-                console.error("Error loading pending scripts from Firebase:", error);
-            });
-        }
-
-        // Рендеринг списка скриптов
-        function renderScripts(filteredScripts = scripts) {
-            const scriptListContainer = document.getElementById('scriptListContainer');
-            scriptListContainer.innerHTML = '';
-            displayedScriptIds.clear(); //
+            database.ref('pendingScripts').off();
+            database.ref('pendingScripts

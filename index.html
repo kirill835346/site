@@ -647,6 +647,26 @@
         .comment .comment-text {
             font-size: 14px;
         }
+        .modal-content button, .fullscreen-content button, .settings-content button, .history-content button, .notification-content button, .review-content button {
+            background: linear-gradient(90deg, #ff6f61, #ff8787);
+            border: none;
+            padding: 12px 25px;
+            color: #fff;
+            margin: 15px 0;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .modal-content button:hover, .fullscreen-content button:hover, .settings-content button:hover, .history-content button:hover, .notification-content button:hover, .review-content button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -672,39 +692,39 @@
             <img src="images/ava.png" class="avatar" id="userAvatar" alt="Аватар пользователя">
             <div class="user-name" id="userName"></div>
             <button class="tooltip" onclick="openModal(); toggleSidebar();" id="submitButton">
-                <i class="fas fa-upload"></i> <span data-ru="Выложить работу" data-en="Submit work"></span>
+                <i class="fas fa-upload"></i> <span data-ru="Выложить работу" data-en="Submit work">Выложить работу</span>
                 <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
             </button>
             <button class="tooltip" onclick="signIn(); toggleSidebar();" id="signInButton">
-                <i class="fas fa-sign-in-alt"></i> <span data-ru="Войти" data-en="Sign In"></span>
+                <i class="fas fa-sign-in-alt"></i> <span data-ru="Войти" data-en="Sign In">Войти</span>
                 <span class="tooltiptext" data-ru="Войти через Google" data-en="Sign in with Google"></span>
             </button>
             <button class="tooltip" onclick="signOut(); toggleSidebar();" id="signOutButton" style="display: none;">
-                <i class="fas fa-sign-out-alt"></i> <span data-ru="Выйти" data-en="Sign Out"></span>
+                <i class="fas fa-sign-out-alt"></i> <span data-ru="Выйти" data-en="Sign Out">Выйти</span>
                 <span class="tooltiptext" data-ru="Выйти из аккаунта" data-en="Sign out of account"></span>
             </button>
             <button class="tooltip" onclick="window.location.href='/site/bypasser.html'; toggleSidebar();">
-                <i class="fas fa-shield-alt"></i> <span data-ru="Обходчики" data-en="Bypassers"></span>
+                <i class="fas fa-shield-alt"></i> <span data-ru="Обходчики" data-en="Bypassers">Обходчики</span>
                 <span class="tooltiptext" data-ru="Открыть обходчики" data-en="Open bypassers"></span>
             </button>
             <button class="tooltip" onclick="openSettings(); toggleSidebar();">
-                <i class="fas fa-cog"></i> <span data-ru="Настройки" data-en="Settings"></span>
+                <i class="fas fa-cog"></i> <span data-ru="Настройки" data-en="Settings">Настройки</span>
                 <span class="tooltiptext" data-ru="Настроить сайт" data-en="Configure the site"></span>
             </button>
             <button class="tooltip" onclick="openHistory(); toggleSidebar();" id="historyButton" style="display: none;">
-                <i class="fas fa-history"></i> <span data-ru="Работы" data-en="Submissions"></span>
+                <i class="fas fa-history"></i> <span data-ru="Работы" data-en="Submissions">Работы</span>
                 <span class="tooltiptext" data-ru="Посмотреть ваши работы" data-en="View your submissions"></span>
             </button>
             <button class="tooltip" onclick="openReview(); toggleSidebar();" id="reviewButton" style="display: none;">
-                <i class="fas fa-check-circle"></i> <span data-ru="Проверка" data-en="Review"></span>
+                <i class="fas fa-check-circle"></i> <span data-ru="Проверка" data-en="Review">Проверка</span>
                 <span class="tooltiptext" data-ru="Проверить работы" data-en="Review submissions"></span>
             </button>
             <a href="https://funpay.com/users/9532559/" target="_blank" class="tooltip" onclick="toggleSidebar();">
-                <i class="fas fa-wallet"></i> <span data-ru="FunPay" data-en="FunPay"></span>
+                <i class="fas fa-wallet"></i> <span data-ru="FunPay" data-en="FunPay">FunPay</span>
                 <span class="tooltiptext" data-ru="Перейти на FunPay" data-en="Go to FunPay"></span>
             </a>
             <a href="https://t.me/ezezuroyd" target="_blank" class="tooltip" onclick="toggleSidebar();">
-                <i class="fab fa-telegram-plane"></i> <span data-ru="Telegram" data-en="Telegram"></span>
+                <i class="fab fa-telegram-plane"></i> <span data-ru="Telegram" data-en="Telegram">Telegram</span>
                 <span class="tooltiptext" data-ru="Связаться в Telegram" data-en="Contact on Telegram"></span>
             </a>
         </div>
@@ -713,25 +733,25 @@
     <div class="modal" id="submitModal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-            <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
+            <h2 data-ru="Отправить скрипт" data-en="Submit Script">Отправить скрипт</h2>
             <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/gif" required>
-            <small data-ru="Загрузите аватар скрипта (PNG, JPG, GIF)" data-en="Upload script avatar (PNG, JPG, GIF)"></small>
+            <small data-ru="Загрузите аватар скрипта (PNG, JPG, GIF)" data-en="Upload script avatar (PNG, JPG, GIF)">Загрузите аватар скрипта (PNG, JPG, GIF)</small>
             <input type="text" id="scriptName" data-ru-placeholder="Название кода или игры" data-en-placeholder="Code or game name" maxlength="40" required>
-            <small data-ru="Название (до 40 символов), например, 'Автокликер' или 'Roblox'" data-en="Name (up to 40 chars), e.g., 'Autoclicker' or 'Roblox'"></small>
+            <small data-ru="Название (до 40 символов), например, 'Автокликер' или 'Roblox'" data-en="Name (up to 40 chars), e.g., 'Autoclicker' or 'Roblox'">Название (до 40 символов), например, 'Автокликер' или 'Roblox'</small>
             <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
-            <small data-ru="Опишите, что делает скрипт" data-en="Describe what the script does"></small>
+            <small data-ru="Опишите, что делает скрипт" data-en="Describe what the script does">Опишите, что делает скрипт</small>
             <textarea id="scriptCode" data-ru-placeholder="Код (макс 10 строк)" data-en-placeholder="Code (max 10 lines)" required oninput="limitCodeLines()"></textarea>
-            <small data-ru="Вставьте код (до 10 строк)" data-en="Insert code (up to 10 lines)"></small>
+            <small data-ru="Вставьте код (до 10 строк)" data-en="Insert code (up to 10 lines)">Вставьте код (до 10 строк)</small>
             <p id="lineCount">Строк: 0</p>
             <div class="checkbox-container">
                 <input type="checkbox" id="hasKey">
-                <label for="hasKey" data-ru="Есть ключ" data-en="Has key"></label>
+                <label for="hasKey" data-ru="Есть ключ" data-en="Has key">Есть ключ:</label>
             </div>
             <div class="checkbox-container">
                 <input type="checkbox" id="allowComments" checked>
-                <label for="allowComments" data-ru="Разрешить комментарии" data-en="Allow comments"></label>
+                <label for="allowComments" data-ru="Разрешить комментарии" data-en="Allow comments">Разрешить комментарии:</label>
             </div>
-            <button onclick="submitScript()">Отправить</button>
+            <button onclick="submitScript()"><span data-ru="Отправить" data-en="Submit">Отправить</span></button>
         </div>
     </div>
 
@@ -747,12 +767,12 @@
             <div class="rating">
                 <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
                 <button class="dislike-btn" id="fullDislikeBtn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
-                <button class="admin-delete-btn" id="adminDeleteBtn" style="display: none;"><i class="fas fa-trash"></i> Удалить (Админ)</button>
+                <button class="admin-delete-btn" id="adminDeleteBtn" style="display: none;"><i class="fas fa-trash"></i> <span data-ru="Удалить (Админ)" data-en="Delete (Admin)">Удалить (Админ)</span></button>
             </div>
             <div class="comment-section">
-                <h4 data-ru="Комментарии" data-en="Comments"></h4>
+                <h4 data-ru="Комментарии" data-en="Comments">Комментарии</h4>
                 <textarea class="comment-input" id="commentInput" data-ru-placeholder="Напишите комментарий..." data-en-placeholder="Write a comment..." data-ru-disabled="Автор не хочет комментариев" data-en-disabled="Author does not want comments"></textarea>
-                <button onclick="submitComment()">Отправить</button>
+                <button onclick="submitComment()"><span data-ru="Отправить" data-en="Submit">Отправить</span></button>
                 <div class="comment-list" id="commentList"></div>
             </div>
         </div>
@@ -761,27 +781,27 @@
     <div class="settings-modal" id="settingsModal">
         <div class="settings-content">
             <button class="close-btn" onclick="closeSettings()"><i class="fas fa-times"></i></button>
-            <h2 data-ru="Настройки" data-en="Settings"></h2>
-            <label for="themeSelect" data-ru="Тема сайта" data-en="Site Theme"></label>
+            <h2 data-ru="Настройки" data-en="Settings">Настройки</h2>
+            <label for="themeSelect" data-ru="Тема сайта" data-en="Site Theme">Тема сайта:</label>
             <select id="themeSelect" onchange="changeTheme()">
-                <option value="dark" data-ru="Тёмная" data-en="Dark">Dark</option>
-                <option value="light" data-ru="Светлая" data-en="Light">Light</option>
-                <option value="space" data-ru="Космос" data-en="Space">Space</option>
+                <option value="dark" data-ru="Тёмная" data-en="Dark">Тёмная</option>
+                <option value="light" data-ru="Светлая" data-en="Light">Светлая</option>
+                <option value="space" data-ru="Космос" data-en="Space">Космос</option>
             </select>
-            <small data-ru="Выберите тему сайта" data-en="Select site theme"></small>
-            <label for="languageSelect" data-ru="Язык" data-en="Language"></label>
+            <small data-ru="Выберите тему сайта" data-en="Select site theme">Выберите тему сайта</small>
+            <label for="languageSelect" data-ru="Язык" data-en="Language">Язык:</label>
             <select id="languageSelect" onchange="changeLanguage()">
                 <option value="ru" data-ru="Русский" data-en="Russian">Русский</option>
-                <option value="en" data-ru="Английский" data-en="English">English</option>
+                <option value="en" data-ru="Английский" data-en="English">Английский</option>
             </select>
-            <small data-ru="Выберите язык сайта" data-en="Select site language"></small>
+            <small data-ru="Выберите язык сайта" data-en="Select site language">Выберите язык сайта</small>
         </div>
     </div>
 
     <div class="history-modal" id="historyModal">
         <div class="history-content">
             <button class="close-btn" onclick="closeHistory()"><i class="fas fa-times"></i></button>
-            <h2 data-ru="Ваши работы" data-en="Your Submissions"></h2>
+            <h2 data-ru="Ваши работы" data-en="Your Submissions">Ваши работы</h2>
             <div id="historyList" class="script-list"></div>
         </div>
     </div>
@@ -789,7 +809,7 @@
     <div class="review-modal" id="reviewModal">
         <div class="review-content">
             <button class="close-btn" onclick="closeReview()"><i class="fas fa-times"></i></button>
-            <h2 data-ru="Проверка работ" data-en="Review Submissions"></h2>
+            <h2 data-ru="Проверка работ" data-en="Review Submissions">Проверка работ</h2>
             <div id="reviewList" class="script-list"></div>
         </div>
     </div>
@@ -804,8 +824,8 @@
             <p id="reviewKeyStatus"></p>
             <pre id="reviewFullCode"></pre>
             <div class="action-buttons">
-                <button class="accept-btn" id="reviewAcceptBtn">Принять</button>
-                <button class="reject-btn" id="reviewRejectBtn">Отказать</button>
+                <button class="accept-btn" id="reviewAcceptBtn"><span data-ru="Принять" data-en="Accept">Принять</span></button>
+                <button class="reject-btn" id="reviewRejectBtn"><span data-ru="Отказать" data-en="Reject">Отказать</span></button>
             </div>
         </div>
     </div>
@@ -814,26 +834,26 @@
 
     <div class="notification-modal" id="newUserNotification">
         <div class="notification-content">
-            <h2 data-ru="Уведомления" data-en="Notifications"></h2>
+            <h2 data-ru="Уведомления" data-en="Notifications">Уведомления</h2>
             <p data-ru="Хотите включить уведомления, чтобы узнать, приняли ваш код или отказали?" data-en="Would you like to enable notifications to know if your script is accepted or rejected?"></p>
             <p class="warning" data-ru="Больше потом нельзя изменить это решение!" data-en="You cannot change this decision later!"></p>
-            <button onclick="enableNotifications()">Да</button>
-            <button onclick="disableNotifications()">Нет</button>
+            <button onclick="enableNotifications()"><span data-ru="Да" data-en="Yes">Да</span></button>
+            <button onclick="disableNotifications()"><span data-ru="Нет" data-en="No">Нет</span></button>
         </div>
     </div>
 
     <div class="notification-modal" id="thanksNotification">
         <div class="notification-content">
-            <h2 data-ru="Спасибо!" data-en="Thank You!"></h2>
-            <p data-ru="Спасибо, что пользуетесь нашим сайтом! 😊" data-en="Thank you for using our site! 😊"></p>
+            <h2 data-ru="Спасибо!" data-en="Thank You!">Спасибо!</h2>
+            <p data-ru="Спасибо, что пользуетесь нашим сайтом! 😊" data-en="Thank you for using our site! 😊">Спасибо, что пользуетесь нашим сайтом! 😊</p>
         </div>
     </div>
 
     <div class="notification-modal" id="sadNotification">
         <div class="notification-content">
-            <h2 data-ru="Жаль :(" data-en="Sorry :("></h2>
+            <h2 data-ru="Жаль :(" data-en="Sorry :(">Жаль :(</h2>
             <p>:(</p>
-            <button onclick="signOut()">Выйти</button>
+            <button onclick="signOut()"><span data-ru="Выйти" data-en="Sign Out">Выйти</span></button>
         </div>
     </div>
 
@@ -869,10 +889,26 @@
         let telegramMessages = {};
         let pendingScriptsList = [];
         let currentScriptIndex = null;
+        let displayedScriptIds = new Set(); // Для предотвращения дублирования
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
         provider.addScope('email');
+
+        // Инициализация звезд для темы "Космос"
+        function initStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                starsContainer.appendChild(star);
+            }
+        }
 
         // Вход через Google
         function signIn() {
@@ -1085,8 +1121,8 @@
             dislikeBtn.querySelector('.dislike-count').textContent = script.dislikes || 0;
             likeBtn.classList.toggle('liked', script.userRatings && script.userRatings[userId] === 'like');
             dislikeBtn.classList.toggle('disliked', script.userRatings && script.userRatings[userId] === 'dislike');
-            likeBtn.onclick = () => rateScript(index, 'like', null);
-            dislikeBtn.onclick = () => rateScript(index, 'dislike', null);
+            likeBtn.onclick = () => rateScript(index, 'like', event);
+            dislikeBtn.onclick = () => rateScript(index, 'dislike', event);
             if (userEmail === 'kt0r2023@gmail.com') {
                 adminDeleteBtn.style.display = 'block';
                 adminDeleteBtn.onclick = () => adminDeleteScript(index);
@@ -1584,8 +1620,10 @@
 
         // Загрузка всех скриптов
         function loadScripts() {
+            database.ref('scripts').off(); // Отключаем предыдущие слушатели
             database.ref('scripts').on('value', (snapshot) => {
                 scripts = [];
+                displayedScriptIds.clear(); // Очищаем список отображаемых ID
                 const data = snapshot.val();
                 if (data) {
                     Object.keys(data).forEach(key => {
@@ -1601,6 +1639,7 @@
         // Загрузка скриптов пользователя
         function loadUserScripts() {
             if (!userId) return;
+            database.ref('userScripts/' + userId).off(); // Отключаем предыдущие слушатели
             database.ref('userScripts/' + userId).on('value', (snapshot) => {
                 userScripts = [];
                 const data = snapshot.val();
@@ -1624,6 +1663,7 @@
 
         // Загрузка ожидающих скриптов
         function loadPendingScripts() {
+            database.ref('pendingScripts').off(); // Отключаем предыдущие слушатели
             database.ref('pendingScripts').on('value', (snapshot) => {
                 pendingScripts = {};
                 pendingScriptsList = [];
@@ -1644,48 +1684,4 @@
         function renderScripts(filteredScripts = scripts) {
             const scriptListContainer = document.getElementById('scriptListContainer');
             scriptListContainer.innerHTML = '';
-            filteredScripts.forEach((script, index) => {
-                const card = document.createElement('div');
-                card.className = 'script-card';
-                const avatarSrc = script.avatar || 'https://placehold.co/200x150';
-                const scriptName = script.name || 'Без названия';
-                const scriptUser = script.user || 'Аноним';
-                const likes = script.likes || 0;
-                const dislikes = script.dislikes || 0;
-                const isLiked = script.userRatings && script.userRatings[userId] === 'like';
-                const isDisliked = script.userRatings && script.userRatings[userId] === 'dislike';
-                card.innerHTML = `
-                    <img src="${avatarSrc}" class="script-avatar" alt="${scriptName}" onerror="this.src='https://placehold.co/200x150';">
-                    ${script.hasKey ? '<div class="key-message"><i class="fas fa-key"></i> Key</div>' : ''}
-                    <div class="script-info">
-                        <h3>${scriptName}</h3>
-                        <div class="username">${scriptUser}</div>
-                        <div class="rating">
-                            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="rateScript(${index}, 'like', event)">
-                                <i class="fas fa-thumbs-up"></i> <span class="like-count">${likes}</span>
-                            </button>
-                            <button class="dislike-btn ${isDisliked ? 'disliked' : ''}" onclick="rateScript(${index}, 'dislike', event)">
-                                <i class="fas fa-thumbs-down"></i> <span class="dislike-count">${dislikes}</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                card.onclick = (e) => {
-                    if (!e.target.closest('.rating')) {
-                        openFullscreen(index);
-                    }
-                };
-                scriptListContainer.appendChild(card);
-            });
-            updateThemeClasses();
-        }
-
-        // Поиск скриптов
-        function searchScripts() {
-            const searchValue = document.getElementById('searchField').value.toLowerCase();
-            const filterType = document.getElementById('filterSelect').value;
-            const filteredScripts = scripts.filter(script => {
-                if (filterType === 'script') {
-                    return (script.name || '').toLowerCase().includes(searchValue);
-                } else {
-                    return (script
+            displayedScriptIds.clear(); //

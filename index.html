@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Script Hub</title>
+    <title>Script-net</title>
     <link rel="icon" type="image/png" href="images/ava.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -588,13 +588,72 @@
             transform: scale(1.1);
             box-shadow: 0 5px 20px rgba(255, 135, 135, 0.5);
         }
+        .comment-section {
+            margin-top: 20px;
+        }
+        .comment-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #666;
+            border: none;
+            color: #fff;
+            border-radius: 10px;
+            resize: none;
+        }
+        .comment-input.light-theme {
+            background-color: #ddd;
+            color: #333;
+        }
+        .comment-input.space-theme {
+            background-color: #3b3b5e;
+        }
+        .comment-input:disabled {
+            background-color: #444;
+            color: #888;
+        }
+        .comment-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .comment {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #666;
+            border-radius: 10px;
+        }
+        .comment.light-theme {
+            background: #ddd;
+        }
+        .comment.space-theme {
+            background: #4a4a7a;
+        }
+        .comment img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .comment .comment-content {
+            flex: 1;
+        }
+        .comment .comment-username {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .comment .comment-text {
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="stars" id="stars"></div>
     <div class="header">
         <img id="headerAvatar" src="images/ava.png" alt="Site Avatar">
-        <h1>Roblox Script Hub</h1>
+        <h1>Script-net</h1>
         <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
     </div>
     <div class="container" id="mainContainer">
@@ -657,18 +716,20 @@
             <h2 data-ru="Отправить скрипт" data-en="Submit Script"></h2>
             <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/gif" required>
             <small data-ru="Загрузите аватар скрипта (PNG, JPG, GIF)" data-en="Upload script avatar (PNG, JPG, GIF)"></small>
-            <input type="text" id="scriptName" data-ru-placeholder="Название скрипта" data-en-placeholder="Script Name" maxlength="25" required>
-            <small data-ru="Название (до 25 символов), например, 'Автокликер'" data-en="Name (up to 25 chars), e.g., 'Autoclicker'"></small>
+            <input type="text" id="scriptName" data-ru-placeholder="Название кода или игры" data-en-placeholder="Code or game name" maxlength="40" required>
+            <small data-ru="Название (до 40 символов), например, 'Автокликер' или 'Roblox'" data-en="Name (up to 40 chars), e.g., 'Autoclicker' or 'Roblox'"></small>
             <textarea id="scriptDesc" data-ru-placeholder="Описание" data-en-placeholder="Description" required></textarea>
             <small data-ru="Опишите, что делает скрипт" data-en="Describe what the script does"></small>
             <textarea id="scriptCode" data-ru-placeholder="Код (макс 10 строк)" data-en-placeholder="Code (max 10 lines)" required oninput="limitCodeLines()"></textarea>
             <small data-ru="Вставьте код (до 10 строк)" data-en="Insert code (up to 10 lines)"></small>
             <p id="lineCount">Строк: 0</p>
-            <input type="text" id="scriptTarget" data-ru-placeholder="Для чего код" data-en-placeholder="What the code is for" required>
-            <small data-ru="Например, 'Roblox, фарм'" data-en="E.g., 'Roblox, farming'"></small>
             <div class="checkbox-container">
                 <input type="checkbox" id="hasKey">
                 <label for="hasKey" data-ru="Есть ключ" data-en="Has key"></label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="allowComments" checked>
+                <label for="allowComments" data-ru="Разрешить комментарии" data-en="Allow comments"></label>
             </div>
             <button onclick="submitScript()">Отправить</button>
         </div>
@@ -681,13 +742,18 @@
             <h3 id="fullName"></h3>
             <div class="username" id="fullUser"></div>
             <p id="fullDesc"></p>
-            <p id="fullTarget"></p>
             <p id="keyStatus"></p>
             <pre id="fullCode"></pre>
             <div class="rating">
                 <button class="like-btn" id="fullLikeBtn"><i class="fas fa-thumbs-up"></i> <span class="like-count">0</span></button>
                 <button class="dislike-btn" id="fullDislikeBtn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">0</span></button>
                 <button class="admin-delete-btn" id="adminDeleteBtn" style="display: none;"><i class="fas fa-trash"></i> Удалить (Админ)</button>
+            </div>
+            <div class="comment-section">
+                <h4 data-ru="Комментарии" data-en="Comments"></h4>
+                <textarea class="comment-input" id="commentInput" data-ru-placeholder="Напишите комментарий..." data-en-placeholder="Write a comment..." data-ru-disabled="Автор не хочет комментариев" data-en-disabled="Author does not want comments"></textarea>
+                <button onclick="submitComment()">Отправить</button>
+                <div class="comment-list" id="commentList"></div>
             </div>
         </div>
     </div>
@@ -735,7 +801,6 @@
             <h3 id="reviewFullName"></h3>
             <div class="username" id="reviewFullUser"></div>
             <p id="reviewFullDesc"></p>
-            <p id="reviewFullTarget"></p>
             <p id="reviewKeyStatus"></p>
             <pre id="reviewFullCode"></pre>
             <div class="action-buttons">
@@ -773,6 +838,7 @@
     </div>
 
     <script>
+        // Инициализация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDkCcxWEzi2aiu8RhzQxIV2Rfw-3wWK2Vg",
             authDomain: "script-net.firebaseapp.com",
@@ -787,12 +853,14 @@
         const database = firebase.database();
         const auth = firebase.auth();
 
+        // Глобальные переменные
         let scripts = [];
         let userScripts = [];
         let pendingScripts = {};
         let username = localStorage.getItem('username') || null;
         let userId = localStorage.getItem('userId') || null;
         let userEmail = localStorage.getItem('userEmail') || null;
+        let userPicture = localStorage.getItem('userPicture') || 'images/ava.png';
         let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentTheme = localStorage.getItem('theme') || 'dark';
         let isAuthChecked = false;
@@ -800,11 +868,13 @@
         let notificationPreference = localStorage.getItem('notificationPreference') || null;
         let telegramMessages = {};
         let pendingScriptsList = [];
+        let currentScriptIndex = null;
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
         provider.addScope('email');
 
+        // Вход через Google
         function signIn() {
             auth.signInWithPopup(provider).then(result => {
                 const user = result.user;
@@ -816,6 +886,7 @@
             createRipple(event);
         }
 
+        // Выход из аккаунта
         function signOut() {
             auth.signOut().then(() => {
                 username = null;
@@ -840,6 +911,7 @@
             });
         }
 
+        // Отслеживание состояния авторизации
         auth.onAuthStateChanged(user => {
             if (user) {
                 updateUI(user);
@@ -864,26 +936,28 @@
             isAuthChecked = true;
         });
 
+        // Обновление интерфейса после входа
         function updateUI(user) {
             username = user.displayName;
             userId = user.uid;
             userEmail = user.email;
+            userPicture = user.photoURL || 'images/ava.png';
             localStorage.setItem('username', username);
             localStorage.setItem('userId', userId);
             localStorage.setItem('userEmail', userEmail);
-            localStorage.setItem('userPicture', user.photoURL || 'images/ava.png');
+            localStorage.setItem('userPicture', userPicture);
             database.ref('users/' + userId).set({
                 username: username,
                 email: userEmail,
-                picture: user.photoURL || 'images/ava.png',
+                picture: userPicture,
                 theme: currentTheme,
                 language: currentLanguage
             });
             document.getElementById('signInButton').style.display = 'none';
             document.getElementById('signOutButton').style.display = 'block';
             document.getElementById('submitButton').style.display = 'block';
-            document.getElementById('userAvatar').src = user.photoURL || 'images/ava.png';
-            document.getElementById('headerAvatar').src = user.photoURL || 'images/ava.png';
+            document.getElementById('userAvatar').src = userPicture;
+            document.getElementById('headerAvatar').src = userPicture;
             document.getElementById('userName').textContent = username;
             loadUserScripts();
             loadScripts();
@@ -891,19 +965,19 @@
             checkAdminStatus();
         }
 
+        // Проверка статуса администратора
         function checkAdminStatus() {
             if (userEmail === 'kt0r2023@gmail.com' && Object.keys(pendingScripts).length > 0) {
                 document.getElementById('reviewButton').style.display = 'block';
                 if (Notification.permission === 'granted') {
                     new Notification(currentLanguage === 'ru' ? 'Новые работы ждут проверки!' : 'New submissions await review!');
-                } else {
-                    console.log('Notifications not permitted for admin');
                 }
             } else {
                 document.getElementById('reviewButton').style.display = 'none';
             }
         }
 
+        // Смена языка
         function changeLanguage() {
             currentLanguage = document.getElementById('languageSelect').value;
             localStorage.setItem('language', currentLanguage);
@@ -913,11 +987,15 @@
             updateLanguage();
         }
 
+        // Обновление текста на выбранный язык
         function updateLanguage() {
             document.querySelectorAll('[data-ru]').forEach(element => {
                 const text = element.getAttribute(`data-${currentLanguage}`);
-                if (element.tagName === 'INPUT') {
+                if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                     element.placeholder = element.getAttribute(`data-${currentLanguage}-placeholder`) || '';
+                    if (element.id === 'commentInput' && element.disabled) {
+                        element.placeholder = element.getAttribute(`data-${currentLanguage}-disabled`) || '';
+                    }
                 } else if (element.tagName === 'LABEL') {
                     element.textContent = text + ':';
                 } else {
@@ -938,6 +1016,7 @@
             });
         }
 
+        // Смена темы
         function changeTheme() {
             currentTheme = document.getElementById('themeSelect').value;
             localStorage.setItem('theme', currentTheme);
@@ -953,16 +1032,18 @@
             updateThemeClasses();
         }
 
+        // Обновление классов темы
         function updateThemeClasses() {
             const isLight = document.body.classList.contains('light-theme');
             const isSpace = document.body.classList.contains('space-theme');
-            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small').forEach(el => {
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small, .comment-input, .comment').forEach(el => {
                 el.classList.remove('light-theme', 'space-theme');
                 if (isLight) el.classList.add('light-theme');
                 if (isSpace) el.classList.add('space-theme');
             });
         }
 
+        // Переключение бокового меню
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const menuToggle = document.getElementById('menuToggle');
@@ -970,6 +1051,7 @@
             menuToggle.innerHTML = sidebar.classList.contains('open') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
         }
 
+        // Открытие модального окна для отправки скрипта
         function openModal() {
             if (!isAuthChecked) return;
             if (!userId) {
@@ -981,17 +1063,19 @@
             createRipple(event);
         }
 
+        // Закрытие модального окна
         function closeModal() {
             document.getElementById('submitModal').style.display = 'none';
         }
 
+        // Открытие полноэкранного окна для просмотра скрипта
         function openFullscreen(index) {
+            currentScriptIndex = index;
             const script = scripts[index];
             document.getElementById('fullAvatar').src = script.avatar || 'https://placehold.co/200x150';
             document.getElementById('fullName').textContent = script.name || 'Без названия';
             document.getElementById('fullUser').textContent = script.user || 'Аноним';
             document.getElementById('fullDesc').textContent = script.desc || 'Нет описания';
-            document.getElementById('fullTarget').textContent = `Target: ${script.target || 'Не указано'}`;
             document.getElementById('keyStatus').textContent = script.hasKey ? (currentLanguage === 'ru' ? 'Ключ: Есть' : 'Key: Present') : '';
             document.getElementById('fullCode').textContent = script.code || 'Код отсутствует';
             const likeBtn = document.getElementById('fullLikeBtn');
@@ -1009,15 +1093,26 @@
             } else {
                 adminDeleteBtn.style.display = 'none';
             }
+            const commentInput = document.getElementById('commentInput');
+            commentInput.disabled = !script.allowComments;
+            if (!script.allowComments) {
+                commentInput.placeholder = commentInput.getAttribute(`data-${currentLanguage}-disabled`);
+            } else {
+                commentInput.placeholder = commentInput.getAttribute(`data-${currentLanguage}-placeholder`);
+            }
+            loadComments(script.id);
             document.getElementById('fullscreenWindow').style.display = 'flex';
             updateThemeClasses();
             createRipple(event);
         }
 
+        // Закрытие полноэкранного окна
         function closeFullscreen() {
             document.getElementById('fullscreenWindow').style.display = 'none';
+            currentScriptIndex = null;
         }
 
+        // Открытие настроек
         function openSettings() {
             document.getElementById('settingsModal').style.display = 'flex';
             document.getElementById('themeSelect').value = currentTheme;
@@ -1027,10 +1122,12 @@
             createRipple(event);
         }
 
+        // Закрытие настроек
         function closeSettings() {
             document.getElementById('settingsModal').style.display = 'none';
         }
 
+        // Открытие истории работ пользователя
         function openHistory() {
             const historyList = document.getElementById('historyList');
             historyList.innerHTML = '';
@@ -1064,10 +1161,12 @@
             updateThemeClasses();
         }
 
+        // Закрытие истории
         function closeHistory() {
             document.getElementById('historyModal').style.display = 'none';
         }
 
+        // Открытие окна проверки работ
         function openReview() {
             const reviewList = document.getElementById('reviewList');
             reviewList.innerHTML = '';
@@ -1088,17 +1187,18 @@
             updateThemeClasses();
         }
 
+        // Закрытие окна проверки
         function closeReview() {
             document.getElementById('reviewModal').style.display = 'none';
         }
 
+        // Открытие полноэкранного окна для проверки
         function openReviewFullscreen(index) {
             const script = pendingScriptsList[index];
             document.getElementById('reviewFullAvatar').src = script.avatar || 'https://placehold.co/200x150';
             document.getElementById('reviewFullName').textContent = script.name || 'Без названия';
             document.getElementById('reviewFullUser').textContent = script.user || 'Аноним';
             document.getElementById('reviewFullDesc').textContent = script.desc || 'Нет описания';
-            document.getElementById('reviewFullTarget').textContent = `Target: ${script.target || 'Не указано'}`;
             document.getElementById('reviewKeyStatus').textContent = script.hasKey ? (currentLanguage === 'ru' ? 'Ключ: Есть' : 'Key: Present') : '';
             document.getElementById('reviewFullCode').textContent = script.code || 'Код отсутствует';
             document.getElementById('reviewAcceptBtn').onclick = () => handleReviewAction('accept', script.id, index);
@@ -1107,10 +1207,12 @@
             updateThemeClasses();
         }
 
+        // Закрытие полноэкранного окна проверки
         function closeReviewFullscreen() {
             document.getElementById('reviewFullscreen').style.display = 'none';
         }
 
+        // Обработка действий модерации
         function handleReviewAction(action, scriptId, index) {
             handleTelegramCallback(`${action}_${scriptId}`);
             pendingScriptsList.splice(index, 1);
@@ -1123,6 +1225,7 @@
             }
         }
 
+        // Ограничение количества строк кода
         function limitCodeLines() {
             const code = document.getElementById('scriptCode').value;
             const lines = code.split('\n');
@@ -1133,22 +1236,36 @@
             document.getElementById('lineCount').textContent = `Строк: ${lineCount}`;
         }
 
+        // Отправка скрипта
         function submitScript() {
             const avatarInput = document.getElementById('avatarInput').files[0];
             const name = document.getElementById('scriptName').value;
             const desc = document.getElementById('scriptDesc').value;
             const code = document.getElementById('scriptCode').value;
-            const target = document.getElementById('scriptTarget').value;
             const hasKey = document.getElementById('hasKey').checked;
+            const allowComments = document.getElementById('allowComments').checked;
 
-            if (!avatarInput || !name || !desc || !code || !target) {
+            if (!avatarInput || !name || !desc || !code) {
                 alert(currentLanguage === 'ru' ? 'Заполните все поля!' : 'Fill in all fields!');
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {}, userId: userId, hasKey };
+                const script = {
+                    name,
+                    user: username,
+                    desc,
+                    code,
+                    avatar: e.target.result,
+                    likes: 0,
+                    dislikes: 0,
+                    userRatings: {},
+                    userId: userId,
+                    hasKey,
+                    allowComments,
+                    comments: {}
+                };
                 const scriptId = database.ref('pendingScripts').push().key;
                 database.ref('pendingScripts/' + scriptId).set(script)
                     .then(() => {
@@ -1167,8 +1284,8 @@
                         document.getElementById('scriptName').value = '';
                         document.getElementById('scriptDesc').value = '';
                         document.getElementById('scriptCode').value = '';
-                        document.getElementById('scriptTarget').value = '';
                         document.getElementById('hasKey').checked = false;
+                        document.getElementById('allowComments').checked = true;
                         document.getElementById('lineCount').textContent = 'Строк: 0';
                         closeModal();
                     })
@@ -1180,11 +1297,12 @@
             createRipple(event);
         }
 
+        // Отправка скрипта в Telegram для модерации
         function sendToTelegram(scriptId, script) {
             const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
             const chatId = '5180010738';
             const firstTenLines = script.code.split('\n').slice(0, 10).join('\n');
-            const message = `Новая работа:\nНазвание: ${script.name}\nАвтор: ${script.user}\nОписание: ${script.desc}\nЦель: ${script.target}\nКлюч: ${script.hasKey ? 'Есть' : 'Нет'}\nКод:\n${firstTenLines}`;
+            const message = `Новая работа:\nНазвание: ${script.name}\nАвтор: ${script.user}\nОписание: ${script.desc}\nКлюч: ${script.hasKey ? 'Есть' : 'Нет'}\nКомментарии: ${script.allowComments ? 'Разрешены' : 'Запрещены'}\nКод:\n${firstTenLines}`;
             
             const url = `https://api.telegram.org/bot${token}/sendMessage`;
             const params = {
@@ -1217,7 +1335,6 @@
                         chat_id: data.result.chat.id,
                         message_id: data.result.message_id
                     };
-                    console.log(`Telegram message sent for script ${scriptId}:`, telegramMessages[scriptId]);
                 } else {
                     console.error('Telegram API error:', data);
                     alert(currentLanguage === 'ru' ? 'Ошибка отправки в Telegram: ' + data.description : 'Error sending to Telegram: ' + data.description);
@@ -1229,6 +1346,7 @@
             });
         }
 
+        // Удаление кнопок в Telegram после модерации
         function removeTelegramButtons(scriptId) {
             const token = '7853493397:AAEx9agfe4F3lBZU--QL0cu1lgHzw78OfxE';
             const messageInfo = telegramMessages[scriptId];
@@ -1257,7 +1375,6 @@
             })
             .then(data => {
                 if (data.ok) {
-                    console.log(`Buttons removed for script ${scriptId}`);
                     delete telegramMessages[scriptId];
                 } else {
                     console.error('Telegram API error on removing buttons:', data);
@@ -1268,26 +1385,24 @@
             });
         }
 
+        // Симуляция ответа Telegram
         function simulateTelegramCallback(callbackData, event) {
             event.stopPropagation();
             handleTelegramCallback(callbackData);
         }
 
+        // Обработка ответа Telegram
         function handleTelegramCallback(callbackData) {
             const [action, scriptId] = callbackData.split('_');
-            console.log(`Handling Telegram callback: ${action} for script ${scriptId}`);
-            
             if (action === 'accept') {
                 const script = pendingScripts[scriptId];
                 if (script) {
                     const newScriptId = database.ref('scripts').push().key;
                     database.ref('scripts/' + newScriptId).set({ ...script, id: newScriptId })
                         .then(() => {
-                            console.log(`Script ${newScriptId} added to scripts`);
                             return database.ref('userScripts/' + script.userId + '/' + newScriptId).set({ ...script, id: newScriptId });
                         })
                         .then(() => {
-                            console.log(`Script ${newScriptId} added to userScripts for user ${script.userId}`);
                             database.ref('pendingScripts/' + scriptId).remove()
                                 .then(() => {
                                     delete pendingScripts[scriptId];
@@ -1295,14 +1410,8 @@
                                     loadUserScripts();
                                     loadPendingScripts();
                                     removeTelegramButtons(scriptId);
-                                    if (notificationPreference === 'enabled') {
-                                        if (Notification.permission === 'granted') {
-                                            new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
-                                        } else {
-                                            console.log('Notifications not permitted by user');
-                                        }
-                                    } else {
-                                        console.log('Notifications are disabled for this user');
+                                    if (notificationPreference === 'enabled' && Notification.permission === 'granted') {
+                                        new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
                                     }
                                 })
                                 .catch(error => {
@@ -1312,8 +1421,6 @@
                         .catch(error => {
                             console.error('Error saving script to Firebase:', error);
                         });
-                } else {
-                    console.error(`Script ${scriptId} not found in pendingScripts`);
                 }
             } else if (action === 'reject') {
                 database.ref('pendingScripts/' + scriptId).remove()
@@ -1323,14 +1430,8 @@
                         loadUserScripts();
                         loadPendingScripts();
                         removeTelegramButtons(scriptId);
-                        if (notificationPreference === 'enabled') {
-                            if (Notification.permission === 'granted') {
-                                new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
-                            } else {
-                                console.log('Notifications not permitted by user');
-                            }
-                        } else {
-                            console.log('Notifications are disabled for this user');
+                        if (notificationPreference === 'enabled' && Notification.permission === 'granted') {
+                            new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
                         }
                     })
                     .catch(error => {
@@ -1339,12 +1440,14 @@
             }
         }
 
+        // Показ уведомления для новых пользователей
         function showNewUserNotification() {
             document.getElementById('newUserNotification').style.display = 'flex';
             updateLanguage();
             updateThemeClasses();
         }
 
+        // Включение уведомлений
         function enableNotifications() {
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
@@ -1359,6 +1462,7 @@
             });
         }
 
+        // Отключение уведомлений
         function disableNotifications() {
             localStorage.setItem('notificationPreference', 'disabled');
             notificationPreference = 'disabled';
@@ -1366,6 +1470,7 @@
             document.getElementById('sadNotification').style.display = 'flex';
         }
 
+        // Удаление скрипта администратором
         function adminDeleteScript(index) {
             const script = scripts[index];
             if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить этот скрипт? (Админ)' : 'Are you sure you want to delete this script? (Admin)')) {
@@ -1393,6 +1498,7 @@
             }
         }
 
+        // Удаление скрипта пользователем
         function deleteUserScript(scriptId, event) {
             event.stopPropagation();
             if (confirm(currentLanguage === 'ru' ? 'Вы уверены, что хотите удалить эту работу?' : 'Are you sure you want to delete this submission?')) {
@@ -1427,6 +1533,7 @@
             }
         }
 
+        // Оценка скрипта (лайк/дизлайк)
         function rateScript(index, type, event) {
             if (!isAuthChecked) return;
             if (!userId) {
@@ -1475,6 +1582,7 @@
             if (event) createRipple(event);
         }
 
+        // Загрузка всех скриптов
         function loadScripts() {
             database.ref('scripts').on('value', (snapshot) => {
                 scripts = [];
@@ -1490,6 +1598,7 @@
             });
         }
 
+        // Загрузка скриптов пользователя
         function loadUserScripts() {
             if (!userId) return;
             database.ref('userScripts/' + userId).on('value', (snapshot) => {
@@ -1513,6 +1622,7 @@
             });
         }
 
+        // Загрузка ожидающих скриптов
         function loadPendingScripts() {
             database.ref('pendingScripts').on('value', (snapshot) => {
                 pendingScripts = {};
@@ -1530,6 +1640,7 @@
             });
         }
 
+        // Рендеринг списка скриптов
         function renderScripts(filteredScripts = scripts) {
             const scriptListContainer = document.getElementById('scriptListContainer');
             scriptListContainer.innerHTML = '';
@@ -1569,6 +1680,7 @@
             updateThemeClasses();
         }
 
+        // Поиск скриптов
         function searchScripts() {
             const searchValue = document.getElementById('searchField').value.toLowerCase();
             const filterType = document.getElementById('filterSelect').value;
@@ -1576,67 +1688,4 @@
                 if (filterType === 'script') {
                     return (script.name || '').toLowerCase().includes(searchValue);
                 } else {
-                    return (script.user || '').toLowerCase().includes(searchValue);
-                }
-            });
-            renderScripts(filteredScripts);
-        }
-
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = `${Math.random() * 3 + 1}px`;
-                star.style.height = star.style.width;
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.animationDuration = `${Math.random() * 5 + 5}s`;
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                starsContainer.appendChild(star);
-            }
-        }
-
-        function createRipple(event) {
-            const button = event.currentTarget;
-            const rect = button.getBoundingClientRect();
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple');
-            const diameter = Math.max(button.clientWidth, button.clientHeight);
-            const radius = diameter / 2;
-            ripple.style.width = ripple.style.height = `${diameter}px`;
-            ripple.style.left = `${event.clientX - rect.left - radius}px`;
-            ripple.style.top = `${event.clientY - rect.top - radius}px`;
-            button.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 600);
-        }
-
-        function showNotification() {
-            const notification = document.getElementById('notification');
-            notification.textContent = notification.getAttribute(`data-${currentLanguage}`);
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function flashSignInButton() {
-            const signInButton = document.getElementById('signInButton');
-            signInButton.classList.add('flash');
-            setTimeout(() => {
-                signInButton.classList.remove('flash');
-            }, 1000);
-        }
-
-        document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
-        document.querySelectorAll('.sidebar button').forEach(button => {
-            button.addEventListener('click', createRipple);
-        });
-
-        createStars();
-        updateLanguage();
-        changeTheme();
-        loadScripts();
-    </script>
-</body>
-</html>
+                    return (script

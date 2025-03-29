@@ -94,6 +94,7 @@
             color: #fff;
             font-size: 24px;
             cursor: pointer;
+            z-index: 1001;
         }
         .main-section {
             flex: 4;
@@ -132,6 +133,7 @@
                 width: 100%;
                 transform: translateX(100%);
                 z-index: 1000;
+                transition: transform 0.3s ease;
             }
             .sidebar.open {
                 transform: translateX(0);
@@ -376,7 +378,7 @@
             visibility: visible;
             opacity: 1;
         }
-        .modal, .fullscreen, .settings-modal, .history-modal, .notification-modal {
+        .modal, .fullscreen, .settings-modal, .history-modal, .notification-modal, .review-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -392,7 +394,7 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content {
+        .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content {
             background: linear-gradient(145deg, #444, #555);
             padding: 25px;
             border-radius: 15px;
@@ -402,14 +404,14 @@
             transition: all 0.5s ease;
             position: relative;
         }
-        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme {
+        .modal-content.light-theme, .fullscreen-content.light-theme, .settings-content.light-theme, .history-content.light-theme, .notification-content.light-theme, .review-content.light-theme {
             background: linear-gradient(145deg, #fff, #eee);
         }
-        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme {
+        .modal-content.space-theme, .fullscreen-content.space-theme, .settings-content.space-theme, .history-content.space-theme, .notification-content.space-theme, .review-content.space-theme {
             background: linear-gradient(145deg, #2e2e5e, #4a4a7a);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre {
+        .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre {
             width: 100%;
             margin: 10px 0;
             padding: 12px;
@@ -422,16 +424,16 @@
             resize: vertical;
             overflow-x: hidden;
         }
-        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme {
+        .modal-content input.light-theme, .modal-content textarea.light-theme, .settings-content select.light-theme, .fullscreen-content pre.light-theme, .review-content pre.light-theme {
             background-color: #ddd;
             color: #333;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
-        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme, .fullscreen-content pre.space-theme {
+        .modal-content input.space-theme, .modal-content textarea.space-theme, .settings-content select.space-theme, .fullscreen-content pre.space-theme, .review-content pre.space-theme {
             background-color: #3b3b5e;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
-        .modal-content small, .settings-content small, .history-content small, .notification-content small {
+        .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small {
             display: block;
             color: #bbb;
             font-size: 12px;
@@ -439,10 +441,10 @@
             margin-bottom: 10px;
             transition: color 0.5s ease;
         }
-        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme, .notification-content small.light-theme {
+        .modal-content small.light-theme, .settings-content small.light-theme, .history-content small.light-theme, .notification-content small.light-theme, .review-content small.light-theme {
             color: #555;
         }
-        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme, .notification-content small.space-theme {
+        .modal-content small.space-theme, .settings-content small.space-theme, .history-content small.space-theme, .notification-content small.space-theme, .review-content small.space-theme {
             color: #ccc;
         }
         .close-btn {
@@ -501,13 +503,13 @@
         .flash {
             animation: flash 0.5s ease 2;
         }
-        .history-content .script-list {
+        .history-content .script-list, .review-content .script-list {
             display: flex;
             flex-wrap: nowrap;
             overflow-x: auto;
             gap: 20px;
         }
-        .history-content .script-list .script-card {
+        .history-content .script-list .script-card, .review-content .script-list .script-card {
             flex: 0 0 auto;
             width: 200px;
         }
@@ -522,19 +524,32 @@
             margin-right: 5px;
             transition: all 0.3s ease;
         }
-        .history-content .script-card .accept-btn {
+        .history-content .script-card .accept-btn, .review-content .accept-btn {
             background: linear-gradient(45deg, #4caf50, #66bb6a);
         }
-        .history-content .script-card .reject-btn {
+        .history-content .script-card .reject-btn, .review-content .reject-btn {
             background: linear-gradient(45deg, #ff4d4d, #ff6666);
         }
-        .history-content .script-card .delete-btn:hover, .history-content .script-card .accept-btn:hover, .history-content .script-card .reject-btn:hover {
+        .history-content .script-card .delete-btn:hover, .history-content .script-card .accept-btn:hover, .history-content .script-card .reject-btn:hover, .review-content .accept-btn:hover, .review-content .reject-btn:hover {
             transform: scale(1.05);
         }
         .history-content .script-card .status {
             font-size: 12px;
             color: #bbb;
             margin-top: 5px;
+        }
+        .review-content .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .review-content .action-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         .like-animation {
             position: absolute;
@@ -597,35 +612,39 @@
         <div class="sidebar" id="sidebar">
             <img src="images/ava.png" class="avatar" id="userAvatar" alt="Аватар пользователя">
             <div class="user-name" id="userName"></div>
-            <button class="tooltip" onclick="openModal()" id="submitButton">
+            <button class="tooltip" onclick="openModal(); toggleSidebar();" id="submitButton">
                 <i class="fas fa-upload"></i> <span data-ru="Выложить работу" data-en="Submit work"></span>
                 <span class="tooltiptext" data-ru="Загрузить новый скрипт" data-en="Upload a new script"></span>
             </button>
-            <button class="tooltip" onclick="signIn()" id="signInButton">
+            <button class="tooltip" onclick="signIn(); toggleSidebar();" id="signInButton">
                 <i class="fas fa-sign-in-alt"></i> <span data-ru="Войти" data-en="Sign In"></span>
                 <span class="tooltiptext" data-ru="Войти через Google" data-en="Sign in with Google"></span>
             </button>
-            <button class="tooltip" onclick="signOut()" id="signOutButton" style="display: none;">
+            <button class="tooltip" onclick="signOut(); toggleSidebar();" id="signOutButton" style="display: none;">
                 <i class="fas fa-sign-out-alt"></i> <span data-ru="Выйти" data-en="Sign Out"></span>
                 <span class="tooltiptext" data-ru="Выйти из аккаунта" data-en="Sign out of account"></span>
             </button>
-            <button class="tooltip" onclick="window.location.href='/site/bypasser.html'">
+            <button class="tooltip" onclick="window.location.href='/site/bypasser.html'; toggleSidebar();">
                 <i class="fas fa-shield-alt"></i> <span data-ru="Обходчики" data-en="Bypassers"></span>
                 <span class="tooltiptext" data-ru="Открыть обходчики" data-en="Open bypassers"></span>
             </button>
-            <button class="tooltip" onclick="openSettings()">
+            <button class="tooltip" onclick="openSettings(); toggleSidebar();">
                 <i class="fas fa-cog"></i> <span data-ru="Настройки" data-en="Settings"></span>
                 <span class="tooltiptext" data-ru="Настроить сайт" data-en="Configure the site"></span>
             </button>
-            <button class="tooltip" onclick="openHistory()" id="historyButton" style="display: none;">
+            <button class="tooltip" onclick="openHistory(); toggleSidebar();" id="historyButton" style="display: none;">
                 <i class="fas fa-history"></i> <span data-ru="Работы" data-en="Submissions"></span>
                 <span class="tooltiptext" data-ru="Посмотреть ваши работы" data-en="View your submissions"></span>
             </button>
-            <a href="https://funpay.com/users/9532559/" target="_blank" class="tooltip">
+            <button class="tooltip" onclick="openReview(); toggleSidebar();" id="reviewButton" style="display: none;">
+                <i class="fas fa-check-circle"></i> <span data-ru="Проверка" data-en="Review"></span>
+                <span class="tooltiptext" data-ru="Проверить работы" data-en="Review submissions"></span>
+            </button>
+            <a href="https://funpay.com/users/9532559/" target="_blank" class="tooltip" onclick="toggleSidebar();">
                 <i class="fas fa-wallet"></i> <span data-ru="FunPay" data-en="FunPay"></span>
                 <span class="tooltiptext" data-ru="Перейти на FunPay" data-en="Go to FunPay"></span>
             </a>
-            <a href="https://t.me/ezezuroyd" target="_blank" class="tooltip">
+            <a href="https://t.me/ezezuroyd" target="_blank" class="tooltip" onclick="toggleSidebar();">
                 <i class="fab fa-telegram-plane"></i> <span data-ru="Telegram" data-en="Telegram"></span>
                 <span class="tooltiptext" data-ru="Связаться в Telegram" data-en="Contact on Telegram"></span>
             </a>
@@ -681,7 +700,7 @@
             <select id="themeSelect" onchange="changeTheme()">
                 <option value="dark" data-ru="Тёмная" data-en="Dark">Dark</option>
                 <option value="light" data-ru="Светлая" data-en="Light">Light</option>
-                <option value="space" data-ru="Космос" data-en="Space">Space</option>
+                <option value="space" data-ru="К Wосмос" data-en="Space">Space</option>
             </select>
             <small data-ru="Выберите тему сайта" data-en="Select site theme"></small>
             <label for="languageSelect" data-ru="Язык" data-en="Language"></label>
@@ -698,6 +717,31 @@
             <button class="close-btn" onclick="closeHistory()"><i class="fas fa-times"></i></button>
             <h2 data-ru="Ваши работы" data-en="Your Submissions"></h2>
             <div id="historyList" class="script-list"></div>
+        </div>
+    </div>
+
+    <div class="review-modal" id="reviewModal">
+        <div class="review-content">
+            <button class="close-btn" onclick="closeReview()"><i class="fas fa-times"></i></button>
+            <h2 data-ru="Проверка работ" data-en="Review Submissions"></h2>
+            <div id="reviewList" class="script-list"></div>
+        </div>
+    </div>
+
+    <div class="fullscreen" id="reviewFullscreen">
+        <div class="review-content" id="reviewFullscreenContent">
+            <button class="close-btn" onclick="closeReviewFullscreen()"><i class="fas fa-times"></i></button>
+            <img id="reviewFullAvatar" class="script-avatar" alt="Аватар скрипта">
+            <h3 id="reviewFullName"></h3>
+            <div class="username" id="reviewFullUser"></div>
+            <p id="reviewFullDesc"></p>
+            <p id="reviewFullTarget"></p>
+            <p id="reviewKeyStatus"></p>
+            <pre id="reviewFullCode"></pre>
+            <div class="action-buttons">
+                <button class="accept-btn" id="reviewAcceptBtn">Принять</button>
+                <button class="reject-btn" id="reviewRejectBtn">Отказать</button>
+            </div>
         </div>
     </div>
 
@@ -755,6 +799,7 @@
         let hasSubmitted = localStorage.getItem('hasSubmitted') || false;
         let notificationPreference = localStorage.getItem('notificationPreference') || null;
         let telegramMessages = {};
+        let pendingScriptsList = [];
 
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('profile');
@@ -784,6 +829,7 @@
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('historyButton').style.display = 'none';
+                document.getElementById('reviewButton').style.display = 'none';
                 document.getElementById('userAvatar').src = 'images/ava.png';
                 document.getElementById('headerAvatar').src = 'images/ava.png';
                 document.getElementById('userName').textContent = '';
@@ -809,6 +855,7 @@
                 document.getElementById('signOutButton').style.display = 'none';
                 document.getElementById('submitButton').style.display = 'block';
                 document.getElementById('historyButton').style.display = 'none';
+                document.getElementById('reviewButton').style.display = 'none';
                 document.getElementById('userAvatar').src = 'images/ava.png';
                 document.getElementById('headerAvatar').src = 'images/ava.png';
                 document.getElementById('userName').textContent = '';
@@ -840,6 +887,21 @@
             document.getElementById('userName').textContent = username;
             loadUserScripts();
             loadScripts();
+            loadPendingScripts();
+            checkAdminStatus();
+        }
+
+        function checkAdminStatus() {
+            if (userEmail === 'kt0r2023@gmail.com' && Object.keys(pendingScripts).length > 0) {
+                document.getElementById('reviewButton').style.display = 'block';
+                if (Notification.permission === 'granted') {
+                    new Notification(currentLanguage === 'ru' ? 'Новые работы ждут проверки!' : 'New submissions await review!');
+                } else {
+                    console.log('Notifications not permitted for admin');
+                }
+            } else {
+                document.getElementById('reviewButton').style.display = 'none';
+            }
         }
 
         function changeLanguage() {
@@ -894,7 +956,7 @@
         function updateThemeClasses() {
             const isLight = document.body.classList.contains('light-theme');
             const isSpace = document.body.classList.contains('space-theme');
-            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small').forEach(el => {
+            document.querySelectorAll('.script-card, .script-info, .sidebar, .search-container, .search, .filter-select, .modal-content, .fullscreen-content, .settings-content, .history-content, .notification-content, .review-content, .username, .modal-content input, .modal-content textarea, .settings-content select, .fullscreen-content pre, .review-content pre, .modal-content small, .settings-content small, .history-content small, .notification-content small, .review-content small').forEach(el => {
                 el.classList.remove('light-theme', 'space-theme');
                 if (isLight) el.classList.add('light-theme');
                 if (isSpace) el.classList.add('space-theme');
@@ -983,7 +1045,7 @@
                         <h3>${script.name || 'Без названия'}</h3>
                         <div class="username">${script.user || 'Аноним'}</div>
                         <div class="status">${status}</div>
-                        ${script.isPending ? `
+                        ${script.isPending && userEmail === 'kt0r2023@gmail.com' ? `
                             <button class="accept-btn" onclick="simulateTelegramCallback('accept_${script.id}', event)">Принять</button>
                             <button class="reject-btn" onclick="simulateTelegramCallback('reject_${script.id}', event)">Отказать</button>
                         ` : ''}
@@ -1004,6 +1066,61 @@
 
         function closeHistory() {
             document.getElementById('historyModal').style.display = 'none';
+        }
+
+        function openReview() {
+            const reviewList = document.getElementById('reviewList');
+            reviewList.innerHTML = '';
+            pendingScriptsList.forEach((script, index) => {
+                const card = document.createElement('div');
+                card.className = 'script-card';
+                card.innerHTML = `
+                    <img src="${script.avatar || 'https://placehold.co/200x150'}" class="script-avatar" alt="${script.name || 'Без названия'}" onerror="this.src='https://placehold.co/200x150';">
+                    <div class="script-info">
+                        <h3>${script.name || 'Без названия'}</h3>
+                        <div class="username">${script.user || 'Аноним'}</div>
+                    </div>
+                `;
+                card.onclick = () => openReviewFullscreen(index);
+                reviewList.appendChild(card);
+            });
+            document.getElementById('reviewModal').style.display = 'flex';
+            updateThemeClasses();
+        }
+
+        function closeReview() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
+
+        function openReviewFullscreen(index) {
+            const script = pendingScriptsList[index];
+            document.getElementById('reviewFullAvatar').src = script.avatar || 'https://placehold.co/200x150';
+            document.getElementById('reviewFullName').textContent = script.name || 'Без названия';
+            document.getElementById('reviewFullUser').textContent = script.user || 'Аноним';
+            document.getElementById('reviewFullDesc').textContent = script.desc || 'Нет описания';
+            document.getElementById('reviewFullTarget').textContent = `Target: ${script.target || 'Не указано'}`;
+            document.getElementById('reviewKeyStatus').textContent = script.hasKey ? (currentLanguage === 'ru' ? 'Ключ: Есть' : 'Key: Present') : '';
+            document.getElementById('reviewFullCode').textContent = script.code || 'Код отсутствует';
+            document.getElementById('reviewAcceptBtn').onclick = () => handleReviewAction('accept', script.id, index);
+            document.getElementById('reviewRejectBtn').onclick = () => handleReviewAction('reject', script.id, index);
+            document.getElementById('reviewFullscreen').style.display = 'flex';
+            updateThemeClasses();
+        }
+
+        function closeReviewFullscreen() {
+            document.getElementById('reviewFullscreen').style.display = 'none';
+        }
+
+        function handleReviewAction(action, scriptId, index) {
+            handleTelegramCallback(`${action}_${scriptId}`);
+            pendingScriptsList.splice(index, 1);
+            closeReviewFullscreen();
+            if (pendingScriptsList.length > 0) {
+                openReviewFullscreen(index < pendingScriptsList.length ? index : 0);
+            } else {
+                closeReview();
+                checkAdminStatus();
+            }
         }
 
         function limitCodeLines() {
@@ -1033,23 +1150,31 @@
             reader.onload = function(e) {
                 const script = { name, user: username, desc, target, code, avatar: e.target.result, likes: 0, dislikes: 0, userRatings: {}, userId: userId, hasKey };
                 const scriptId = database.ref('pendingScripts').push().key;
-                pendingScripts[scriptId] = script;
-                sendToTelegram(scriptId, script);
+                database.ref('pendingScripts/' + scriptId).set(script)
+                    .then(() => {
+                        pendingScripts[scriptId] = script;
+                        pendingScriptsList.push({ ...script, id: scriptId });
+                        sendToTelegram(scriptId, script);
+                        checkAdminStatus();
 
-                if (!hasSubmitted && !notificationPreference) {
-                    showNewUserNotification();
-                    localStorage.setItem('hasSubmitted', 'true');
-                    hasSubmitted = true;
-                }
+                        if (!hasSubmitted && !notificationPreference) {
+                            showNewUserNotification();
+                            localStorage.setItem('hasSubmitted', 'true');
+                            hasSubmitted = true;
+                        }
 
-                document.getElementById('avatarInput').value = '';
-                document.getElementById('scriptName').value = '';
-                document.getElementById('scriptDesc').value = '';
-                document.getElementById('scriptCode').value = '';
-                document.getElementById('scriptTarget').value = '';
-                document.getElementById('hasKey').checked = false;
-                document.getElementById('lineCount').textContent = 'Строк: 0';
-                closeModal();
+                        document.getElementById('avatarInput').value = '';
+                        document.getElementById('scriptName').value = '';
+                        document.getElementById('scriptDesc').value = '';
+                        document.getElementById('scriptCode').value = '';
+                        document.getElementById('scriptTarget').value = '';
+                        document.getElementById('hasKey').checked = false;
+                        document.getElementById('lineCount').textContent = 'Строк: 0';
+                        closeModal();
+                    })
+                    .catch(error => {
+                        console.error('Error saving pending script to Firebase:', error);
+                    });
             };
             reader.readAsDataURL(avatarInput);
             createRipple(event);
@@ -1159,23 +1284,30 @@
                     database.ref('scripts/' + newScriptId).set({ ...script, id: newScriptId })
                         .then(() => {
                             console.log(`Script ${newScriptId} added to scripts`);
-                            return database.ref('userScripts/' + userId + '/' + newScriptId).set({ ...script, id: newScriptId });
+                            return database.ref('userScripts/' + script.userId + '/' + newScriptId).set({ ...script, id: newScriptId });
                         })
                         .then(() => {
-                            console.log(`Script ${newScriptId} added to userScripts for user ${userId}`);
-                            delete pendingScripts[scriptId];
-                            loadScripts();
-                            loadUserScripts();
-                            removeTelegramButtons(scriptId);
-                            if (notificationPreference === 'enabled') {
-                                if (Notification.permission === 'granted') {
-                                    new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
-                                } else {
-                                    console.log('Notifications not permitted by user');
-                                }
-                            } else {
-                                console.log('Notifications are disabled for this user');
-                            }
+                            console.log(`Script ${newScriptId} added to userScripts for user ${script.userId}`);
+                            database.ref('pendingScripts/' + scriptId).remove()
+                                .then(() => {
+                                    delete pendingScripts[scriptId];
+                                    loadScripts();
+                                    loadUserScripts();
+                                    loadPendingScripts();
+                                    removeTelegramButtons(scriptId);
+                                    if (notificationPreference === 'enabled') {
+                                        if (Notification.permission === 'granted') {
+                                            new Notification(currentLanguage === 'ru' ? 'Ваш скрипт принят!' : 'Your script has been accepted!');
+                                        } else {
+                                            console.log('Notifications not permitted by user');
+                                        }
+                                    } else {
+                                        console.log('Notifications are disabled for this user');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error removing pending script from Firebase:', error);
+                                });
                         })
                         .catch(error => {
                             console.error('Error saving script to Firebase:', error);
@@ -1184,19 +1316,26 @@
                     console.error(`Script ${scriptId} not found in pendingScripts`);
                 }
             } else if (action === 'reject') {
-                delete pendingScripts[scriptId];
-                loadScripts();
-                loadUserScripts();
-                removeTelegramButtons(scriptId);
-                if (notificationPreference === 'enabled') {
-                    if (Notification.permission === 'granted') {
-                        new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
-                    } else {
-                        console.log('Notifications not permitted by user');
-                    }
-                } else {
-                    console.log('Notifications are disabled for this user');
-                }
+                database.ref('pendingScripts/' + scriptId).remove()
+                    .then(() => {
+                        delete pendingScripts[scriptId];
+                        loadScripts();
+                        loadUserScripts();
+                        loadPendingScripts();
+                        removeTelegramButtons(scriptId);
+                        if (notificationPreference === 'enabled') {
+                            if (Notification.permission === 'granted') {
+                                new Notification(currentLanguage === 'ru' ? 'Ваш скрипт отклонён.' : 'Your script has been rejected.');
+                            } else {
+                                console.log('Notifications not permitted by user');
+                            }
+                        } else {
+                            console.log('Notifications are disabled for this user');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error removing pending script from Firebase:', error);
+                    });
             }
         }
 
@@ -1262,11 +1401,21 @@
                         database.ref('userScripts/' + userId + '/' + scriptId).remove()
                             .then(() => {
                                 if (pendingScripts[scriptId]) {
-                                    delete pendingScripts[scriptId];
-                                    removeTelegramButtons(scriptId);
+                                    database.ref('pendingScripts/' + scriptId).remove()
+                                        .then(() => {
+                                            delete pendingScripts[scriptId];
+                                            removeTelegramButtons(scriptId);
+                                            loadPendingScripts();
+                                            loadUserScripts();
+                                            loadScripts();
+                                        })
+                                        .catch(error => {
+                                            console.error("Error removing from pendingScripts:", error);
+                                        });
+                                } else {
+                                    loadUserScripts();
+                                    loadScripts();
                                 }
-                                loadUserScripts();
-                                loadScripts();
                             })
                             .catch(error => {
                                 console.error("Error removing from userScripts:", error);
@@ -1364,6 +1513,23 @@
             });
         }
 
+        function loadPendingScripts() {
+            database.ref('pendingScripts').on('value', (snapshot) => {
+                pendingScripts = {};
+                pendingScriptsList = [];
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        pendingScripts[key] = data[key];
+                        pendingScriptsList.push({ ...data[key], id: key });
+                    });
+                }
+                checkAdminStatus();
+            }, (error) => {
+                console.error("Error loading pending scripts from Firebase:", error);
+            });
+        }
+
         function renderScripts(filteredScripts = scripts) {
             const scriptListContainer = document.getElementById('scriptListContainer');
             scriptListContainer.innerHTML = '';
@@ -1407,72 +1573,4 @@
             const searchValue = document.getElementById('searchField').value.toLowerCase();
             const filterType = document.getElementById('filterSelect').value;
             const filteredScripts = scripts.filter(script => {
-                if (filterType === 'script') {
-                    return (script.name || '').toLowerCase().includes(searchValue);
-                } else {
-                    return (script.user || '').toLowerCase().includes(searchValue);
-                }
-            });
-            renderScripts(filteredScripts);
-        }
-
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.width = `${Math.random() * 3 + 1}px`;
-                star.style.height = star.style.width;
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.animationDuration = `${Math.random() * 5 + 5}s`;
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                starsContainer.appendChild(star);
-            }
-        }
-
-        function createRipple(event) {
-            const button = event.currentTarget;
-            const rect = button.getBoundingClientRect();
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple');
-            const diameter = Math.max(button.clientWidth, button.clientHeight);
-            const radius = diameter / 2;
-            ripple.style.width = ripple.style.height = `${diameter}px`;
-            ripple.style.left = `${event.clientX - rect.left - radius}px`;
-            ripple.style.top = `${event.clientY - rect.top - radius}px`;
-            button.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 600);
-        }
-
-        function showNotification() {
-            const notification = document.getElementById('notification');
-            notification.textContent = notification.getAttribute(`data-${currentLanguage}`);
-            notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function flashSignInButton() {
-            const signInButton = document.getElementById('signInButton');
-            signInButton.classList.add('flash');
-            setTimeout(() => {
-                signInButton.classList.remove('flash');
-            }, 1000);
-        }
-
-        document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
-        document.querySelectorAll('.sidebar button').forEach(button => {
-            button.addEventListener('click', createRipple);
-        });
-
-        createStars();
-        updateLanguage();
-        changeTheme();
-        loadScripts();
-
-        window.handleTelegramCallback = handleTelegramCallback;
-    </script>
-</body>
-    </html>
+                if (filter
